@@ -92,6 +92,11 @@ class io.newgrounds.models.objects.SaveSlot extends io.newgrounds.models.BaseObj
 		this.___url = ___url;
 	}
 
+    public function hasData():Boolean
+    {
+        return this.url !== null;
+    }
+
     public function clear(callback:Function, thisArg:Object) 
     {
         if (!this.getCore()) {

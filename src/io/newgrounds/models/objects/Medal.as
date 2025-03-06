@@ -142,7 +142,19 @@ class io.newgrounds.models.objects.Medal extends io.newgrounds.models.BaseObject
             id: this.id
         });
 
-        this.getCore().executeComponent(component, callback, thisArg);
+        var callbackParams = {callback: callback, thisArg: thisArg};
+        this.getCore().executeComponent(component, onUnlock, this, callbackParams);
+    }
+
+    public function onUnlock(result:Object, callbackParams:Object):Void
+    {
+        if (result.success) {
+            this.unlocked = true;
+        }
+
+        if (callbackParams.callback !== undefined) {
+            callbackParams.callback.call(callbackParams.thisArg, result.medal);
+        }
     }
 
 }

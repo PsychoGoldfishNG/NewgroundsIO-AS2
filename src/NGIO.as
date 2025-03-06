@@ -32,6 +32,8 @@ class NGIO
     // the component library can use this to link the scoreboard popup
     public static var scoreBoardComponent:MovieClip = null;
 
+    public static var pingTimer:Number;
+
     /**
     * Initializes the Newgrounds.io API
     * @param app_id Your application's unique ID
@@ -203,6 +205,9 @@ class NGIO
                     if (session.remember) {
                         NGIO.core.saveSession();
                     }
+
+                    // let's run a timer in the background to keep the session alive
+                    NGIO.startPingTimer();
                 
                 // if we've flagged that passport is open, assume we're waiting for the user to finish logging in
                 } else if (NGIO.passport_open) {
@@ -252,6 +257,12 @@ class NGIO
             NGIO.core.executeComponent(component, callback, thisArg);
         }
         NGIO.core.clearSession();
+    }
+
+    public static function startPingTimer():Void
+    {
+        if (NGIO.pingTimer) clearInterval(NGIO.pingTimer);
+        NGIO.pingTimer = setInterval(NGIO.sendPing, 300000);
     }
 
     /**
@@ -745,38 +756,5 @@ class NGIO
 
         var component = new io.newgrounds.models.components.Loader.loadReferral({referral_name:referral_name});
         NGIO.core.executeComponent(component);
-    }
-
-    public static function unlockMedal(medal_id:Number, callback:Function, thisArg:Object):Void
-    {
-        if (!NGIO.checkCore()) return;
-
-        if (!NGIO.core.medals) {
-            throw new Error("Medals have not been loaded yet.  Call getMedals or loadAppData first.");
-            return;
-        }
-
-        if (thisArg === undefined) thisArg = {};
-
-        var medal = NGIO.getMedal(medal_id);
-        if (!medal) {
-            throw new Error("Medal ID "+medal_id+" not found.");
-            return;
-        }
-
-        if (medal.unlocked) {
-            if (NGIO.core.debug) trace("Medal "+medal_id+" is already unlocked.");
-            callback.call(thisArg, medal, false);
-            return;
-        } else {
-            if (NGIO.core.debug) trace("Unlocking medal "+medal_id);
-            var component = new io.newgrounds.models.components.Medal.unlock({id:medal_id});
-            NGIO.core.executeComponent(component, NGIO.onUnlockMedal, {}, {medal:medal, callback:callback, thisArg:thisArg});
-        }
-    }
-
-    public static function onUnlockMedal(result:Object, data:Object):Void
-    {
-        data.callback.call(data.thisArg, result.medal, result.success);
     }
 }
