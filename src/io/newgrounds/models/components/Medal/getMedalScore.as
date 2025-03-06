@@ -7,29 +7,18 @@ import io.newgrounds.models.BaseComponent;
 /**
  * Used to call the Medal.getMedalScore component.
  */
-class io.newgrounds.models.components.Medal.getMedalScore extends io.newgrounds.models.BaseComponent 
-{
+class io.newgrounds.models.components.Medal.getMedalScore extends io.newgrounds.models.BaseComponent {
 
 	/**
 	* Constructor 
 	*/
-	public function getMedalScore() 
-    {
+	public function getMedalScore() {
 		super();
-
 		this.__object = "Medal.getMedalScore";
-
 		this.__isSecure = false;
 		this.__requireSession = true;
 		this.__isRedirect = false;
-
 		this.__castTypes = {};
-
-
-
+		this.__arrayTypes = {};
 	}
-
-
-
 }
-

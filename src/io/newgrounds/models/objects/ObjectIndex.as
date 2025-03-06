@@ -2,264 +2,199 @@
 
 class io.newgrounds.models.objects.ObjectIndex {
 
-	
-	public static function CreateObject(name:String, json:Object)
-	{
+	public static function CreateObject(name:String, json:Object) {
 		switch (name.toLowerCase()) {
-			
 			case "request":
-				var new_Request = new io.newgrounds.models.objects.Request(json);
-				return new_Request;
-
+				return new io.newgrounds.models.objects.Request(json);
 
 			case "debug":
-				var new_Debug = new io.newgrounds.models.objects.Debug(json);
-				return new_Debug;
+				return new io.newgrounds.models.objects.Debug(json);
 
 			case "response":
-				var new_Response = new io.newgrounds.models.objects.Response(json);
-				return new_Response;
-
+				return new io.newgrounds.models.objects.Response(json);
 
 			case "error":
-				var new_Error = new io.newgrounds.models.objects.Error(json);
-				return new_Error;
+				return new io.newgrounds.models.objects.Error(json);
 
 			case "session":
-				var new_Session = new io.newgrounds.models.objects.Session(json);
-				return new_Session;
+				return new io.newgrounds.models.objects.Session(json);
 
 			case "user":
-				var new_User = new io.newgrounds.models.objects.User(json);
-				return new_User;
+				return new io.newgrounds.models.objects.User(json);
 
 			case "usericons":
-				var new_UserIcons = new io.newgrounds.models.objects.UserIcons(json);
-				return new_UserIcons;
+				return new io.newgrounds.models.objects.UserIcons(json);
 
 			case "medal":
-				var new_Medal = new io.newgrounds.models.objects.Medal(json);
-				return new_Medal;
+				return new io.newgrounds.models.objects.Medal(json);
 
 			case "scoreboard":
-				var new_ScoreBoard = new io.newgrounds.models.objects.ScoreBoard(json);
-				return new_ScoreBoard;
+				return new io.newgrounds.models.objects.ScoreBoard(json);
 
 			case "score":
-				var new_Score = new io.newgrounds.models.objects.Score(json);
-				return new_Score;
+				return new io.newgrounds.models.objects.Score(json);
 
 			case "saveslot":
-				var new_SaveSlot = new io.newgrounds.models.objects.SaveSlot(json);
-				return new_SaveSlot;
+				return new io.newgrounds.models.objects.SaveSlot(json);
+
 		}
 		return null;
 	}
 
-	public static function CreateComponent(name:String, json:Object)
-	{
+	public static function CreateComponent(name:String, json:Object) {
 		switch (name.toLowerCase()) {
-			
 			case "app.logview":
-				var new_App_logView = new io.newgrounds.models.components.App.logView(json);
-				return new_App_logView;
+				return new io.newgrounds.models.components.App.logView(json);
 
 			case "app.checksession":
-				var new_App_checkSession = new io.newgrounds.models.components.App.checkSession(json);
-				return new_App_checkSession;
+				return new io.newgrounds.models.components.App.checkSession(json);
 
 			case "app.gethostlicense":
-				var new_App_getHostLicense = new io.newgrounds.models.components.App.getHostLicense(json);
-				return new_App_getHostLicense;
+				return new io.newgrounds.models.components.App.getHostLicense(json);
 
 			case "app.getcurrentversion":
-				var new_App_getCurrentVersion = new io.newgrounds.models.components.App.getCurrentVersion(json);
-				return new_App_getCurrentVersion;
+				return new io.newgrounds.models.components.App.getCurrentVersion(json);
 
 			case "app.startsession":
-				var new_App_startSession = new io.newgrounds.models.components.App.startSession(json);
-				return new_App_startSession;
+				return new io.newgrounds.models.components.App.startSession(json);
 
 			case "app.endsession":
-				var new_App_endSession = new io.newgrounds.models.components.App.endSession(json);
-				return new_App_endSession;
+				return new io.newgrounds.models.components.App.endSession(json);
 
 			case "cloudsave.clearslot":
-				var new_CloudSave_clearSlot = new io.newgrounds.models.components.CloudSave.clearSlot(json);
-				return new_CloudSave_clearSlot;
+				return new io.newgrounds.models.components.CloudSave.clearSlot(json);
 
 			case "cloudsave.loadslot":
-				var new_CloudSave_loadSlot = new io.newgrounds.models.components.CloudSave.loadSlot(json);
-				return new_CloudSave_loadSlot;
+				return new io.newgrounds.models.components.CloudSave.loadSlot(json);
 
 			case "cloudsave.loadslots":
-				var new_CloudSave_loadSlots = new io.newgrounds.models.components.CloudSave.loadSlots(json);
-				return new_CloudSave_loadSlots;
+				return new io.newgrounds.models.components.CloudSave.loadSlots(json);
 
 			case "cloudsave.setdata":
-				var new_CloudSave_setData = new io.newgrounds.models.components.CloudSave.setData(json);
-				return new_CloudSave_setData;
+				return new io.newgrounds.models.components.CloudSave.setData(json);
 
 			case "event.logevent":
-				var new_Event_logEvent = new io.newgrounds.models.components.Event.logEvent(json);
-				return new_Event_logEvent;
+				return new io.newgrounds.models.components.Event.logEvent(json);
 
 			case "gateway.getversion":
-				var new_Gateway_getVersion = new io.newgrounds.models.components.Gateway.getVersion(json);
-				return new_Gateway_getVersion;
+				return new io.newgrounds.models.components.Gateway.getVersion(json);
 
 			case "gateway.getdatetime":
-				var new_Gateway_getDatetime = new io.newgrounds.models.components.Gateway.getDatetime(json);
-				return new_Gateway_getDatetime;
+				return new io.newgrounds.models.components.Gateway.getDatetime(json);
 
 			case "gateway.ping":
-				var new_Gateway_ping = new io.newgrounds.models.components.Gateway.ping(json);
-				return new_Gateway_ping;
+				return new io.newgrounds.models.components.Gateway.ping(json);
 
 			case "loader.loadofficialurl":
-				var new_Loader_loadOfficialUrl = new io.newgrounds.models.components.Loader.loadOfficialUrl(json);
-				return new_Loader_loadOfficialUrl;
+				return new io.newgrounds.models.components.Loader.loadOfficialUrl(json);
 
 			case "loader.loadauthorurl":
-				var new_Loader_loadAuthorUrl = new io.newgrounds.models.components.Loader.loadAuthorUrl(json);
-				return new_Loader_loadAuthorUrl;
+				return new io.newgrounds.models.components.Loader.loadAuthorUrl(json);
 
 			case "loader.loadreferral":
-				var new_Loader_loadReferral = new io.newgrounds.models.components.Loader.loadReferral(json);
-				return new_Loader_loadReferral;
+				return new io.newgrounds.models.components.Loader.loadReferral(json);
 
 			case "loader.loadmoregames":
-				var new_Loader_loadMoreGames = new io.newgrounds.models.components.Loader.loadMoreGames(json);
-				return new_Loader_loadMoreGames;
+				return new io.newgrounds.models.components.Loader.loadMoreGames(json);
 
 			case "loader.loadnewgrounds":
-				var new_Loader_loadNewgrounds = new io.newgrounds.models.components.Loader.loadNewgrounds(json);
-				return new_Loader_loadNewgrounds;
+				return new io.newgrounds.models.components.Loader.loadNewgrounds(json);
 
 			case "medal.getlist":
-				var new_Medal_getList = new io.newgrounds.models.components.Medal.getList(json);
-				return new_Medal_getList;
+				return new io.newgrounds.models.components.Medal.getList(json);
 
 			case "medal.getmedalscore":
-				var new_Medal_getMedalScore = new io.newgrounds.models.components.Medal.getMedalScore(json);
-				return new_Medal_getMedalScore;
+				return new io.newgrounds.models.components.Medal.getMedalScore(json);
 
 			case "medal.unlock":
-				var new_Medal_unlock = new io.newgrounds.models.components.Medal.unlock(json);
-				return new_Medal_unlock;
+				return new io.newgrounds.models.components.Medal.unlock(json);
 
 			case "scoreboard.getboards":
-				var new_ScoreBoard_getBoards = new io.newgrounds.models.components.ScoreBoard.getBoards(json);
-				return new_ScoreBoard_getBoards;
+				return new io.newgrounds.models.components.ScoreBoard.getBoards(json);
 
 			case "scoreboard.postscore":
-				var new_ScoreBoard_postScore = new io.newgrounds.models.components.ScoreBoard.postScore(json);
-				return new_ScoreBoard_postScore;
+				return new io.newgrounds.models.components.ScoreBoard.postScore(json);
 
 			case "scoreboard.getscores":
-				var new_ScoreBoard_getScores = new io.newgrounds.models.components.ScoreBoard.getScores(json);
-				return new_ScoreBoard_getScores;
+				return new io.newgrounds.models.components.ScoreBoard.getScores(json);
+
 		}
 		return null;
 	}
 
-	public static function CreateResult(name:String, json:Object)
-	{
+	public static function CreateResult(name:String, json:Object) {
 		switch (name.toLowerCase()) {
-			
 			case "app.checksession":
-				var new_App_checkSession = new io.newgrounds.models.results.App.checkSession(json);
-				return new_App_checkSession;
+				return new io.newgrounds.models.results.App.checkSession(json);
 
 			case "app.gethostlicense":
-				var new_App_getHostLicense = new io.newgrounds.models.results.App.getHostLicense(json);
-				return new_App_getHostLicense;
+				return new io.newgrounds.models.results.App.getHostLicense(json);
 
 			case "app.getcurrentversion":
-				var new_App_getCurrentVersion = new io.newgrounds.models.results.App.getCurrentVersion(json);
-				return new_App_getCurrentVersion;
+				return new io.newgrounds.models.results.App.getCurrentVersion(json);
 
 			case "app.startsession":
-				var new_App_startSession = new io.newgrounds.models.results.App.startSession(json);
-				return new_App_startSession;
+				return new io.newgrounds.models.results.App.startSession(json);
 
 			case "cloudsave.clearslot":
-				var new_CloudSave_clearSlot = new io.newgrounds.models.results.CloudSave.clearSlot(json);
-				return new_CloudSave_clearSlot;
+				return new io.newgrounds.models.results.CloudSave.clearSlot(json);
 
 			case "cloudsave.loadslot":
-				var new_CloudSave_loadSlot = new io.newgrounds.models.results.CloudSave.loadSlot(json);
-				return new_CloudSave_loadSlot;
+				return new io.newgrounds.models.results.CloudSave.loadSlot(json);
 
 			case "cloudsave.loadslots":
-				var new_CloudSave_loadSlots = new io.newgrounds.models.results.CloudSave.loadSlots(json);
-				return new_CloudSave_loadSlots;
+				return new io.newgrounds.models.results.CloudSave.loadSlots(json);
 
 			case "cloudsave.setdata":
-				var new_CloudSave_setData = new io.newgrounds.models.results.CloudSave.setData(json);
-				return new_CloudSave_setData;
+				return new io.newgrounds.models.results.CloudSave.setData(json);
 
 			case "event.logevent":
-				var new_Event_logEvent = new io.newgrounds.models.results.Event.logEvent(json);
-				return new_Event_logEvent;
+				return new io.newgrounds.models.results.Event.logEvent(json);
 
 			case "gateway.getversion":
-				var new_Gateway_getVersion = new io.newgrounds.models.results.Gateway.getVersion(json);
-				return new_Gateway_getVersion;
+				return new io.newgrounds.models.results.Gateway.getVersion(json);
 
 			case "gateway.getdatetime":
-				var new_Gateway_getDatetime = new io.newgrounds.models.results.Gateway.getDatetime(json);
-				return new_Gateway_getDatetime;
+				return new io.newgrounds.models.results.Gateway.getDatetime(json);
 
 			case "gateway.ping":
-				var new_Gateway_ping = new io.newgrounds.models.results.Gateway.ping(json);
-				return new_Gateway_ping;
+				return new io.newgrounds.models.results.Gateway.ping(json);
 
 			case "loader.loadofficialurl":
-				var new_Loader_loadOfficialUrl = new io.newgrounds.models.results.Loader.loadOfficialUrl(json);
-				return new_Loader_loadOfficialUrl;
+				return new io.newgrounds.models.results.Loader.loadOfficialUrl(json);
 
 			case "loader.loadauthorurl":
-				var new_Loader_loadAuthorUrl = new io.newgrounds.models.results.Loader.loadAuthorUrl(json);
-				return new_Loader_loadAuthorUrl;
+				return new io.newgrounds.models.results.Loader.loadAuthorUrl(json);
 
 			case "loader.loadreferral":
-				var new_Loader_loadReferral = new io.newgrounds.models.results.Loader.loadReferral(json);
-				return new_Loader_loadReferral;
+				return new io.newgrounds.models.results.Loader.loadReferral(json);
 
 			case "loader.loadmoregames":
-				var new_Loader_loadMoreGames = new io.newgrounds.models.results.Loader.loadMoreGames(json);
-				return new_Loader_loadMoreGames;
+				return new io.newgrounds.models.results.Loader.loadMoreGames(json);
 
 			case "loader.loadnewgrounds":
-				var new_Loader_loadNewgrounds = new io.newgrounds.models.results.Loader.loadNewgrounds(json);
-				return new_Loader_loadNewgrounds;
+				return new io.newgrounds.models.results.Loader.loadNewgrounds(json);
 
 			case "medal.getlist":
-				var new_Medal_getList = new io.newgrounds.models.results.Medal.getList(json);
-				return new_Medal_getList;
+				return new io.newgrounds.models.results.Medal.getList(json);
 
 			case "medal.getmedalscore":
-				var new_Medal_getMedalScore = new io.newgrounds.models.results.Medal.getMedalScore(json);
-				return new_Medal_getMedalScore;
+				return new io.newgrounds.models.results.Medal.getMedalScore(json);
 
 			case "medal.unlock":
-				var new_Medal_unlock = new io.newgrounds.models.results.Medal.unlock(json);
-				return new_Medal_unlock;
+				return new io.newgrounds.models.results.Medal.unlock(json);
 
 			case "scoreboard.getboards":
-				var new_ScoreBoard_getBoards = new io.newgrounds.models.results.ScoreBoard.getBoards(json);
-				return new_ScoreBoard_getBoards;
+				return new io.newgrounds.models.results.ScoreBoard.getBoards(json);
 
 			case "scoreboard.postscore":
-				var new_ScoreBoard_postScore = new io.newgrounds.models.results.ScoreBoard.postScore(json);
-				return new_ScoreBoard_postScore;
+				return new io.newgrounds.models.results.ScoreBoard.postScore(json);
 
 			case "scoreboard.getscores":
-				var new_ScoreBoard_getScores = new io.newgrounds.models.results.ScoreBoard.getScores(json);
-				return new_ScoreBoard_getScores;
+				return new io.newgrounds.models.results.ScoreBoard.getScores(json);
+
 		}
 		return null;
 	}
+
 }
-	

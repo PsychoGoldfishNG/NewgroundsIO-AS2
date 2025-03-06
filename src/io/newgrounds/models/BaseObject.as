@@ -81,12 +81,22 @@ class io.newgrounds.models.BaseObject {
     public function fillProperties(props:Object):Void
     {
         for (var key in props) {
+
+            // components will be expecting user ids, vs objects
+            if (key === 'user' && (this instanceof BaseComponent) && (props[key] instanceof io.newgrounds.models.objects.User)) {
+                props[key] = props[key].id;
+            }
+
             // ignore anything that isn't a property of this child class
             if (this.__properties.indexOf(key) != -1) {
-
                 // cast the value to the correct type
                 this.castValue(key, props[key]);
             }   
+        }
+
+        // if this object has a host property, and it's not present in the initial properties array, pull it from the core
+        if (this.__properties.indexOf('host') != -1 && props['host'] === undefined) {
+             this.castValue('host', io.newgrounds.core.getHost());
         }
     }
 
@@ -104,22 +114,26 @@ class io.newgrounds.models.BaseObject {
             // some properties can be arrays of a specific model
             if (this.__arrayTypes[propName] === true && value instanceof Array) {
 
+                var aValue;
+
                 // make a new array and populate it with cast values
                 var newArr = [];
                 for (var i = 0; i < value.length; i++) {
-                    newArr.push(this.castValue(propName, value[i]));
+                    aValue  = this.castValue(propName, value[i]);
+                    newArr.push(aValue);
                 }
                 value = newArr;
 
             // other properties need to be cast to a specific model
             } else if (this.__castTypes[propName] !== undefined && !(value instanceof this.__castTypes[propName])) {
                 value = new this.__castTypes[propName](value);
-
+                value.attachCore(this.getCore());
             }
         }
 
         // set the property and return the final value
         this[propName] = value;
+
         return value;
     }
 

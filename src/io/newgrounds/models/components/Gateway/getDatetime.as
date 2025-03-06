@@ -7,29 +7,18 @@ import io.newgrounds.models.BaseComponent;
 /**
  * Used to call the Gateway.getDatetime component.
  */
-class io.newgrounds.models.components.Gateway.getDatetime extends io.newgrounds.models.BaseComponent 
-{
+class io.newgrounds.models.components.Gateway.getDatetime extends io.newgrounds.models.BaseComponent {
 
 	/**
 	* Constructor 
 	*/
-	public function getDatetime() 
-    {
+	public function getDatetime() {
 		super();
-
 		this.__object = "Gateway.getDatetime";
-
 		this.__isSecure = false;
 		this.__requireSession = false;
 		this.__isRedirect = false;
-
 		this.__castTypes = {};
-
-
-
+		this.__arrayTypes = {};
 	}
-
-
-
 }
-

@@ -7,29 +7,18 @@ import io.newgrounds.models.BaseComponent;
 /**
  * Used to call the App.endSession component.
  */
-class io.newgrounds.models.components.App.endSession extends io.newgrounds.models.BaseComponent 
-{
+class io.newgrounds.models.components.App.endSession extends io.newgrounds.models.BaseComponent {
 
 	/**
 	* Constructor 
 	*/
-	public function endSession() 
-    {
+	public function endSession() {
 		super();
-
 		this.__object = "App.endSession";
-
 		this.__isSecure = false;
 		this.__requireSession = true;
 		this.__isRedirect = false;
-
 		this.__castTypes = {};
-
-
-
+		this.__arrayTypes = {};
 	}
-
-
-
 }
-

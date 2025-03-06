@@ -7,29 +7,18 @@ import io.newgrounds.models.BaseComponent;
 /**
  * Used to call the Gateway.ping component.
  */
-class io.newgrounds.models.components.Gateway.ping extends io.newgrounds.models.BaseComponent 
-{
+class io.newgrounds.models.components.Gateway.ping extends io.newgrounds.models.BaseComponent {
 
 	/**
 	* Constructor 
 	*/
-	public function ping() 
-    {
+	public function ping() {
 		super();
-
 		this.__object = "Gateway.ping";
-
 		this.__isSecure = false;
 		this.__requireSession = false;
 		this.__isRedirect = false;
-
 		this.__castTypes = {};
-
-
-
+		this.__arrayTypes = {};
 	}
-
-
-
 }
-

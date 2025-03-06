@@ -4,64 +4,56 @@
 import io.newgrounds.models.BaseObject;
 
 /**
-* Contains all the information needed to execute an API component.
-*/
+ * Contains all the information needed to execute an API component.
+ */
 class io.newgrounds.models.objects.Execute extends io.newgrounds.models.BaseObject {
-
 	private var ___component:String;
 	private var ___parameters;
 	private var ___secure:String;
 	private var ___echo:Object;
 
 	/**
-	* Constructor 
-	* @param props An object of initial properties for this instance
-	*/
-	public function Execute(props:Object)
-    {
+	 * Constructor 
+	 * @param props An object of initial properties for this instance
+	 */
+	public function Execute(props:Object) {
 		super();
-
 		this.__object = 'Execute';
 		this.__properties = this.__properties.concat(["component","parameters","secure","echo"]);
 		this.__required = ["component","secure"];
-
 		this.__castTypes = {};
 		this.__arrayTypes = {};
-
+		this.__arrayTypes.parameters = true;
 		this.fillProperties(props);
 
 			this.__componentObject = null;
 
 	}
-
 	/**
-    * The name of the component you want to call, ie 'App.connect'.
-    */
+	 * The name of the component you want to call, ie 'App.connect'.
+	 */
 	public function get component():String {
 		return this.___component;
 	}
 
-    /**
-    * @private
-    */
-	public function set component(___component:String)
-    {
-        this.___component = ___component;
-    }
-
 	/**
-    * An object of parameters you want to pass to the component.
-    */
+	 * @private
+	 */
+	public function set component(___component:String) {
+		this.___component = ___component;
+	}
+	/**
+	 * An object of parameters you want to pass to the component.
+	 */
 	public function get parameters() {
 		return this.___parameters;
 	}
 
-    /**
-    * @private
-    */
-	public function set parameters(___parameters)
-    {
-        if (___parameters instanceof Array) {
+	/**
+	 * @private
+	 */
+	public function set parameters(___parameters) {
+		if (___parameters instanceof Array) {
             var newArr = [];
             var val;
             for (var i=0; i<___parameters.length; i++) {
@@ -71,38 +63,33 @@ class io.newgrounds.models.objects.Execute extends io.newgrounds.models.BaseObje
         } else {
             this.___parameters = ___parameters;
         }
-    }
-
+	}
 	/**
-    * A an encrypted io.newgrounds.models.objects.Execute object or array of io.newgrounds.models.objects.Execute objects.
-    */
+	 * A an encrypted io.newgrounds.models.objects.Execute object or array of io.newgrounds.models.objects.Execute objects.
+	 */
 	public function get secure():String {
 		return this.___secure;
 	}
 
-    /**
-    * @private
-    */
-	public function set secure(___secure:String)
-    {
-        this.___secure = ___secure;
-    }
-
 	/**
-    * An optional value that will be returned, verbatim, in the result object.
-    */
+	 * @private
+	 */
+	public function set secure(___secure:String) {
+		this.___secure = ___secure;
+	}
+	/**
+	 * An optional value that will be returned, verbatim, in the result object.
+	 */
 	public function get echo():Object {
 		return this.___echo;
 	}
 
-    /**
-    * @private
-    */
-	public function set echo(___echo:Object)
-    {
-        this.___echo = ___echo;
-    }
-
+	/**
+	 * @private
+	 */
+	public function set echo(___echo:Object) {
+		this.___echo = ___echo;
+	}
 
     private var __componentObject:io.newgrounds.models.BaseComponent;
 

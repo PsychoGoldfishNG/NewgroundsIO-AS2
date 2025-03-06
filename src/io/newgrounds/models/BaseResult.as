@@ -40,11 +40,12 @@ class io.newgrounds.models.BaseResult extends io.newgrounds.models.BaseObject
         this._error = _error;
     }
 
-    public function castValue(propName, value):Void
+    public function castValue(propName, value)
     {
         if (propName === 'error') {
             value = new io.newgrounds.models.objects.Error(value);
+            value.attachCore(this.getCore());
         }
-        super.castValue(propName, value);
+        return super.castValue(propName, value);
     }
 }

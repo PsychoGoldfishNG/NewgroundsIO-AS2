@@ -7,41 +7,31 @@ import io.newgrounds.models.BaseResult;
 /**
  * Returned when App.startSession component is called
  */
-class io.newgrounds.models.results.App.startSession extends io.newgrounds.models.BaseResult 
-{
-    private var ___session:io.newgrounds.models.objects.Session;
+class io.newgrounds.models.results.App.startSession extends io.newgrounds.models.BaseResult {
+	private var ___session:io.newgrounds.models.objects.Session;
 
 	/**
 	* Constructor 
 	 * @param props An object of initial properties for this instance
 	*/
-	public function startSession(props:Object) 
-    {
+	public function startSession(props:Object) {
 		super();
-
 		this.__object = "App.startSession";
 		this.__properties = this.__properties.concat(["session"]);
-
-				this.__castTypes = {};
-
+		this.__castTypes = {};
+		this.__arrayTypes = {};
 		this.__castTypes.session = io.newgrounds.models.objects.Session;
-
 		this.fillProperties(props);
-
 	}
-
 
 	public function get session():io.newgrounds.models.objects.Session {
 		return this.___session;
 	}
 
-    /**
-    * @private
-    */
-	public function set session(___session:io.newgrounds.models.objects.Session)
-    {
-        this.___session = ___session;
-    }
-
-
+	/**
+	* @private
+	*/
+	public function set session(___session:io.newgrounds.models.objects.Session) {
+		this.___session = ___session;
+	}
 }

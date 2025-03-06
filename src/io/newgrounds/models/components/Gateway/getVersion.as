@@ -7,29 +7,18 @@ import io.newgrounds.models.BaseComponent;
 /**
  * Used to call the Gateway.getVersion component.
  */
-class io.newgrounds.models.components.Gateway.getVersion extends io.newgrounds.models.BaseComponent 
-{
+class io.newgrounds.models.components.Gateway.getVersion extends io.newgrounds.models.BaseComponent {
 
 	/**
 	* Constructor 
 	*/
-	public function getVersion() 
-    {
+	public function getVersion() {
 		super();
-
 		this.__object = "Gateway.getVersion";
-
 		this.__isSecure = false;
 		this.__requireSession = false;
 		this.__isRedirect = false;
-
 		this.__castTypes = {};
-
-
-
+		this.__arrayTypes = {};
 	}
-
-
-
 }
-

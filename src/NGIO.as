@@ -24,7 +24,13 @@ class NGIO
     public static var session_cache:Number = -1;
     public static var session_cache_timeout:Number = 3000;
     public static var passport_open:Boolean = false;
-    public static var passport_url:String = null;
+    public static var localVersion:String = null;
+
+    // the component library can use this to link the medal popup
+    public static var medalPopup:MovieClip = null;
+
+    // the component library can use this to link the scoreboard popup
+    public static var scoreBoardComponent:MovieClip = null;
 
     /**
     * Initializes the Newgrounds.io API
@@ -32,10 +38,64 @@ class NGIO
     * @param encryption_key Your application's encryption key
     * @param debug Whether or not to enable debug mode
     */
-    public static function init(app_id:String, encryption_key:String, debug:Boolean):Void
+    public static function init(app_id:String, encryption_key:String, localVersion:String, debug:Boolean):Void
     {
         if (debug !== true) debug = false;
+        NGIO.localVersion = localVersion ? localVersion : null;
         NGIO.core = new io.newgrounds.core(app_id, encryption_key, debug);
+        NGIO.core.executeComponent(new io.newgrounds.models.components.App.logView());
+    }
+
+    /**
+    * Checks if the core object has been initialized
+    * @return Boolean Whether or not the core object has been initialized
+    */
+    private static function checkCore():Boolean
+    {
+        if (!NGIO.core) {
+            throw new Error("You must call NGIO.init before using any other NGIO functions.");
+            return false;
+        }
+        return true;
+    }
+
+    /**
+    * Checks if a session has been started
+    * @return Boolean Whether or not a session has been started
+    */
+    public static function hasSession():Boolean
+    {
+        if (!NGIO.checkCore()) return false;
+
+        if (!NGIO.core.session) {
+            trace("You must call NGIO.checkSession before using any other NGIO functions.");
+            return false;
+        }
+        return true;
+    }
+
+    /**
+    * Checks if a user has been loaded
+    * @return Boolean Whether or not a user has been loaded
+    */
+    public static function hasUser():Boolean
+    {
+        if (!NGIO.hasSession) return false;
+
+        return NGIO.core.session.user ? true : false;
+    }
+
+    /**
+    * Opens the Newgrounds.io passport in a new window
+    */
+    public static function openPassport():Void
+    {
+        if (NGIO.core.session.passport_url) {
+            NGIO.passport_open = true;
+            getURL(NGIO.core.session.passport_url, "_blank");
+        } else {
+            trace("You need to run a checkSession call before opening passport.");
+        }
     }
 
     /**
@@ -67,7 +127,12 @@ class NGIO
         NGIO.session_cache = (new Date()).getTime();
 
         // If we're not in a cached state, we'll make a server call to check the session
-        var component = new io.newgrounds.models.components.App.checkSession();
+        var component;
+        if (NGIO.core.session && NGIO.core.session.id) {
+            component = new io.newgrounds.models.components.App.checkSession();
+        } else {
+            component = new io.newgrounds.models.components.App.startSession();
+        }
         NGIO.core.executeComponent(component, NGIO.onCheckSession, {}, {callback:callback, thisArg:thisArg});
     }
 
@@ -161,7 +226,7 @@ class NGIO
     }
 
     /**
-    * Starts a new session.  This is private to prevent users from creating sessions without checking them first.
+    * Starts a new session.
     *
     * @param callback A function to call when the session is started. The callback will receive a response object with the following properties:
     * - status: A string representing the current status of the session
@@ -169,10 +234,549 @@ class NGIO
     * - error: An Error object if there was a problem starting the session
     * @param thisArg The scope to call the callback in
     */
-    private static function startSession(callback:Function, thisArg:Object):Void
+    public static function startSession(callback:Function, thisArg:Object):Void
     {
         // send a startSession component, but handle it the same as a checkSession call
         var component = new io.newgrounds.models.components.App.startSession();
         NGIO.core.executeComponent(component, NGIO.onCheckSession, {}, {callback:callback, thisArg:thisArg});
+    }
+
+    public static function endSession(callback:Function, thisArg:Object):Void
+    {
+        if (!NGIO.checkCore()) return;
+
+        NGIO.session_cache = -1;
+
+        if (NGIO.core.session && NGIO.core.session.id) {
+            var component = new io.newgrounds.models.components.App.endSession();
+            NGIO.core.executeComponent(component, callback, thisArg);
+        }
+        NGIO.core.clearSession();
+    }
+
+    /**
+    * Loads all the data and objects associated with the app from the server.
+    * This includes the most recent version available, whether this host is licensed to use the app,
+    * the list of medals you can unlock, the list of available scoreboards, and the list of cloudsave slots.
+    *
+    * @param config An array of strings representing the data to load.  Valid values are: 'currentVersion', 'hostApproved', 'saveSlots', 'medals', 'scoreboards'
+    * @param callback A function to call when the data load is complete. The callback will receive a response object with the loaded data.
+    * @param thisArg The scope to call the callback in
+    */
+    public static function loadAppData(config:Array, callback:Function, thisArg:Object):Void
+    {
+        if ((!config instanceof Array) || config.length < 1) return;
+
+        if (!NGIO.checkCore()) return;
+
+        var component, objectName;
+
+        for (var i = 0; i < config.length; i++) {
+            
+            component = null;
+
+            switch(config[i].toLowerCase()) {
+            
+                case 'currentversion':
+                    component = new io.newgrounds.models.components.App.getCurrentVersion({version:NGIO.localVersion});                    
+                    break;
+
+                case 'hostapproved':
+                    component = new io.newgrounds.models.components.App.getHostLicense();
+                    break;
+
+                case 'saveslots':
+                    component = new io.newgrounds.models.components.CloudSave.loadSlots();
+                    break;
+
+                case 'medals':
+                    component = new io.newgrounds.models.components.Medal.getList();
+                    break;
+
+                case 'medalscore':
+                    component = new io.newgrounds.models.components.Medal.getMedalScore();
+                    break;
+
+                case 'scoreboards':
+                    component = new io.newgrounds.models.components.ScoreBoard.getBoards();
+                    break;
+            }
+
+            if (component) NGIO.core.queueComponent(component);
+        }
+
+        if (NGIO.core.hasQueuedComponents()) {
+            NGIO.core.executeQueue(NGIO.onLoadAppData, {}, {callback:callback, thisArg:thisArg});
+        } else {
+            var response = {success:false, error:{message:"Invalid config, no data will be loaded."}};
+            NGIO.onLoadAppData(response, {callback:callback, thisArg:thisArg});
+        }
+    }
+
+    /**
+    * Handles the result of an app data load
+    * @param result The result of the app data load
+    * @param data The data object passed to the loadAppData call (contains the callback and thisArg passed to loadAppData)
+    */
+    public static function onLoadAppData(results:Array, data:Object):Void
+    {
+        var response = {};
+
+        var success = false;
+        
+        if (results instanceof Array) {
+            for (var i = 0; i < results.length; i++) {
+                var result = results[i];
+                
+                switch(result.getObjectName()) {
+                    case "App.getCurrentVersion":
+                        response.currentVersion = result.current_version;
+                        response.clientDeprecated = result.client_deprecated;
+                        success = true;
+                        break;
+                    case "App.getHostLicense":
+                        response.hostApproved = result.host_approved;
+                        success = true;
+                        break;
+                    case "CloudSave.loadSlots":
+                        response.saveSlots = result.slots;
+                        success = true;
+                        break;
+                    case "Medal.getList":
+                        response.medals = result.medals;
+                        success = true;
+                        break;
+                    case "Medal.getMedalScore":
+                        response.medals = result.medal_score;
+                        success = true;
+                        break;
+                    case "ScoreBoard.getBoards":
+                        response.scoreBoards = result.scoreboards;
+                        success = true;
+                        break;
+                }
+            }
+        }
+
+        response.success = success;
+
+        if (!success) {
+            response.error = results.error && results.error.message ? results.error.message : "There was a problem loading the app data.";
+            trace("NGIO.loadAppData: " + response.error);
+        }
+
+        if (data.callback) {
+            if (data.thisArg) {
+                data.callback.call(data.thisArg, response);
+            } else {
+                data.callback(response);
+            }
+        }
+    }
+
+    /**
+    * Gets the user associated with the current session, or null if no user is loaded
+    * @return User The user object associated with the current session, or null if no user has been loaded
+    */
+    public static function getUser():io.newgrounds.models.objects.User
+    {
+        return NGIO.hasUser() ? NGIO.core.session.user : null;
+    }
+
+    /**
+    * Gets the latest available version number (in x.y.z format) of this app, returns a string result to the provided callback
+    * @param callback A function to call when the version number is retrieved
+    * @param thisArg The scope to call the callback in
+    */
+    public static function getCurrentVersion(callback:Function, thisArg:Object):Void
+    {
+        if (!NGIO.checkCore()) return;
+
+        if (typeof(callback) !== "function") throw new Error("getCurrentVersion requires a callback function");
+        if (typeof thisArg === "undefined") thisArg = {};
+
+        if (NGIO.core.currentVersion !== null) {
+            NGIO.onGetCurrentVersion({}, {callback:callback, thisArg:thisArg});
+        } else {
+            var component = new io.newgrounds.models.components.App.getCurrentVersion();
+            NGIO.core.executeComponent(component, NGIO.onGetCurrentVersion, {}, {callback:callback, thisArg:thisArg});
+        }
+    }
+
+    /**
+    * Handles the result of a getCurrentVersion call
+    * @param result The result of the getCurrentVersion call
+    * @param data The data object passed to the getCurrentVersion call (contains the callback and thisArg parameters)
+    */
+    public static function onGetCurrentVersion(result:Object, data:Object):Void
+    {
+        // the actual version number will get cached in the core object, so we'll extract from there and ignore the result object
+        data.callback.call(data.thisArg, NGIO.core.currentVersion);
+    }
+
+    /**
+    * Checks if this version of the app client is deprecated, returns a boolean result to the provided callback
+    * @param callback A function to call when the version number is retrieved
+    * @param thisArg The scope to call the callback in
+    */
+    public static function getClientDeprecated(callback:Function, thisArg:Object):Void
+    {
+        if (!NGIO.checkCore()) return;
+
+        if (typeof(callback) !== "function") throw new Error("getClientDeprecated requires a callback function");
+        if (typeof thisArg === "undefined") thisArg = {};
+        
+        if (NGIO.core.clientDeprecated !== null) {
+            NGIO.onGetClientDeprecated({}, {callback:callback, thisArg:thisArg});
+        } else {
+            var component = new io.newgrounds.models.components.App.getCurrentVersion();
+            NGIO.core.executeComponent(component, NGIO.onGetClientDeprecated, {}, {callback:callback, thisArg:thisArg});
+        }
+    }
+
+    /**
+    * Handles the result of a getClientDeprecated call
+    * @param result The result of the getClientDeprecated call
+    * @param data The data object passed to the getClientDeprecated call (contains the callback and thisArg parameters)
+    */
+    public static function onGetClientDeprecated(result:Object, data:Object):Void
+    {
+        // the actual deprecation value will get cached in the core object, so we'll extract from there and ignore the result object
+        data.callback.call(data.thisArg, NGIO.core.clientDeprecated);
+    }
+
+    /**
+    * Checks if this host is licensed to use this app, returns a boolean result to the provided callback
+    * @param callback A function to call when the version number is retrieved
+    * @param thisArg The scope to call the callback in
+    */
+    public static function getHostApproved(callback:Function, thisArg:Object):Void
+    {
+        if (!NGIO.checkCore()) return;
+
+        if (typeof(callback) !== "function") throw new Error("getHostApproved requires a callback function");
+        if (typeof thisArg === "undefined") thisArg = {};
+
+        if (NGIO.core.hostApproved !== null) {
+            NGIO.onGetHostApproved({}, {callback:callback, thisArg:thisArg});
+        } else {
+            var component = new io.newgrounds.models.components.App.getHostLicense();
+            NGIO.core.executeComponent(component, NGIO.onGetHostApproved, {}, {callback:callback, thisArg:thisArg});
+        }
+    }
+
+    /**
+    * Handles the result of a getHostApproved call
+    * @param result The result of the getHostApproved call
+    * @param data The data object passed to the getHostApproved call (contains the callback and thisArg parameters)
+    */
+    public static function onGetHostApproved(result:Object, data:Object):Void
+    {
+        // the actual approved value will get cached in the core object, so we'll extract from there and ignore the result object
+        data.callback.call(data.thisArg, NGIO.core.hostApproved);
+    }
+
+    /**
+    * Gets the list of medals available for this app, returns an array of Medal objects to the provided callback
+    * @param callback A function to call when the medal list retrieved
+    * @param thisArg The scope to call the callback in
+    * @param refresh Whether or not to force a refresh of the medals list
+    */
+    public static function getMedals(callback:Function, thisArg:Object, refresh:Boolean):Void
+    {
+        if (!NGIO.checkCore()) return;
+
+        if (typeof(callback) !== "function") throw new Error("getMedals requires a callback function");
+        if (typeof thisArg === "undefined") thisArg = {};
+
+        if (NGIO.core.medals !== null && refresh !== true) {
+            NGIO.onGetMedals({}, {callback:callback, thisArg:thisArg});
+        } else {
+            var component = new io.newgrounds.models.components.Medal.getList();
+            NGIO.core.executeComponent(component, NGIO.onGetMedals, {}, {callback:callback, thisArg:thisArg});
+        }
+    }
+
+    /**
+    * Handles the result of a getMedals call
+    * @param result The result of the getMedals call
+    * @param data The data object passed to the getMedals call (contains the callback and thisArg parameters)
+    */
+    public static function onGetMedals(result:Object, data:Object):Void
+    {
+        // the actual medal list will get cached in the core object, so we'll extract from there and ignore the result object
+        data.callback.call(data.thisArg, NGIO.core.medals);
+    }
+
+    /**
+    * Gets the user's current medal score.
+    * @param callback A function to call when the medal score is retrieved
+    * @param thisArg The scope to call the callback in
+    * @param refresh Whether or not to force a refresh of the medal score
+    */
+    public static function getMedalScore(callback:Function, thisArg:Object, refresh:Boolean):Void
+    {
+        if (!NGIO.checkCore()) return;
+
+        if (typeof(callback) !== "function") throw new Error("getMedalScore requires a callback function");
+        if (typeof thisArg === "undefined") thisArg = {};
+
+        if (NGIO.core.medalScore !== null && refresh !== true) {
+            NGIO.onGetMedalScore({}, {callback:callback, thisArg:thisArg});
+        } else {
+            var component = new io.newgrounds.models.components.Medal.getMedalScore();
+            NGIO.core.executeComponent(component, NGIO.onGetMedalScore, {}, {callback:callback, thisArg:thisArg});
+        }
+    }
+
+    /**
+    * Handles the result of a getMedalScore call
+    * @param result The result of the getMedalScore call
+    * @param data The data object passed to the getMedalScore call (contains the callback and thisArg parameters)
+    */
+    public static function onGetMedalScore(result:Object, data:Object):Void
+    {
+        // the actual medal score will get cached in the core object, so we'll extract from there and ignore the result object
+        data.callback.call(data.thisArg, NGIO.core.medalScore ? NGIO.core.medalScore : 0);
+    }
+
+    /**
+    * Gets the list of cloud save slots available for this app, returns an array of CloudSaveSlot objects to the provided callback
+    * @param callback A function to call when the list of save slots is retrieved
+    * @param thisArg The scope to call the callback in
+    * @param refresh Whether or not to force a refresh of the save slots list
+    */
+    public static function getSaveSlots(callback:Function, thisArg:Object, refresh:Boolean):Void
+    {
+        if (!NGIO.checkCore()) return;
+
+        if (typeof(callback) !== "function") throw new Error("getSaveSlots requires a callback function");
+        if (typeof thisArg === "undefined") thisArg = {};
+
+        if (NGIO.core.saveSlots !== null && refresh !== true) {
+            NGIO.onGetSaveSlots({}, {callback:callback, thisArg:thisArg});
+        } else {
+            var component = new io.newgrounds.models.components.CloudSave.loadSlots();
+            NGIO.core.executeComponent(component, NGIO.onGetSaveSlots, {}, {callback:callback, thisArg:thisArg});
+        }
+    }
+
+    /**
+    * Handles the result of a getSaveSlots call
+    * @param result The result of the getSaveSlots call
+    * @param data The data object passed to the getSaveSlots call (contains the callback and thisArg parameters)
+    */
+    public static function onGetSaveSlots(result:Object, data:Object):Void
+    {
+        // the actual save slot list will get cached in the core object, so we'll extract from there and ignore the result object
+        data.callback.call(data.thisArg, NGIO.core.saveSlots);
+    }
+
+    /**
+    * Gets a specific save slot by ID
+    * @param id The ID of the save slot to retrieve
+    * @return SaveSlot The save slot object with the provided ID
+    */
+    public static function getSaveSlot(id:Number) {
+
+        if (!NGIO.checkCore()) return;
+
+        var saveSlots = NGIO.core.saveSlots;
+
+        if (!saveSlots) {
+            throw new Error("Save slots have not been loaded yet.  Call getSaveSlots or loadAppData first.");
+        }
+
+        for (var i = 0; i < saveSlots.length; i++) {
+            if (saveSlots[i].id === id) {
+                return saveSlots[i];
+            }
+        }
+
+        return null;
+    }
+
+    /**
+    * Gets a specific medal by ID
+    * @param id The ID of the medal to retrieve
+    * @return Medal The medal object with the provided ID
+    */
+    public static function getMedal(id:Number) {
+
+        if (!NGIO.checkCore()) return;
+
+        var medals = NGIO.core.medals;
+
+        if (!medals) {
+            throw new Error("Medals have not been loaded yet.  Call getMedals or loadAppData first.");
+        }
+
+        for (var i = 0; i < medals.length; i++) {
+            if (medals[i].id === id) {
+                return medals[i];
+            }
+        }
+
+        return null;
+    }
+
+    /**
+    * Gets the list of scoreboards available for this app, returns an array of ScoreBoard objects to the provided callback
+    * @param callback A function to call when the version number is retrieved
+    * @param thisArg The scope to call the callback in
+    */
+    public static function getScoreBoards(callback:Function, thisArg:Object):Void
+    {
+        if (!NGIO.checkCore()) return;
+
+        if (typeof(callback) !== "function") throw new Error("getScoreBoards requires a callback function");
+        if (typeof thisArg === "undefined") thisArg = {};
+
+        if (NGIO.core.scoreBoards !== null) {
+            NGIO.onGetScoreBoards({}, {callback:callback, thisArg:thisArg});
+        } else {
+            var component = new io.newgrounds.models.components.ScoreBoard.getBoards();
+            NGIO.core.executeComponent(component, NGIO.onGetScoreBoards, {}, {callback:callback, thisArg:thisArg});
+        }
+    }
+
+    /**
+    * Handles the result of a getScoreBoards call
+    * @param result The result of the getScoreBoards call
+    * @param data The data object passed to the getScoreBoards call (contains the callback and thisArg parameters)
+    */
+    public static function onGetScoreBoards(result:Object, data:Object):Void
+    {
+        // the actual version number will get cached in the core object, so we'll extract from there and ignore the result object
+        data.callback.call(data.thisArg, NGIO.core.scoreBoards);
+    }
+
+    /**
+    * Gets a specific scoreboard by ID
+    * @param id The ID of the scoreboard to retrieve
+    * @return ScoreBoard The scoreboard object with the provided ID
+    */
+    public static function getScoreBoard(id:Number) {
+
+        if (!NGIO.checkCore()) return;
+
+        var scoreBoards = NGIO.core.scoreBoards;
+
+        if (!scoreBoards) {
+            throw new Error("Scoreboards have not been loaded yet.  Call getScoreBoards or loadAppData first.");
+        }
+
+        for (var i = 0; i < scoreBoards.length; i++) {
+            if (scoreBoards[i].id === id) {
+                return scoreBoards[i];
+            }
+        }
+
+        return null;
+    }
+
+    public static function logEvent(event_name:String, callback:Function, thisArg:Object):Void
+    {
+        if (!NGIO.checkCore()) return;
+
+        var component = new io.newgrounds.models.components.Event.logEvent({event_name:event_name});
+        NGIO.core.executeComponent(component, callback, thisArg);
+    }
+
+    public static function getGatewayDateTime(callback:Function, thisArg:Object):Void
+    {
+        if (!NGIO.checkCore()) return;
+
+        var component = new io.newgrounds.models.components.Gateway.getDatetime();
+        NGIO.core.executeComponent(component, callback, thisArg);
+    }
+
+    public static function getGatewayVersion(callback:Function, thisArg:Object):Void
+    {
+        if (!NGIO.checkCore()) return;
+
+        var component = new io.newgrounds.models.components.Gateway.getVersion();
+        NGIO.core.executeComponent(component, callback, thisArg);
+    }
+
+    public static function sendPing(callback:Function, thisArg:Object):Void
+    {
+        if (!NGIO.checkCore()) return;
+
+        var component = new io.newgrounds.models.components.Gateway.ping();
+        NGIO.core.executeComponent(component, callback, thisArg);
+    }
+
+    public static function loadAuthorUrl():Void
+    {
+        if (!NGIO.checkCore()) return;
+
+        var component = new io.newgrounds.models.components.Loader.loadAuthorUrl();
+        NGIO.core.executeComponent(component);
+    }
+
+    public static function loadMoreGames():Void
+    {
+        if (!NGIO.checkCore()) return;
+
+        var component = new io.newgrounds.models.components.Loader.loadMoreGames();
+        NGIO.core.executeComponent(component);
+    }
+
+    public static function loadNewgrounds():Void
+    {
+        if (!NGIO.checkCore()) return;
+
+        var component = new io.newgrounds.models.components.Loader.loadNewgrounds();
+        NGIO.core.executeComponent(component);
+    }
+
+    public static function loadOfficialUrl():Void
+    {
+        if (!NGIO.checkCore()) return;
+
+        var component = new io.newgrounds.models.components.Loader.loadOfficialUrl();
+        NGIO.core.executeComponent(component);
+    }
+
+    public static function loadReferral(referral_name:String):Void
+    {
+        if (!NGIO.checkCore()) return;
+
+        var component = new io.newgrounds.models.components.Loader.loadReferral({referral_name:referral_name});
+        NGIO.core.executeComponent(component);
+    }
+
+    public static function unlockMedal(medal_id:Number, callback:Function, thisArg:Object):Void
+    {
+        if (!NGIO.checkCore()) return;
+
+        if (!NGIO.core.medals) {
+            throw new Error("Medals have not been loaded yet.  Call getMedals or loadAppData first.");
+            return;
+        }
+
+        if (thisArg === undefined) thisArg = {};
+
+        var medal = NGIO.getMedal(medal_id);
+        if (!medal) {
+            throw new Error("Medal ID "+medal_id+" not found.");
+            return;
+        }
+
+        if (medal.unlocked) {
+            if (NGIO.core.debug) trace("Medal "+medal_id+" is already unlocked.");
+            callback.call(thisArg, medal, false);
+            return;
+        } else {
+            if (NGIO.core.debug) trace("Unlocking medal "+medal_id);
+            var component = new io.newgrounds.models.components.Medal.unlock({id:medal_id});
+            NGIO.core.executeComponent(component, NGIO.onUnlockMedal, {}, {medal:medal, callback:callback, thisArg:thisArg});
+        }
+    }
+
+    public static function onUnlockMedal(result:Object, data:Object):Void
+    {
+        data.callback.call(data.thisArg, result.medal, result.success);
     }
 }

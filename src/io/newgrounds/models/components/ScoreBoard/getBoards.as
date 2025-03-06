@@ -7,29 +7,18 @@ import io.newgrounds.models.BaseComponent;
 /**
  * Used to call the ScoreBoard.getBoards component.
  */
-class io.newgrounds.models.components.ScoreBoard.getBoards extends io.newgrounds.models.BaseComponent 
-{
+class io.newgrounds.models.components.ScoreBoard.getBoards extends io.newgrounds.models.BaseComponent {
 
 	/**
 	* Constructor 
 	*/
-	public function getBoards() 
-    {
+	public function getBoards() {
 		super();
-
 		this.__object = "ScoreBoard.getBoards";
-
 		this.__isSecure = false;
 		this.__requireSession = false;
 		this.__isRedirect = false;
-
 		this.__castTypes = {};
-
-
-
+		this.__arrayTypes = {};
 	}
-
-
-
 }
-
