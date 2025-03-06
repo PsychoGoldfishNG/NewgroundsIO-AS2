@@ -43,7 +43,7 @@ You can copy and paste this into the first frame of your movie if you want to us
 
 Once the component is on your stage, select it, and find the component parameters tab.
 
-![In Older Versions of Flash, the parameters tab is at the bottom of the screen.](help_component_params_newer.png)
+![In Older Versions of Flash, the parameters tab is at the bottom of the screen.](help_component_params_older.png)
 
 ![In Newer Versions of Flash, it's a sub-menu in the Properties tab on the right side of the screen](help_component_params_newer.png)
 
