@@ -2,7 +2,7 @@
 
 This is a library of ActionScript 2.0 classes for interactng with the [Newgrounds.IO API](https://www.newgrounds.io).
 
-# Installation
+## Installation
 
 **Step 1:** [Download the ActionScript library](/PsychoGoldfishNG/NewgroundsIO-AS2/blob/main/src/NGIO.zip)
 
