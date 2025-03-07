@@ -328,7 +328,7 @@ If you are using any custom events, or want to track how much traffic your app i
     // track a custom referral
     NGIO.loadReferral(referral_name);
 
-# Advanced Use
+## Advanced Use
 While the components and NGIO class are all most people will ever need, advanced users can do anything the API is capable of doing.
 
 One case that comes to mind is looking up medals from another game to grant bonus content in say, a sequel.
