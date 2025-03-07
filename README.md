@@ -1,4 +1,3 @@
-
 # NewgroundsIO-AS2
 
 This is a library of ActionScript 2.0 classes for interactng with the [Newgrounds.IO API](https://www.newgrounds.io).
@@ -217,6 +216,10 @@ In both cases, we use a function to handle the loaded value.  This is because we
 You will also notice, after the function, we have the word 'this'.  In ActionScript, when a function is called directly, it uses the context of whatever object, movieclip, class, etc it was called in as 'this'.  However, if a function is executed using function.call, you can pass an argument telling it what object to use as the 'this' context within the function.
 
 If you used the code as I have it written on a MovieClip keyframe, you could use `this.play();` inside of the function, 'this' would refer to the MovieClip which would then play as expected.
+
+Finally, if you want to delete a save slot, use the following:
+
+    slot.clear();
 
 ### Checking a Medal's Status
 
