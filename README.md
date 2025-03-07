@@ -270,7 +270,7 @@ If you want to load scores outside of the Newgrounds.IO ScoreBoard components, y
 
     // first you need to set up your filter object
     
-    // If you want to get a general list of teh best users....
+    // If you want to get a general list of the best users....
     var filters = {
 	    period: 'D', // this can be D,W,M,Y or A
 	    social: false, // set to true if you only want to load the user's friends
