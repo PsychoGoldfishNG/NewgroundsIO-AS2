@@ -19,7 +19,7 @@ Hard Disk\Documents and Settings\user\Local Settings\Application Data\Adobe\Adob
 * **Mac**: 
 Hard Disk/Users/user/Library/Application Support/Adobe/Adobe Flash CS3/language/Configuration/Classes
 
-*(replace Adove Flash CS3 with whatever version of Flash you have installed)*
+*(replace Adobe Flash CS3 with whatever version of Flash you have installed)*
 
 To add a new class path, go into Edit->Preferences->ActionScript and press the AcrionScript 2.0 Settings button.  Hit the + button to add a new row, then the crosshair button to set the actual path.
 
