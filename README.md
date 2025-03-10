@@ -1,9 +1,8 @@
-
 # NewgroundsIO-AS2
 
 This is a library of ActionScript 2.0 classes for interactng with the [Newgrounds.IO API](https://www.newgrounds.io).
 
-# Installation
+## Installation
 
 **Step 1:** [Download the ActionScript library](/PsychoGoldfishNG/NewgroundsIO-AS2/blob/main/NGIO.zip)
 
@@ -18,6 +17,8 @@ Global class paths can be found at:
 Hard Disk\Documents and Settings\user\Local Settings\Application Data\Adobe\Adobe Flash CS3\language\Configuration\Classes.
 * **Mac**: 
 Hard Disk/Users/user/Library/Application Support/Adobe/Adobe Flash CS3/language/Configuration/Classes
+
+*(replace Adobe Flash CS3 with whatever version of Flash you have installed)*
 
 To add a new class path, go into Edit->Preferences->ActionScript and press the AcrionScript 2.0 Settings button.  Hit the + button to add a new row, then the crosshair button to set the actual path.
 
@@ -247,6 +248,10 @@ You will also notice, after the function, we have the word 'this'.  In ActionScr
 
 If you used the code as I have it written on a MovieClip keyframe, you could use `this.play();` inside of the function, 'this' would refer to the MovieClip which would then play as expected.
 
+Finally, if you want to delete a save slot, use the following:
+
+    slot.clear();
+
 ### Checking a Medal's Status
 
 You can check the status of any loaded medal like so:
@@ -301,7 +306,7 @@ If you want to load scores outside of the Newgrounds.IO ScoreBoard components, y
 
     // first you need to set up your filter object
     
-    // If you want to get a general list of teh best users....
+    // If you want to get a general list of the best users....
     var filters = {
 	    period: 'D', // this can be D,W,M,Y or A
 	    social: false, // set to true if you only want to load the user's friends
@@ -354,7 +359,7 @@ If you are using any custom events, or want to track how much traffic your app i
     // track a custom referral
     NGIO.loadReferral(referral_name);
 
-# Advanced Use
+## Advanced Use
 While the components and NGIO class are all most people will ever need, advanced users can do anything the API is capable of doing.
 
 One case that comes to mind is looking up medals from another game to grant bonus content in say, a sequel.
