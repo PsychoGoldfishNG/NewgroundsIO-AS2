@@ -447,3 +447,4 @@ If you want to execute multiple components in a single call, you can use the com
         this
     );
     
+This library will automatically fill the 'host' property of components that reuire one.
