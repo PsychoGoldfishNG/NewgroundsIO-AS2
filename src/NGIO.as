@@ -32,7 +32,13 @@ class NGIO
     // the component library can use this to link the scoreboard popup
     public static var scoreBoardComponent:MovieClip = null;
 
+    // this will be used as an interval timer for keeping sessions alive
     public static var pingTimer:Number;
+
+    public static var audio:Object = {
+        muted: false,
+        volume: 100
+    };
 
     /**
     * Initializes the Newgrounds.io API

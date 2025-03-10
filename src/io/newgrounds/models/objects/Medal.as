@@ -153,7 +153,7 @@ class io.newgrounds.models.objects.Medal extends io.newgrounds.models.BaseObject
         }
 
         if (callbackParams.callback !== undefined) {
-            callbackParams.callback.call(callbackParams.thisArg, result.medal);
+            callbackParams.callback.call(callbackParams.thisArg, result.medal, result.medal_score);
         }
     }
 

@@ -5,13 +5,13 @@ This is a library of ActionScript 2.0 classes for interactng with the [Newground
 
 # Installation
 
-**Step 1:** [Download the ActionScript library](/PsychoGoldfishNG/NewgroundsIO-AS2/blob/main/src/NGIO.zip)
+**Step 1:** [Download the ActionScript library](/PsychoGoldfishNG/NewgroundsIO-AS2/blob/main/NGIO.zip)
 
-**Step 2:** Extract library where Flash can access it.
+**Step 2:** Extract the library where Flash can access it.
 
-If you only ever plan on using this once, you can unzip the contents to the same directory as your .fla file, and your project will import it that way.
+If you plan on only using this once, you can just unzip the contents to the same directory as your .fla file, and your project will import it automatically.
 
-If you want all of your Flash projects to have access to the library, you can either unzip it to the global class path, or save it wherever you like and add a new class path.
+If you want all of your Flash projects to have access, you can unzip it to the global class path, or save it wherever you like and add a new class path.
 
 Global class paths can be found at:
 * **Windows**: 
@@ -21,55 +21,78 @@ Hard Disk/Users/user/Library/Application Support/Adobe/Adobe Flash CS3/language/
 
 To add a new class path, go into Edit->Preferences->ActionScript and press the AcrionScript 2.0 Settings button.  Hit the + button to add a new row, then the crosshair button to set the actual path.
 
+**Note:** You may also need to install the [fonts used in the component library](/PsychoGoldfishNG/NewgroundsIO-AS2/tree/main/src/fonts).
+
 ## Using the Library
 
 Before doing anything, you will need to [have a project created on Newgrounds](https://www.newgrounds.com/projects/games).
 
 Once you have a project, look towards the bottom of the page for the **API Tools** button, and click it.
 
-On this page you will see your App Credentials, and links to all the various features.
+On this page you will see your App Credentials, and links to all the various NGIO features.
 
 Once the library is installed, and your project is set up, you have a few options on how you can use it.  
 
-The simplest way is to [download the component library](/PsychoGoldfishNG/NewgroundsIO-AS2/blob/main/src/ngio_components.fla) and use the pre-fabricated clips.
+The simplest way is to [download the component library](/PsychoGoldfishNG/NewgroundsIO-AS2/blob/main/src/Components.zip) and use the pre-fabricated clips.
 
 ## NGIO Components
 
 ### The Newgrounds.IO Connector
 
-This is the most important component as it is used to initialize your app and get a valid user session.
+This is the most important component as it is used to initialize your app and get a valid user session. None of the other components will work without this one!
 
-You can copy and paste this into the first frame of your movie if you want to use it as a preloader, or in the first frame after your custom preloader.
+Copy and paste this into the first frame of your movie, if you want to use it as a preloader, or in the first frame after an existing preloader. You want this to execute before there's any possibility of other API calls being made.
 
-Once the component is on your stage, select it, and find the component parameters tab.
+Once the component is on your stage, select it, and find the component *parameters* tab.
 
-![In Older Versions of Flash, the parameters tab is at the bottom of the screen.](help_component_params_older.png)
+![In Older Versions of Flash, the parameters tab is at the bottom of the screen.](docs/help_component_params_older.png)
 
-![In Newer Versions of Flash, it's a sub-menu in the Properties tab on the right side of the screen](help_component_params_newer.png)
+![In Newer Versions of Flash, it's a sub-menu in the Properties tab on the right side of the screen](docs/help_component_params_newer.png)
 
-Copy the App ID and Encryption Key, from your project's API Tools page, into the matching parameter boxes.
+Copy the *App ID* and *Encryption Key*, from your project's API Tools page, into the matching parameter boxes.
 
-If you set an 'Official Version Number' in your App Settings, copy this to the App version parameter as well.
+If you set an *'Official Version Number'* in your App Settings, copy this to the *App Version* parameter as well.
 
-You can check or set the debug option to true if you want to test in debug mode.  This will output all network communications, and will run your API commands without actually posting anything to user accounts (medals won't actually unlock, scores won't be recorded, etc).
+Set the debug option to true if you want to test in debug mode. *(This will output all network communications, and will run your API commands without actually posting anything to user accounts. Mmedals won't actually unlock, scores won't be recorded, etc.)*
 
-Once this component is set up, you should be able to test things. 
+If you test your project, the component will now do a series of checks.
 
-When you run your movie, the component will check your app version and look for any game protection settings. If the user is playing an outdated version, or is on a host you haven't approved, the component will direct them to play your official version.
+First, it will simutaneously run the App.getCurrentVersion and App.getHostLicense components to see if there's a newer version available, or if the site hosting this copy has permission.  
 
-If these checks all pass, it will then look for a valid user session.  If the game is running directly on Newgrounds, and the user is logged in, it will act like everything has been loaded and move on.
+If there is a newer version, the user will be prompted to load that version, or carry on with the old copy.
 
-If the user is not logged in, it will prompt them to do so and handle checking for updates to the current session while they do so.  When a user logs in this way, they can check the 'remember me' box, and your game will save their session ID.  The next time they start the game, they will see a welcome screen and be given the option to log out or continue.
+![New version prompt](docs/help_new_version.png)
 
-Once you have a valid login, it will pull in all your app's metadata (medal lists, scoreboards, save slots, etc) and call the Event.logView component.
+If the host has been blocked, the user will get a prompt asking if they would like to play a legal version.
 
-Finally, it will tell the main movie to play, where you can finally start the actual game.
+![Blocked host prompt](docs/help_illegal_copy.png)
 
-At this point you should be able to use the other components and the NGIO class.
+Next, the component will call the App.checkSession component and see if we have an existing user session.
 
-**Note:** You can edit everything in these components to match the vibe of your app if you know what you are doing.
+If your game is hosted directly on Newgrounds, and the user is logged in, this will jump straight to the end of the process and start your game.
+
+If the game is hosted elsewhere, but there is a saved user session, the user will see a welcome message and be asked if they want to continue or sign out.  If they sign out, the App.endSession component will be called and the component will restart the check session process.
+
+![Welcome screen](docs/help_welcome_screen.png)
+
+If the user is not logged in, the component will automatically call the App.startSession component, then prompt the user to sign in, or continue without logging in.
+
+![Login prompt](docs/help_login_screen.png)
+
+Should they choose to log in, the component will open Newgrounds Passport in a new browser tab, and call the App.checkSession component in the background until it the user completes logging in.
+
+Finally, once the user has been logged in (or opted to skip logging in), the component will simultaneously call the CloudSave.loadSlots, Medal.getList and ScoreBoard.getBoards components to pull in those objects from the server.
+
+Once all these checks are completed, it will tell the main timeline to play so you can start your actual game.
+
+At this point you should be able to use the other components and the various methods in the NGIO class.
+
+**Note:** You can edit everything in these components to match the vibe of your app (if you know what you are doing)!
 
 ### The Newgrounds.IO Medal Popup
+
+![(You should get a medal for actually reading these docs!)](docs/help_medal_popup.png)
+
 This is the clip you'll want to use to unlock medals and show the fancy unlock animation.
 
 The best way to use this clip is to copy it on the root timeline, above any frames where unlocking a medal is possible.
@@ -97,17 +120,25 @@ We actually have 3 versions of this component.
 
 The first one is the full scoreboard, which will let players select any of your scoreboards, and check all of the different social and time-based views.
 
+![Full Feature Scoreboard](docs/help_scoreboard_full.png)
+
 The second one is designed for a single scoreboard (the user can't change boards), but still has the different social and time based views.
+
+![Single Scoreboard](docs/help_scoreboard_single.png)
 
 The third is the simplest view, designed for a single board and will only show the scores with no additional options.
 
-All of these are set up the same way.  
+![Minimalist Scoreboard](docs/help_scoreboard_minimum.png)
 
-Copy and paste them wherever you would like to show a scoreboard.  Select the board, then go to the component parameters tab *(see where this is above in **The Newgrounds.IO Connector** section).*
+All of these components get set up the same way.  
+
+Copy and paste wherever you would like to show a scoreboard.  Select the board, then go to the component *parameters* tab *(see above for help locating this).*
 
 Set the ScoreBoard ID of the board you want to show, the time period you want to load, and what users to Show.  If you want to filter scores by a specific tag, you can set that as well.
 
-If you are using the first 2 versions of this component, these will simply set the default view, but the player will be able to flip through all the different options.
+*(If you are using the first 2 versions of this component, these will simply set the default view. The player will be able to flip through all the different options.)*
+
+When these scoreboards are used, they will atomatically attach themselves to the NGIO class.  You can access them via `NGIO.scoreBoard`.
 
 Each of these components has an [X] button to close them.  You can either edit the clip directly and change what it does, or use the following code to handle when it gets clicked:
 
