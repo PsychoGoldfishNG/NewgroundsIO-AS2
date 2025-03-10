@@ -165,6 +165,7 @@ Here's an example of how you can do that:
         // we have a user, so we can do stuff!
         var user_name = NGIO.getUser().name;
         var userpage_url = NGIO.getUser().url;
+        var is_supporter = NGIO.getUser().supporter;
         
         // do the stuff...
         
@@ -244,9 +245,9 @@ And you can load data back into a native object, or as a raw string as well:
 
 In both cases, we use a function to handle the loaded value.  This is because we have to wait for the data to be pulled from the server, and this will not happen instantly.  This is known as an asynchronous callback.
 
-You will also notice, after the function, we have the word 'this'.  In ActionScript, when a function is called directly, it uses the context of whatever object, movieclip, class, etc it was called in as 'this'.  However, if a function is executed using function.call, you can pass an argument telling it what object to use as the 'this' context within the function.
+You will also notice, after the function, we have the word 'this'.  In ActionScript, when a function is called directly, it uses the context of whatever object, movieclip, class, etc it was called in as 'this'.  However, if a function is executed using function.call, you can pass an argument telling it what object to use as the 'this' context within the function. Our components use this method.
 
-If you used the code as I have it written on a MovieClip keyframe, you could use `this.play();` inside of the function, 'this' would refer to the MovieClip which would then play as expected.
+If you used the code, as I have it written, on a keyframe in a MovieClip, you could use `this.play();` inside of the function, 'this' would refer to the MovieClip which would then play as expected.
 
 Finally, if you want to delete a save slot, use the following:
 
@@ -297,10 +298,11 @@ If you are using incremental scores, you might need to load the updated value us
         function(new_score) {
 	        trace("The new value is "+score.value);
 	        trace("But if you want to display it pretty, it's "+score.formatted_value);
-        }
+        },
+        this
     );
 
-**Note:** If you aren't using tags, you can just put null as the value.
+**Note:** If you aren't using tags, you can just put *null* as the value.
 
 If you want to load scores outside of the Newgrounds.IO ScoreBoard components, you can do that like so:
 
@@ -308,12 +310,12 @@ If you want to load scores outside of the Newgrounds.IO ScoreBoard components, y
     
     // If you want to get a general list of the best users....
     var filters = {
-	    period: 'D', // this can be D,W,M,Y or A
-	    social: false, // set to true if you only want to load the user's friends
+	    period: 'D', // this can be D, W, M, Y or A
+	    social: false, // set to true if you only want to load the user and their friends
 	    tag: null // or set an actual string value if you use this
 	};
 
-	// or, if you want to look up the user's best scores:
+	// If you want to look up the user's best scores:
 	var filters = {
 	    user: NGIO.getUser()
 	};
@@ -321,13 +323,19 @@ If you want to load scores outside of the Newgrounds.IO ScoreBoard components, y
 	// now we can load the results
 	scoreBoard.getScores(
 	    function(scores) {
+
+            // make sure we got some scores returned
 	        if (scores && scores.length > 1) {
-	            for(var i=0; i<scores.length; i++) {
+	            
+                // and now we can loop through them!
+                for(var i=0; i<scores.length; i++) {
+
 		            trace((i+1)+": "+scores[i].user.name+" => "+scores[i].formatted_value);
 		             
-		            // actual value can be pulled with:
+		            // The actual integer value can be pulled with:
 		            scores[i].value;
 	            }
+
 	        } else {
 	            trace('there are no scores right now');
 	        }
@@ -337,11 +345,13 @@ If you want to load scores outside of the Newgrounds.IO ScoreBoard components, y
 
 ### Logging Events and Referrals
 
-If you are using any custom events, or want to track how much traffic your app is referring to various URLs, you can use the following methods:
+If you want to log an event:
 
     // Log a custom event
     NGIO.logEvent(event_name);
-    
+
+If you want to log any custom referrals *(these will automatically open in a new browser tab)*:
+
     // Note: the following calls will open a new browser tab!
     
     // track a referral to Newgrounds (we appreciate you)
@@ -360,23 +370,21 @@ If you are using any custom events, or want to track how much traffic your app i
     NGIO.loadReferral(referral_name);
 
 ## Advanced Use
-While the components and NGIO class are all most people will ever need, advanced users can do anything the API is capable of doing.
+While the components and NGIO class are all most people will ever need, advanced users can do anything the API is capable of doing using the core class.
 
-One case that comes to mind is looking up medals from another game to grant bonus content in say, a sequel.
-
-This can be done by using the NGIO core class and manually setting up components and handling result objects.
+We'll do a quick example of how you might use this to look up the medals from another game. *(This is a fun way to unlock secrets across multiple games)*
 
 If you were to look at the [API documents for the Medal.getList component](https://www.newgrounds.io/help/components/#medal-getlist), you will see it can use an optional app_id property.
 
 Because the NGIO class only preloads data for it's primary App ID, the helper methods there will only ever access those medals.
 
-So, in order to use this extra property, we're going to set up a component object manually, and have our core class execute it.
+In order to use this extra property, we're going to set up a component from scratch, and have our core class execute it.
 
-The good news is we can get the core instance the NGIO class is already using, so we won't need to initialize anything else.
+The good news is we can get the core instance that the NGIO class is already using, so we won't need to initialize anything else.
 
 Here's how we would load the medals for another app:
 
-    // create the Medal.getList component
+    // create the Medal.getList component, and set the app_id property
     var component = new io.newgrounds.models.components.Medal.getList({
         app_id: app_id_for_other_game
     });
