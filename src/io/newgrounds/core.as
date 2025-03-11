@@ -392,6 +392,12 @@ class io.newgrounds.core
         // some items will be arrays of objects that need to be attached to the core
         var attach = [];
 
+        // if the result is from another app, don't do any additional processing.
+        // we don't want to enable things like accidental cloudSave overwrites and whatnot.
+        if (result.app_id !== undefined && result.app_id != this._appId) {
+            return;
+        }
+
         // this is the stuff we DO want to cache
         switch(result.getObjectName()) {
 

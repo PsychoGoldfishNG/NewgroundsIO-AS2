@@ -249,6 +249,16 @@ You will also notice, after the function, we have the word 'this'.  In ActionScr
 
 If you used the code, as I have it written, on a keyframe in a MovieClip, you could use `this.play();` inside of the function, 'this' would refer to the MovieClip which would then play as expected.
 
+If you want to obfuscate your save data, you could also tap into the encryption methods in the core class like so:
+
+    // this is what we want to save
+    var save_object = {foo:"bar"};
+
+    // we can svae this raw string so the final file isn't readable by the human eye
+    var encrypted_string = NGIO.core.encrypt(save_object);
+
+*Be aware that encrypting large objects may cause your game to slow down, or even crash, so don't go too crazy with that.  Try to only save the bare minimum amount of data.*
+
 Finally, if you want to delete a save slot, use the following:
 
     slot.clear();
