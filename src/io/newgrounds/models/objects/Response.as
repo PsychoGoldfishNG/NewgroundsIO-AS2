@@ -13,7 +13,6 @@ class io.newgrounds.models.objects.Response extends io.newgrounds.models.BaseObj
 	private var ___result;
 	private var ___error:io.newgrounds.models.objects.Error;
 	private var ___api_version:String;
-	private var ___help_url:String;
 	private var ___echo:Object;
 
 	/**
@@ -23,7 +22,7 @@ class io.newgrounds.models.objects.Response extends io.newgrounds.models.BaseObj
 	public function Response(props:Object) {
 		super();
 		this.__object = 'Response';
-		this.__properties = this.__properties.concat(["app_id","success","debug","result","error","api_version","help_url","echo"]);
+		this.__properties = this.__properties.concat(["app_id","success","debug","result","error","api_version","echo"]);
 		this.__required = [];
 		this.__castTypes = {};
 		this.__arrayTypes = {};
@@ -119,19 +118,6 @@ class io.newgrounds.models.objects.Response extends io.newgrounds.models.BaseObj
 	 */
 	public function set api_version(___api_version:String) {
 		this.___api_version = ___api_version;
-	}
-	/**
-	 * If there was an error, this will contain the URL for our help docs.
-	 */
-	public function get help_url():String {
-		return this.___help_url;
-	}
-
-	/**
-	 * @private
-	 */
-	public function set help_url(___help_url:String) {
-		this.___help_url = ___help_url;
 	}
 	/**
 	 * If you passed an 'echo' value in your request object, it will be echoed here.

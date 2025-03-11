@@ -27,7 +27,7 @@ class io.newgrounds.models.objects.Score extends io.newgrounds.models.BaseObject
 		this.fillProperties(props);
 	}
 	/**
-	 * The user who earned score. If this property is absent, the score belongs to the active user.
+	 * The user who earned this score. If this property is absent, the score belongs to the active user.
 	 */
 	public function get user():io.newgrounds.models.objects.User {
 		return this.___user;

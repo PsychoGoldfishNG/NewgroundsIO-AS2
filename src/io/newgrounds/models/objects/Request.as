@@ -64,7 +64,7 @@ class io.newgrounds.models.objects.Request extends io.newgrounds.models.BaseObje
         }
 	}
 	/**
-	 * An optional login session id.
+	 * An optional login session id. Components that save and unlock things to a user account will require this.
 	 */
 	public function get session_id():String {
 		return this.___session_id;

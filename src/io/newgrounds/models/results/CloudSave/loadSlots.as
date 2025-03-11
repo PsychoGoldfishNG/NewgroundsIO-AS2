@@ -49,7 +49,7 @@ class io.newgrounds.models.results.CloudSave.loadSlots extends io.newgrounds.mod
         }
 	}
 	/**
-	* The App ID of another, approved app to load scores from.
+	* The App ID the loaded slots belong to, if loaded from an external app.
 	*/
 	public function get app_id():String {
 		return this.___app_id;

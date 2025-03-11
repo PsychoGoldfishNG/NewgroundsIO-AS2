@@ -22,9 +22,6 @@ class io.newgrounds.models.objects.ObjectIndex {
 			case "user":
 				return new io.newgrounds.models.objects.User(json);
 
-			case "usericons":
-				return new io.newgrounds.models.objects.UserIcons(json);
-
 			case "medal":
 				return new io.newgrounds.models.objects.Medal(json);
 

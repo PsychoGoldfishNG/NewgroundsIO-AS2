@@ -69,7 +69,7 @@ class io.newgrounds.models.objects.Medal extends io.newgrounds.models.BaseObject
 		this.___description = ___description;
 	}
 	/**
-	 * The URL for the medal's icon.
+	 * The URL for the medal's icon (typically a webp file).
 	 */
 	public function get icon():String {
 		return this.___icon;
@@ -95,7 +95,7 @@ class io.newgrounds.models.objects.Medal extends io.newgrounds.models.BaseObject
 		this.___value = ___value;
 	}
 	/**
-	 * The difficulty id of the medal.
+	 * The difficulty id of the medal: 1 = easy, 2 = moderate, 3 = challenging, 4 = difficult, 5 = brutal.
 	 */
 	public function get difficulty():Number {
 		return this.___difficulty;
@@ -118,7 +118,7 @@ class io.newgrounds.models.objects.Medal extends io.newgrounds.models.BaseObject
 		this.___secret = ___secret;
 	}
 	/**
-	 * This will only be set if a valid user session exists.
+	 * This will only be set if a valid session_id exists in the request object.
 	 */
 	public function get unlocked():Boolean {
 		return this.___unlocked;

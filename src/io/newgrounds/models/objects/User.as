@@ -9,7 +9,7 @@ import io.newgrounds.models.BaseObject;
 class io.newgrounds.models.objects.User extends io.newgrounds.models.BaseObject {
 	private var ___id:Number;
 	private var ___name:String;
-	private var ___icons:io.newgrounds.models.objects.UserIcons;
+	private var ___url:String;
 	private var ___supporter:Boolean;
 
 	/**
@@ -19,11 +19,10 @@ class io.newgrounds.models.objects.User extends io.newgrounds.models.BaseObject 
 	public function User(props:Object) {
 		super();
 		this.__object = 'User';
-		this.__properties = this.__properties.concat(["id","name","icons","supporter"]);
+		this.__properties = this.__properties.concat(["id","name","url","supporter"]);
 		this.__required = [];
 		this.__castTypes = {};
 		this.__arrayTypes = {};
-		this.__castTypes.icons = io.newgrounds.models.objects.UserIcons;
 		this.fillProperties(props);
 	}
 	/**
@@ -53,20 +52,20 @@ class io.newgrounds.models.objects.User extends io.newgrounds.models.BaseObject 
 		this.___name = ___name;
 	}
 	/**
-	 * The user's icon images.
+	 * The URL to the user's profile.
 	 */
-	public function get icons():io.newgrounds.models.objects.UserIcons {
-		return this.___icons;
+	public function get url():String {
+		return this.___url;
 	}
 
 	/**
 	 * @private
 	 */
-	public function set icons(___icons:io.newgrounds.models.objects.UserIcons) {
-		this.___icons = ___icons;
+	public function set url(___url:String) {
+		this.___url = ___url;
 	}
 	/**
-	 * Returns true if the user has a Newgrounds Supporter upgrade.
+	 * Returns true if the user currently has a Newgrounds Supporter upgrade.
 	 */
 	public function get supporter():Boolean {
 		return this.___supporter;

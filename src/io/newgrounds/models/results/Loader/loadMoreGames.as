@@ -23,6 +23,9 @@ class io.newgrounds.models.results.Loader.loadMoreGames extends io.newgrounds.mo
 		this.fillProperties(props);
 	}
 
+	/**
+	* The URL to redirect to. (This will only be returned if the redirect param is set to false.)
+	*/
 	public function get url():String {
 		return this.___url;
 	}

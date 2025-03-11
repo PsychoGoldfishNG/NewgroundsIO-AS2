@@ -34,7 +34,7 @@ class io.newgrounds.models.objects.Error extends io.newgrounds.models.BaseObject
 		this.___message = ___message;
 	}
 	/**
-	 * A code indication the error type.
+	 * A code indicating the error type.
 	 */
 	public function get code():Number {
 		return this.___code;
