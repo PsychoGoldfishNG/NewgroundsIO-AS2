@@ -405,6 +405,7 @@ class io.newgrounds.core
                 break;
 
             case "CloudSave.loadSlot":
+            case "CloudSave.setData":
                 // update the cache with the new slot data
                 if (this._saveSlots) {
                     for(var i=0; i<this._saveSlots.length; i++) {
