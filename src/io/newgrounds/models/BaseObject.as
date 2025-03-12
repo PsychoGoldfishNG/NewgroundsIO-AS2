@@ -84,7 +84,11 @@ class io.newgrounds.models.BaseObject {
 
             // components will be expecting user ids, vs objects
             if (key === 'user' && (this instanceof BaseComponent) && (props[key] instanceof io.newgrounds.models.objects.User)) {
-                props[key] = props[key].id;
+                if (props[key].id) {
+                    props[key] = props[key].id;
+                } else if (props[key].name) {
+                    props[key] = props[key].name;
+                }
             }
 
             // ignore anything that isn't a property of this child class
