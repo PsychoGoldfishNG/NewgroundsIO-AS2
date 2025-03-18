@@ -32,6 +32,8 @@ Once you have a project, look towards the bottom of the page for the **API Tools
 
 On this page you will see your App Credentials, and links to all the various NGIO features.
 
+Because ActionScript 2.0 doesn't have proper binary support, you won't be able to use the latest AES-128 encryption.  So on the **API Tools** page, look for the **Advanced** options button in the top right corner and click it.  Change your **Encryption Cipher** to RC4.
+
 Once the library is installed, and your project is set up, you have a few options on how you can use it.  
 
 The simplest way is to [download the component library](/PsychoGoldfishNG/NewgroundsIO-AS2/blob/main/src/Components.zip) and use the pre-fabricated clips.
@@ -457,4 +459,4 @@ If you want to execute multiple components in a single call, you can use the com
         this
     );
     
-This library will automatically fill the 'host' property of components that reuire one.
+This library will automatically fill the 'host' property of components that require one.
