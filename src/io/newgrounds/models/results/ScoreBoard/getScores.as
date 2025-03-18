@@ -11,6 +11,7 @@ class io.newgrounds.models.results.ScoreBoard.getScores extends io.newgrounds.mo
 	private var ___period:String;
 	private var ___social:Boolean;
 	private var ___limit:Number;
+	private var ___skip:Number;
 	private var ___scoreboard:io.newgrounds.models.objects.ScoreBoard;
 	private var ___scores:Array;
 	private var ___user:io.newgrounds.models.objects.User;
@@ -23,7 +24,7 @@ class io.newgrounds.models.results.ScoreBoard.getScores extends io.newgrounds.mo
 	public function getScores(props:Object) {
 		super();
 		this.__object = "ScoreBoard.getScores";
-		this.__properties = this.__properties.concat(["period","social","limit","scoreboard","scores","user","app_id"]);
+		this.__properties = this.__properties.concat(["period","social","limit","skip","scoreboard","scores","user","app_id"]);
 		this.__castTypes = {};
 		this.__arrayTypes = {};
 		this.__castTypes.scoreboard = io.newgrounds.models.objects.ScoreBoard;
@@ -60,7 +61,7 @@ class io.newgrounds.models.results.ScoreBoard.getScores extends io.newgrounds.mo
 		this.___social = ___social;
 	}
 	/**
-	* The query skip that was used.
+	* The query limit that was used.
 	*/
 	public function get limit():Number {
 		return this.___limit;
@@ -71,6 +72,19 @@ class io.newgrounds.models.results.ScoreBoard.getScores extends io.newgrounds.mo
 	*/
 	public function set limit(___limit:Number) {
 		this.___limit = ___limit;
+	}
+	/**
+	* The query skip that was used.
+	*/
+	public function get skip():Number {
+		return this.___skip;
+	}
+
+	/**
+	* @private
+	*/
+	public function set skip(___skip:Number) {
+		this.___skip = ___skip;
 	}
 	/**
 	* The io.newgrounds.models.objects.ScoreBoard being queried.
