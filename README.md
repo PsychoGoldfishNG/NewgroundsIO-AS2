@@ -22,7 +22,7 @@ Hard Disk/Users/user/Library/Application Support/Adobe/Adobe Flash CS3/language/
 
 To add a new class path, go into Edit->Preferences->ActionScript and press the AcrionScript 2.0 Settings button.  Hit the + button to add a new row, then the crosshair button to set the actual path.
 
-**Note:** You may also need to install the [fonts used in the component library](/tree/main/src/fonts).
+**Note:** You may also need to install the [fonts used in the component library](https://github.com/PsychoGoldfishNG/NewgroundsIO-AS2/tree/main/src/fonts).
 
 ## Using the Library
 
