@@ -4,7 +4,7 @@ This is a library of ActionScript 2.0 classes for interactng with the [Newground
 
 ## Installation
 
-**Step 1:** [Download the ActionScript library](/blob/main/NGIO.zip)
+**Step 1:** [Download the ActionScript library](/NGIO.zip)
 
 **Step 2:** Extract the library where Flash can access it.
 
@@ -36,7 +36,7 @@ Because ActionScript 2.0 doesn't have proper binary support, you won't be able t
 
 Once the library is installed, and your project is set up, you have a few options on how you can use it.  
 
-The simplest way is to [download the component library](/blob/main/src/Components.zip) and use the pre-fabricated clips.
+The simplest way is to [download the component library](/src/Components.zip) and use the pre-fabricated clips.
 
 ## NGIO Components
 
