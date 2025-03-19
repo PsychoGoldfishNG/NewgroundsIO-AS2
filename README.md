@@ -4,7 +4,7 @@ This is a library of ActionScript 2.0 classes for interactng with the [Newground
 
 ## Installation
 
-**Step 1:** [Download the ActionScript library](/PsychoGoldfishNG/NewgroundsIO-AS2/blob/main/NGIO.zip)
+**Step 1:** [Download the ActionScript library](/blob/main/NGIO.zip)
 
 **Step 2:** Extract the library where Flash can access it.
 
@@ -22,7 +22,7 @@ Hard Disk/Users/user/Library/Application Support/Adobe/Adobe Flash CS3/language/
 
 To add a new class path, go into Edit->Preferences->ActionScript and press the AcrionScript 2.0 Settings button.  Hit the + button to add a new row, then the crosshair button to set the actual path.
 
-**Note:** You may also need to install the [fonts used in the component library](/PsychoGoldfishNG/NewgroundsIO-AS2/tree/main/src/fonts).
+**Note:** You may also need to install the [fonts used in the component library](/tree/main/src/fonts).
 
 ## Using the Library
 
@@ -36,7 +36,7 @@ Because ActionScript 2.0 doesn't have proper binary support, you won't be able t
 
 Once the library is installed, and your project is set up, you have a few options on how you can use it.  
 
-The simplest way is to [download the component library](/PsychoGoldfishNG/NewgroundsIO-AS2/blob/main/src/Components.zip) and use the pre-fabricated clips.
+The simplest way is to [download the component library](/blob/main/src/Components.zip) and use the pre-fabricated clips.
 
 ## NGIO Components
 
