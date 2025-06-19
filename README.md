@@ -334,6 +334,8 @@ If you want to load scores outside of the Newgrounds.IO ScoreBoard components, y
 	
 	// now we can load the results
 	scoreBoard.getScores(
+	    filters,
+     
 	    function(scores) {
 
             // make sure we got some scores returned
