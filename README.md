@@ -339,7 +339,7 @@ If you want to load scores outside of the Newgrounds.IO ScoreBoard components, y
 	    function(scores) {
 
             // make sure we got some scores returned
-	        if (scores && scores.length > 1) {
+	        if (scores && scores.length > 0) {
 	            
                 // and now we can loop through them!
                 for(var i=0; i<scores.length; i++) {
