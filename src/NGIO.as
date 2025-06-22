@@ -86,12 +86,12 @@ class NGIO
     * Checks if a user has been loaded
     * @return Boolean Whether or not a user has been loaded
     */
-    public static function hasUser():Boolean
-    {
-        if (!NGIO.hasSession) return false;
-
-        return NGIO.core.session.user ? true : false;
-    }
+      public static function hasUser():Boolean {
+	if (!NGIO.hasSession) {
+		return false;
+	}
+	return true;
+     }
 
     /**
     * Opens the Newgrounds.io passport in a new window
