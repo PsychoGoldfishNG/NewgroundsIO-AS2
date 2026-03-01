@@ -52,11 +52,33 @@ class io.newgrounds.helpers.AppStateBootstrapHelper {
 
 	/**
 	 * Resolves the host/domain currently running the app.
+	 * Extracts the domain from _root._url so it works reliably in all
+	 * Flash Player security sandboxes. file:// URLs return "localhost".
 	 */
 	public static function resolveHost():String {
 		try {
-			var lc:LocalConnection = new LocalConnection();
-			return lc.domain();
+			var url:String = _root._url;
+			if (url != undefined && url != null && url.length > 0) {
+				// file:// protocol means running locally
+				if (url.toLowerCase().indexOf("file://") == 0) {
+					return "localhost";
+				}
+				// Strip protocol (e.g. "http://")
+				var afterProtocol:Number = url.indexOf("://");
+				if (afterProtocol >= 0) {
+					var rest:String = url.substring(afterProtocol + 3);
+					// Domain ends at the first / ? or #
+					var slashPos:Number = rest.indexOf("/");
+					var queryPos:Number = rest.indexOf("?");
+					var hashPos:Number  = rest.indexOf("#");
+					var end:Number = rest.length;
+					if (slashPos >= 0 && slashPos < end) end = slashPos;
+					if (queryPos >= 0 && queryPos < end) end = queryPos;
+					if (hashPos  >= 0 && hashPos  < end) end = hashPos;
+					var host:String = rest.substring(0, end);
+					if (host.length > 0) return host;
+				}
+			}
 		} catch (e) {
 		}
 		return "localhost";
