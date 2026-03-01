@@ -30,7 +30,7 @@ class io.newgrounds.models.components.<%- model.component %>.<%- model.method %>
 	/**
 	 * <%- model.properties[propertyName].description %>
 	 */
-	public var <%- propertyName %>:<%- helpers.getDataType(model.properties[propertyName]) %> = <%- helpers.getDefaultValue(model.properties[propertyName]) %>;
+	public var <%- propertyName %><%- helpers.appendStrictType(model.properties[propertyName]) %> = <%- helpers.getDefaultValue(model.properties[propertyName]) %>;
 
 <%   } -%>
 <% } -%>
