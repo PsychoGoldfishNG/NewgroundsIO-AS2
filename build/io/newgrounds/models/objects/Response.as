@@ -28,7 +28,7 @@ class io.newgrounds.models.objects.Response extends io.newgrounds.BaseObject {
 	/**
 	 * This will be a #Result object, or an array containing one-or-more #Result objects (this will match the structure of the execute property in your #Request object).
 	 */
-	public var result:* = null;
+	public var result = null;
 
 	/**
 	 * If there was an error, this will contain the current version number of the API gateway.
@@ -38,7 +38,7 @@ class io.newgrounds.models.objects.Response extends io.newgrounds.BaseObject {
 	/**
 	 * If you passed an 'echo' value in your request object, it will be echoed here.
 	 */
-	public var echo:* = null;
+	public var echo = null;
 
 
 	/**

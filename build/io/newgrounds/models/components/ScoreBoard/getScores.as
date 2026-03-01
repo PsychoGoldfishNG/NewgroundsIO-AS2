@@ -33,7 +33,7 @@ class io.newgrounds.models.components.ScoreBoard.getScores extends io.newgrounds
 	/**
 	 * A user's ID or name.  If 'social' is true, this user and their friends will be included. Otherwise, only scores for this user will be loaded. If this param is missing and there is a valid session id, that user will be used by default.
 	 */
-	public var user:* = null;
+	public var user = null;
 
 	/**
 	 * An integer indicating the number of scores to skip before starting the list. Default = 0.

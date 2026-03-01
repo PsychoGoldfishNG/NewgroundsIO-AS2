@@ -19,7 +19,7 @@ class io.newgrounds.models.objects.Execute extends io.newgrounds.BaseObject {
 	/**
 	 * An object of parameters you want to pass to the component.
 	 */
-	public var parameters:* = null;
+	public var parameters = null;
 
 	/**
 	 * A an encrypted #Execute object or array of #Execute objects.
@@ -29,7 +29,7 @@ class io.newgrounds.models.objects.Execute extends io.newgrounds.BaseObject {
 	/**
 	 * An optional value that will be returned, verbatim, in the #Result object.
 	 */
-	public var echo:* = null;
+	public var echo = null;
 
 
 	/**

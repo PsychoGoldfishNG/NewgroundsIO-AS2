@@ -18,7 +18,7 @@ class io.newgrounds.models.objects.Request extends io.newgrounds.BaseObject {
 	/**
 	 * A #Execute object, or array of one-or-more #Execute objects.
 	 */
-	public var execute:* = null;
+	public var execute = null;
 
 	/**
 	 * An optional login session id. Components that save and unlock things to a user account will require this.
@@ -33,7 +33,7 @@ class io.newgrounds.models.objects.Request extends io.newgrounds.BaseObject {
 	/**
 	 * An optional value that will be returned, verbatim, in the #Response object.
 	 */
-	public var echo:* = null;
+	public var echo = null;
 
 
 	/**
