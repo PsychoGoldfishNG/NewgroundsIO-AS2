@@ -58,7 +58,7 @@ class io.newgrounds.models.results.App.checkSessionResult extends io.newgrounds.
 	 */
 	public function get castTypes():Object {
 		return {
-			"session": "Session"
+			session: "Session"
 		};
 	}
 

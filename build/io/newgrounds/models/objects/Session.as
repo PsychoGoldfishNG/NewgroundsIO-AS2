@@ -83,7 +83,7 @@ class io.newgrounds.models.objects.Session extends io.newgrounds.BaseObject {
 	 */
 	public function get castTypes():Object {
 		return {
-			"user": "User"
+			user: "User"
 		};
 	}
 

@@ -58,7 +58,7 @@ class io.newgrounds.models.results.CloudSave.setDataResult extends io.newgrounds
 	 */
 	public function get castTypes():Object {
 		return {
-			"slot": "SaveSlot"
+			slot: "SaveSlot"
 		};
 	}
 

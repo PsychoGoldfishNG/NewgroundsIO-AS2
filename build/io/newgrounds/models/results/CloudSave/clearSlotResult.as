@@ -58,7 +58,7 @@ class io.newgrounds.models.results.CloudSave.clearSlotResult extends io.newgroun
 	 */
 	public function get castTypes():Object {
 		return {
-			"slot": "SaveSlot"
+			slot: "SaveSlot"
 		};
 	}
 

@@ -64,8 +64,8 @@ class io.newgrounds.models.results.ScoreBoard.postScoreResult extends io.newgrou
 	 */
 	public function get castTypes():Object {
 		return {
-			"scoreboard": "ScoreBoard",
-			"score": "Score"
+			scoreboard: "ScoreBoard",
+			score: "Score"
 		};
 	}
 

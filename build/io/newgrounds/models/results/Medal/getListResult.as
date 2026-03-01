@@ -62,7 +62,7 @@ class io.newgrounds.models.results.Medal.getListResult extends io.newgrounds.Bas
 	 */
 	public function get castTypes():Object {
 		return {
-			"medals": "array-of-Medal"
+			medals: "array-of-Medal"
 		};
 	}
 

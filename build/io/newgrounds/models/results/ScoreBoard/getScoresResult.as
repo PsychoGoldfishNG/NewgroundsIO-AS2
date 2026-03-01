@@ -94,9 +94,9 @@ class io.newgrounds.models.results.ScoreBoard.getScoresResult extends io.newgrou
 	 */
 	public function get castTypes():Object {
 		return {
-			"scoreboard": "ScoreBoard",
-			"scores": "array-of-Score",
-			"user": "User"
+			scoreboard: "ScoreBoard",
+			scores: "array-of-Score",
+			user: "User"
 		};
 	}
 

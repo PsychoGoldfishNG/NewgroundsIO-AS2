@@ -63,7 +63,7 @@ class io.newgrounds.models.results.Medal.unlockResult extends io.newgrounds.Base
 	 */
 	public function get castTypes():Object {
 		return {
-			"medal": "Medal"
+			medal: "Medal"
 		};
 	}
 

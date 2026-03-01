@@ -98,7 +98,7 @@ class io.newgrounds.models.components.<%- model.component %>.<%- model.method %>
 <%     if (castValue !== "null") { -%>
 <%       if (!isFirst) { %>,
 <%       } -%>
-			"<%- propertyName %>": <%- castValue %><%       isFirst = false; -%>
+			<%- propertyName %>: <%- castValue %><%       isFirst = false; -%>
 <%     } -%>
 <%   } -%>
 <%   if (!isFirst) { %>

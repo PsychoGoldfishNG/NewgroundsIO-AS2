@@ -79,7 +79,7 @@ class io.newgrounds.models.objects.Execute extends io.newgrounds.BaseObject {
 	 */
 	public function get castTypes():Object {
 		return {
-			"parameters": "Array"
+			parameters: "Array"
 		};
 	}
 

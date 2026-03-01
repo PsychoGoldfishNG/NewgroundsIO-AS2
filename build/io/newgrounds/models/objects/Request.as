@@ -82,7 +82,7 @@ class io.newgrounds.models.objects.Request extends io.newgrounds.BaseObject {
 	 */
 	public function get castTypes():Object {
 		return {
-			"execute": "array-of-Execute"
+			execute: "array-of-Execute"
 		};
 	}
 

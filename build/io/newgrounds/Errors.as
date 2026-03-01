@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Errors
  *
  * Provides error codes and helper methods for generating Error models

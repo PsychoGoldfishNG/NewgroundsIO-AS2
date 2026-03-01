@@ -114,7 +114,7 @@ class io.newgrounds.models.results.<%- model.component %>.<%- model.method %>Res
 <%     if (castValue !== "null") { -%>
 <%       if (!isFirst) { %>,
 <%       } -%>
-			"<%- propertyName %>": <%- castValue %><%       isFirst = false; -%>
+			<%- propertyName %>: <%- castValue %><%       isFirst = false; -%>
 <%     } -%>
 <%   } -%>
 <%   if (!isFirst) { %>

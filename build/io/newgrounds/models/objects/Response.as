@@ -87,8 +87,8 @@ class io.newgrounds.models.objects.Response extends io.newgrounds.BaseObject {
 	 */
 	public function get castTypes():Object {
 		return {
-			"debug": "Debug",
-			"result": "array-of-Result"
+			debug: "Debug",
+			result: "array-of-Result"
 		};
 	}
 

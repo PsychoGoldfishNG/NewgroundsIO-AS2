@@ -62,7 +62,7 @@ class io.newgrounds.models.objects.Debug extends io.newgrounds.BaseObject {
 	 */
 	public function get castTypes():Object {
 		return {
-			"request": "Request"
+			request: "Request"
 		};
 	}
 

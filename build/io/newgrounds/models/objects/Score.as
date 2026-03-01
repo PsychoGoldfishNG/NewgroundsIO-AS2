@@ -72,7 +72,7 @@ class io.newgrounds.models.objects.Score extends io.newgrounds.BaseObject {
 	 */
 	public function get castTypes():Object {
 		return {
-			"user": "User"
+			user: "User"
 		};
 	}
 
