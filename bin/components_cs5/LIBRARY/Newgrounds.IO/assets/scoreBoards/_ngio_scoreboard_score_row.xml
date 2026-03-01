@@ -1,0 +1,115 @@
+<DOMSymbolItem xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://ns.adobe.com/xfl/2008/" name="Newgrounds.IO/assets/scoreBoards/_ngio_scoreboard_score_row" itemID="67c60c30-000001b1" lastModified="1771439750">
+  <timeline>
+    <DOMTimeline name="_ngio_scoreboard_score_row">
+      <layers>
+        <DOMLayer name="Layer 3" color="#FFFF4F" visible="false">
+          <frames>
+            <DOMFrame index="0" duration="2" keyMode="9728">
+              <Actionscript>
+                <script><![CDATA[var _this = this;
+
+userBtn.onRelease = function() {
+	getURL(_this.userpage, "_blank");
+};]]></script>
+              </Actionscript>
+              <elements>
+                <DOMSymbolInstance libraryItemName="Newgrounds.IO/assets/scoreBoards/_ngio_scoreboard_line_btn" name="userBtn" selected="true" symbolType="button">
+                  <transformationPoint>
+                    <Point/>
+                  </transformationPoint>
+                </DOMSymbolInstance>
+              </elements>
+            </DOMFrame>
+            <DOMFrame index="2" keyMode="9728">
+              <elements/>
+            </DOMFrame>
+          </frames>
+        </DOMLayer>
+        <DOMLayer name="Layer 1" color="#4FFF4F" current="true" isSelected="true">
+          <frames>
+            <DOMFrame index="0" duration="2" keyMode="9728">
+              <elements>
+                <DOMDynamicText name="index" width="31.9" height="23.2" includeOutlines="true" isSelectable="false">
+                  <matrix>
+                    <Matrix a="1.00199890136719" tx="10" ty="8"/>
+                  </matrix>
+                  <textRuns>
+                    <DOMTextRun>
+                      <characters>X.</characters>
+                      <textAttrs>
+                        <DOMTextAttrs aliasText="false" size="15" bitmapSize="300" face="LiberationSans-Regular" fillColor="#FFFFFF"/>
+                      </textAttrs>
+                    </DOMTextRun>
+                  </textRuns>
+                </DOMDynamicText>
+                <DOMDynamicText name="username" width="316.45" height="20.4" includeOutlines="true" isSelectable="false">
+                  <matrix>
+                    <Matrix a="1.00199890136719" tx="50" ty="6"/>
+                  </matrix>
+                  <textRuns>
+                    <DOMTextRun>
+                      <characters>User-Name-Here</characters>
+                      <textAttrs>
+                        <DOMTextAttrs aliasText="false" bold="true" size="15" bitmapSize="300" face="Helotypo-Regular" fillColor="#FDA238"/>
+                      </textAttrs>
+                    </DOMTextRun>
+                  </textRuns>
+                </DOMDynamicText>
+                <DOMDynamicText name="score" left="-104.3" width="197.25" height="16.8" includeOutlines="true" isSelectable="false">
+                  <matrix>
+                    <Matrix a="1.00224304199219" tx="474.5" ty="8"/>
+                  </matrix>
+                  <textRuns>
+                    <DOMTextRun>
+                      <characters>123,456,789.00</characters>
+                      <textAttrs>
+                        <DOMTextAttrs alignment="right" aliasText="false" size="15" bitmapSize="300" face="LiberationSans-Regular" fillColor="#FFFFFF"/>
+                      </textAttrs>
+                    </DOMTextRun>
+                  </textRuns>
+                </DOMDynamicText>
+              </elements>
+            </DOMFrame>
+          </frames>
+        </DOMLayer>
+        <DOMLayer name="Layer 2" color="#9933CC">
+          <frames>
+            <DOMFrame index="0" keyMode="9728">
+              <Actionscript>
+                <script><![CDATA[stop();]]></script>
+              </Actionscript>
+              <elements/>
+            </DOMFrame>
+            <DOMFrame index="1" keyMode="9728">
+              <elements>
+                <DOMGroup>
+                  <transformationPoint>
+                    <Point x="290" y="16"/>
+                  </transformationPoint>
+                  <members>
+                    <DOMShape>
+                      <transformationPoint>
+                        <Point x="290" y="16"/>
+                      </transformationPoint>
+                      <fills>
+                        <FillStyle index="1">
+                          <SolidColor color="#FFFFFF" alpha="0.0823529411764706"/>
+                        </FillStyle>
+                      </fills>
+                      <edges>
+                        <Edge fillStyle1="1" edges="!11600 640|0 640!0 640|0 0!0 0|11600 0!11600 0|11600 640"/>
+                      </edges>
+                    </DOMShape>
+                  </members>
+                </DOMGroup>
+              </elements>
+            </DOMFrame>
+            <DOMFrame index="2" keyMode="9728">
+              <elements/>
+            </DOMFrame>
+          </frames>
+        </DOMLayer>
+      </layers>
+    </DOMTimeline>
+  </timeline>
+</DOMSymbolItem>

@@ -1,0 +1,37 @@
+<DOMSymbolItem xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://ns.adobe.com/xfl/2008/" name="Newgrounds.IO/assets/medalPopup/_ngio_medal_unlock_shimmer_highlight" itemID="67bf81ba-00000f00" symbolType="graphic" lastModified="1740604122">
+  <timeline>
+    <DOMTimeline name="_ngio_medal_unlock_shimmer_highlight">
+      <layers>
+        <DOMLayer name="Layer 1" color="#4FFF4F" current="true" isSelected="true">
+          <frames>
+            <DOMFrame index="0" keyMode="9728">
+              <elements>
+                <DOMShape>
+                  <fills>
+                    <FillStyle index="1">
+                      <LinearGradient>
+                        <matrix>
+                          <Matrix a="0.0731048583984375" b="0.0508270263671875" c="-0.0542755126953125" d="0.0780487060546875"/>
+                        </matrix>
+                        <GradientEntry color="#FFFFFF" alpha="0" ratio="0.137254901960784"/>
+                        <GradientEntry color="#FFFFFF" ratio="0.184313725490196"/>
+                        <GradientEntry color="#FFFFFF" alpha="0" ratio="0.231372549019608"/>
+                        <GradientEntry color="#FFFFFF" alpha="0" ratio="0.580392156862745"/>
+                        <GradientEntry color="#FFFFFF" ratio="0.635294117647059"/>
+                        <GradientEntry color="#FFFFFF" ratio="0.831372549019608"/>
+                        <GradientEntry color="#FFFFFF" alpha="0" ratio="0.901960784313726"/>
+                      </LinearGradient>
+                    </FillStyle>
+                  </fills>
+                  <edges>
+                    <Edge fillStyle1="1" edges="!-2614 1560|-2010 -1560!-2010 -1560|3132 -1560!3132 -1560|3088 1560!3088 1560|-2614 1560"/>
+                  </edges>
+                </DOMShape>
+              </elements>
+            </DOMFrame>
+          </frames>
+        </DOMLayer>
+      </layers>
+    </DOMTimeline>
+  </timeline>
+</DOMSymbolItem>

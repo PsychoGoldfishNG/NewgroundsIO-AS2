@@ -1,0 +1,1250 @@
+<DOMDocument xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://ns.adobe.com/xfl/2008/" backgroundColor="#009999" width="640" height="480" frameRate="60" currentTimeline="1" xflVersion="2.0" creatorInfo="Adobe Flash Professional CS5.5" platform="Windows" versionInfo="Saved by Adobe Flash Windows 11.5 build 325" majorVersion="11" minorVersion="5" buildNumber="325" guidesSnapTo="false" snapAlign="false" viewAngle3D="62.4108334222142" nextSceneIdentifier="2" playOptionsPlayLoop="false" playOptionsPlayPages="false" playOptionsPlayFrameActions="false">
+     <folders>
+          <DOMFolderItem name="Newgrounds.IO" itemID="698226ed-00000212" isExpanded="true"/>
+          <DOMFolderItem name="Newgrounds.IO/assets" itemID="67cb3914-0000023d" isExpanded="true"/>
+          <DOMFolderItem name="Newgrounds.IO/assets/connector" itemID="67cb3c19-000000a7"/>
+          <DOMFolderItem name="Newgrounds.IO/assets/library" itemID="699dd7d2-0000028e"/>
+          <DOMFolderItem name="Newgrounds.IO/assets/medalPopup" itemID="698a3b82-0000021c"/>
+          <DOMFolderItem name="Newgrounds.IO/assets/saveSlots" itemID="69950e27-00000295"/>
+          <DOMFolderItem name="Newgrounds.IO/assets/scoreBoards" itemID="67cb3c5c-000000ab"/>
+          <DOMFolderItem name="Newgrounds.IO/assets/shared" itemID="6994f073-00000240"/>
+          <DOMFolderItem name="Newgrounds.IO/assets/shared/fonts" itemID="69935e6a-00000450"/>
+          <DOMFolderItem name="Newgrounds.IO/components" itemID="699612be-00000387"/>
+          <DOMFolderItem name="Newgrounds.IO/library" itemID="69a38c61-0000029e"/>
+     </folders>
+     <fonts>
+          <DOMFontItem name="Newgrounds.IO/assets/shared/fonts/Helotypo All" itemID="698a4696-0000023b" font="Helotypo-Regular" size="0" id="10" sourceLastImported="1770669718" embedRanges="9999"/>
+          <DOMFontItem name="Newgrounds.IO/assets/shared/fonts/Liberation Sans" itemID="698a4759-00000248" font="LiberationSans-Regular" size="0" id="12" sourceLastImported="1770669774" embedRanges="9999"/>
+          <DOMFontItem name="Newgrounds.IO/assets/shared/fonts/Liberations Bold" itemID="698a4727-00000246" font="LiberationSans-Bold" size="0" id="13" sourceLastImported="1770669863" embedRanges="9999|1|2|3|4"/>
+          <DOMFontItem name="Newgrounds.IO/assets/shared/fonts/Pakenham" itemID="69935e4a-0000044b" font="PakenhamRg-Regular" size="0" id="14" sourceLastImported="1771265610" embedRanges="9999"/>
+     </fonts>
+     <media>
+          <DOMSoundItem name="Newgrounds.IO/assets/medalPopup/medal_popop_in.mp3" itemID="67cf0960-0000010a" linkageExportForAS="true" linkageIdentifier="__ngio_medalsound_in" linkageClassName="__ngio_medalsound_in" sourceExternalFilepath="./LIBRARY/Newgrounds.IO/assets/medalPopup/medal_popop_in.mp3" sourceLastImported="1741621821" href="Newgrounds.IO/assets/medalPopup/medal_popop_in.mp3" soundDataHRef="M 1 1770666882.dat" format="44kHz 16bit Mono" sampleCount="43776" exportFormat="1" exportBits="7" dataLength="16014" exportNative="true" cachedSampleCount="5472"/>
+          <DOMSoundItem name="Newgrounds.IO/assets/medalPopup/medal_popop_out.mp3" itemID="67cf09a5-0000010d" linkageExportForAS="true" linkageIdentifier="__ngio_medalsound_out" linkageClassName="__ngio_medalsound_out" sourceExternalFilepath="./LIBRARY/Newgrounds.IO/assets/medalPopup/medal_popop_out.mp3" sourceLastImported="1741621829" href="Newgrounds.IO/assets/medalPopup/medal_popop_out.mp3" soundDataHRef="M 2 1770666882.dat" format="44kHz 16bit Mono" sampleCount="34560" exportFormat="1" exportBits="7" dataLength="11343" exportNative="true" cachedSampleCount="4320"/>
+          <DOMBitmapItem name="Newgrounds.IO/assets/library/ngio.png" itemID="699dcdb4-000001d7" sourceExternalFilepath="./LIBRARY/Newgrounds.IO/assets/library/ngio.png" sourceLastImported="1771949492" useImportedJPEGData="false" compressionType="lossless" originalCompressionType="lossless" quality="50" href="Newgrounds.IO/assets/library/ngio.png" bitmapDataHRef="M 4 1772325985.dat" frameLeft="-115200" frameTop="-115200" frameRight="-115200" frameBottom="-115200"/>
+          <DOMCompiledClipItem name="Newgrounds.IO/assets/library/NgioClassLibCompiled" itemID="69a38b5c-00000288" linkageExportForAS="true" linkageIdentifier="NgioClassLibCompiled" linkageClassName="NgioClassLibCompiled" sourceExternalFilepath="./LIBRARY/Newgrounds.IO/assets/library/NgioClassLibCompiled" sourceLastImported="1772325729" displayAsComponent="false" tooltip="Contains a compiled copy of the Newgrounds.io Library" customIconID="0" actionscriptClass="NgioClassLib" swfScmHRef="ilpumb73gu.swf" swfScmSourceFilename="C:\Users\chaos\AppData\Local\Adobe\Flash CS5.5\en_US\Configuration\TMPigbjeb739v..swf" persistLivePreview11="true" livePreview11ScmHRef="ilpumb73gu1.swf" livePreview11ScmSourceFilename="C:\Users\chaos\AppData\Local\Adobe\Flash CS5.5\en_US\Configuration\TMPigbjeb739v..swf" editFrameIndex="1" requiredMinimumPlayerVersion="0" requiredMinimumASVersion="0" parametersAreLocked="true" swcPath="Newgrounds.IO/assets/library/NgioClassLibCompiled.xml" rootSymbolLinkageID="NgioClassLib" movieRectLeft="-171" movieRectTop="-171" movieRectRight="171" movieRectBottom="171" playerVersion="9" actionscriptVersion="3" hashKey="vAEZieHAqhp40EFv99SsO0">
+               <classProperties><![CDATA[<component id="NgioClassLib" class="NgioClassLib" modified="1772325712612">
+<movieBounds xmin="-171" xmax="171" ymin="-171" ymax="171" />
+<classDefs>
+	<classDef id="io.newgrounds.helpers.HttpRequestHelper"/>
+	<classDef id="io.newgrounds.models.components.Event.logEvent"/>
+	<classDef id="io.newgrounds.models.components.Loader.loadOfficialUrl"/>
+	<classDef id="io.newgrounds.models.objects.Request"/>
+	<classDef id="com.hurlant.crypto.symmetric.OFBMode"/>
+	<classDef id="com.hurlant.crypto.symmetric.SimpleIVMode"/>
+	<classDef id="io.newgrounds.models.components.Medal.getMedalScore"/>
+	<classDef id="com.hurlant.crypto.hash.SHA1"/>
+	<classDef id="io.newgrounds.helpers.AppStateSessionHelper"/>
+	<classDef id="io.newgrounds.models.components.Loader.loadNewgrounds"/>
+	<classDef id="io.newgrounds.models.objects.SaveSlot"/>
+	<classDef id="io.newgrounds.models.results.Loader.loadReferralResult"/>
+	<classDef id="com.hurlant.crypto.symmetric.ICipher"/>
+	<classDef id="com.hurlant.crypto.tls.TLSError"/>
+	<classDef id="io.newgrounds.models.results.App.getCurrentVersionResult"/>
+	<classDef id="io.newgrounds.models.components.Gateway.getDatetime"/>
+	<classDef id="io.newgrounds.models.components.CloudSave.clearSlot"/>
+	<classDef id="com.hurlant.crypto.Crypto"/>
+	<classDef id="fl.livepreview.LivePreviewParent"/>
+	<classDef id="io.newgrounds.AppState"/>
+	<classDef id="io.newgrounds.models.results.Gateway.pingResult"/>
+	<classDef id="io.newgrounds.models.components.App.checkSession"/>
+	<classDef id="io.newgrounds.models.objects.Response"/>
+	<classDef id="com.hurlant.crypto.symmetric.CBCMode"/>
+	<classDef id="io.newgrounds.models.objects.Debug"/>
+	<classDef id="io.newgrounds.BaseResult"/>
+	<classDef id="io.newgrounds.models.components.ScoreBoard.getScores"/>
+	<classDef id="io.newgrounds.helpers.AppStateSessionResetHelper"/>
+	<classDef id="io.newgrounds.models.results.Medal.unlockResult"/>
+	<classDef id="com.hurlant.math.ClassicReduction"/>
+	<classDef id="com.hurlant.crypto.hash.MAC"/>
+	<classDef id="com.hurlant.math.BarrettReduction"/>
+	<classDef id="com.hurlant.crypto.prng.Random"/>
+	<classDef id="com.hurlant.crypto.symmetric.TripleDESKey"/>
+	<classDef id="io.newgrounds.models.components.Gateway.ping"/>
+	<classDef id="io.newgrounds.models.components.ScoreBoard.getBoards"/>
+	<classDef id="io.newgrounds.models.objects.User"/>
+	<classDef id="io.newgrounds.helpers.CoreComponentCallHelper"/>
+	<classDef id="io.newgrounds.helpers.NgioGatewayHelper"/>
+	<classDef id="io.newgrounds.models.components.Loader.loadAuthorUrl"/>
+	<classDef id="NgioClassLib"/>
+	<classDef id="com.hurlant.crypto.symmetric.BlowFishKey"/>
+	<classDef id="io.newgrounds.models.results.ScoreBoard.getScoresResult"/>
+	<classDef id="io.newgrounds.models.results.ScoreBoard.postScoreResult"/>
+	<classDef id="io.newgrounds.models.components.ScoreBoard.postScore"/>
+	<classDef id="io.newgrounds.models.objects.NgioError"/>
+	<classDef id="io.newgrounds.models.results.Loader.loadOfficialUrlResult"/>
+	<classDef id="io.newgrounds.models.objects.Score"/>
+	<classDef id="com.hurlant.crypto.hash.SHA224"/>
+	<classDef id="io.newgrounds.models.results.Gateway.getVersionResult"/>
+	<classDef id="io.newgrounds.models.components.CloudSave.loadSlots"/>
+	<classDef id="com.hurlant.crypto.hash.MD5"/>
+	<classDef id="com.hurlant.crypto.prng.ARC4"/>
+	<classDef id="io.newgrounds.models.results.Event.logEventResult"/>
+	<classDef id="com.hurlant.crypto.hash.MD2"/>
+	<classDef id="io.newgrounds.helpers.NgioAuthHelper"/>
+	<classDef id="io.newgrounds.Core"/>
+	<classDef id="com.hurlant.crypto.symmetric.PKCS5"/>
+	<classDef id="com.hurlant.util.Hex"/>
+	<classDef id="com.hurlant.math.NullReduction"/>
+	<classDef id="io.newgrounds.BaseComponent"/>
+	<classDef id="NGIO"/>
+	<classDef id="com.hurlant.crypto.symmetric.ISymmetricKey"/>
+	<classDef id="io.newgrounds.models.components.Gateway.getVersion"/>
+	<classDef id="io.newgrounds.helpers.CoreTransportHelper"/>
+	<classDef id="io.newgrounds.models.results.Gateway.getDatetimeResult"/>
+	<classDef id="io.newgrounds.helpers.NgioEventHelper"/>
+	<classDef id="io.newgrounds.models.results.App.checkSessionResult"/>
+	<classDef id="io.newgrounds.BaseObject"/>
+	<classDef id="com.hurlant.crypto.symmetric.NullPad"/>
+	<classDef id="io.newgrounds.helpers.NgioLoaderHelper"/>
+	<classDef id="io.newgrounds.helpers.AppStateResultUpdateHelper"/>
+	<classDef id="com.hurlant.crypto.symmetric.IVMode"/>
+	<classDef id="io.newgrounds.models.results.App.logViewResult"/>
+	<classDef id="io.newgrounds.models.results.App.getHostLicenseResult"/>
+	<classDef id="io.newgrounds.NGJSON"/>
+	<classDef id="NGJSON.as$50.NGJSONFallback"/>
+	<classDef id="NGJSON.as$50.NGJSONParser"/>
+	<classDef id="com.hurlant.util.Memory"/>
+	<classDef id="io.newgrounds.models.results.ScoreBoard.getBoardsResult"/>
+	<classDef id="io.newgrounds.models.components.Loader.loadMoreGames"/>
+	<classDef id="io.newgrounds.models.objects.ObjectFactory"/>
+	<classDef id="com.hurlant.crypto.symmetric.DESKey"/>
+	<classDef id="io.newgrounds.models.objects.ScoreBoard"/>
+	<classDef id="io.newgrounds.models.results.CloudSave.clearSlotResult"/>
+	<classDef id="io.newgrounds.helpers.AppStateBootstrapHelper"/>
+	<classDef id="io.newgrounds.models.components.CloudSave.loadSlot"/>
+	<classDef id="io.newgrounds.models.results.App.endSessionResult"/>
+	<classDef id="io.newgrounds.models.components.App.endSession"/>
+	<classDef id="io.newgrounds.models.results.Loader.loadMoreGamesResult"/>
+	<classDef id="com.hurlant.crypto.hash.IHMAC"/>
+	<classDef id="com.hurlant.crypto.symmetric.CFB8Mode"/>
+	<classDef id="io.newgrounds.helpers.CoreQueueExecutionHelper"/>
+	<classDef id="io.newgrounds.models.components.CloudSave.setData"/>
+	<classDef id="io.newgrounds.models.components.Medal.unlock"/>
+	<classDef id="io.newgrounds.Errors"/>
+	<classDef id="com.hurlant.crypto.rsa.RSAKey"/>
+	<classDef id="io.newgrounds.models.components.App.logView"/>
+	<classDef id="com.hurlant.crypto.symmetric.XTeaKey"/>
+	<classDef id="io.newgrounds.models.results.CloudSave.loadSlotResult"/>
+	<classDef id="io.newgrounds.models.objects.Execute"/>
+	<classDef id="io.newgrounds.models.components.Medal.getList"/>
+	<classDef id="com.hurlant.crypto.symmetric.CTRMode"/>
+	<classDef id="io.newgrounds.models.components.App.getHostLicense"/>
+	<classDef id="io.newgrounds.helpers.HttpResponseHelper"/>
+	<classDef id="io.newgrounds.models.results.App.startSessionResult"/>
+	<classDef id="com.hurlant.util.Base64"/>
+	<classDef id="com.hurlant.crypto.symmetric.ECBMode"/>
+	<classDef id="io.newgrounds.models.results.CloudSave.setDataResult"/>
+	<classDef id="com.hurlant.crypto.hash.SHA256"/>
+	<classDef id="com.hurlant.crypto.symmetric.IStreamCipher"/>
+	<classDef id="io.newgrounds.helpers.NgioBootstrapHelper"/>
+	<classDef id="io.newgrounds.models.components.App.getCurrentVersion"/>
+	<classDef id="io.newgrounds.helpers.AppStateComponentHelper"/>
+	<classDef id="com.hurlant.math.MontgomeryReduction"/>
+	<classDef id="com.hurlant.crypto.symmetric.CFBMode"/>
+	<classDef id="io.newgrounds.models.objects.Session"/>
+	<classDef id="io.newgrounds.models.components.App.startSession"/>
+	<classDef id="com.hurlant.math.IReduction"/>
+	<classDef id="com.hurlant.crypto.symmetric.AESKey"/>
+	<classDef id="com.hurlant.math.BigInteger"/>
+	<classDef id="io.newgrounds.models.results.Medal.getListResult"/>
+	<classDef id="io.newgrounds.models.results.Loader.loadNewgroundsResult"/>
+	<classDef id="com.hurlant.crypto.hash.SHABase"/>
+	<classDef id="com.hurlant.crypto.prng.IPRNG"/>
+	<classDef id="io.newgrounds.models.objects.Medal"/>
+	<classDef id="io.newgrounds.models.results.Medal.getMedalScoreResult"/>
+	<classDef id="io.newgrounds.models.results.Loader.loadAuthorUrlResult"/>
+	<classDef id="com.hurlant.crypto.hash.IHash"/>
+	<classDef id="io.newgrounds.models.components.Loader.loadReferral"/>
+	<classDef id="com.hurlant.crypto.symmetric.IMode"/>
+	<classDef id="com.hurlant.crypto.hash.HMAC"/>
+	<classDef id="io.newgrounds.SessionStatus"/>
+	<classDef id="io.newgrounds.models.results.CloudSave.loadSlotsResult"/>
+	<classDef id="com.hurlant.crypto.symmetric.IPad"/>
+	<classDef id="io.newgrounds.NgioEvent"/>
+</classDefs>
+<class id="NgioClassLib" >
+	<__go_to_ctor_definition_help file="C:\Newgrounds\ngio-libraries\NewgroundsIO-AS3\src\library\NgioClassLib.as" pos="2310" />
+	<method id="NgioClassLib" isConstructor="true" isProperty="false">
+	</method>
+</class></component>
+]]></classProperties>
+               <SwcItem name="NgioClassLib" version="1772325712" isTopLevel="true"/>
+          </DOMCompiledClipItem>
+     </media>
+     <symbols>
+          <Include href="Newgrounds.IO/assets/connector/_ngio_confirm_btn.xml" itemIcon="0" loadImmediate="false"/>
+          <Include href="Newgrounds.IO/assets/connector/_ngio_confirm_btn_wide.xml" itemIcon="0" loadImmediate="false"/>
+          <Include href="Newgrounds.IO/assets/connector/_ngio_loader_bar.xml" loadImmediate="false"/>
+          <Include href="Newgrounds.IO/assets/connector/_ngio_loader_bar_inner.xml" loadImmediate="false"/>
+          <Include href="Newgrounds.IO/assets/medalPopup/_ngio_medal_icon.xml" loadImmediate="false"/>
+          <Include href="Newgrounds.IO/assets/medalPopup/_ngio_medal_sounds.xml" loadImmediate="false"/>
+          <Include href="Newgrounds.IO/assets/medalPopup/_ngio_medal_unlock_flash.xml" itemIcon="1" loadImmediate="false"/>
+          <Include href="Newgrounds.IO/assets/medalPopup/_ngio_medal_unlock_shimmer.xml" loadImmediate="false"/>
+          <Include href="Newgrounds.IO/assets/medalPopup/_ngio_medal_unlock_shimmer_highlight.xml" itemIcon="1" loadImmediate="false"/>
+          <Include href="Newgrounds.IO/assets/medalPopup/Medal Tester.xml" loadImmediate="false"/>
+          <Include href="Newgrounds.IO/assets/saveSlots/_ngio_saveslot_bar.xml" loadImmediate="false"/>
+          <Include href="Newgrounds.IO/assets/saveSlots/_ngio_saveslot_delete_btn.xml" itemIcon="0" loadImmediate="false"/>
+          <Include href="Newgrounds.IO/assets/saveSlots/_ngio_saveslot_delete_confirm_short.xml" loadImmediate="false"/>
+          <Include href="Newgrounds.IO/assets/saveSlots/_ngio_saveslot_inner.xml" loadImmediate="false"/>
+          <Include href="Newgrounds.IO/assets/saveSlots/_ngio_saveslot_inner_tall.xml" loadImmediate="false"/>
+          <Include href="Newgrounds.IO/assets/saveSlots/_ngio_saveslot_item_mask.xml" loadImmediate="false"/>
+          <Include href="Newgrounds.IO/assets/saveSlots/_ngio_saveslot_manager_scrollbar.xml" loadImmediate="false"/>
+          <Include href="Newgrounds.IO/assets/saveSlots/_ngio_saveslot_select_bg.xml" loadImmediate="false"/>
+          <Include href="Newgrounds.IO/assets/saveSlots/_ngio_saveslot_select_btn.xml" itemIcon="0" loadImmediate="false"/>
+          <Include href="Newgrounds.IO/assets/saveSlots/SaveSlot tester.xml" loadImmediate="false"/>
+          <Include href="Newgrounds.IO/assets/scoreBoards/_ngio_high_score_show_everyone.xml" loadImmediate="false"/>
+          <Include href="Newgrounds.IO/assets/scoreBoards/_ngio_high_score_show_everyone_btn.xml" itemIcon="0" loadImmediate="false"/>
+          <Include href="Newgrounds.IO/assets/scoreBoards/_ngio_high_score_show_friends.xml" loadImmediate="false"/>
+          <Include href="Newgrounds.IO/assets/scoreBoards/_ngio_high_score_show_friends_btn.xml" itemIcon="0" loadImmediate="false"/>
+          <Include href="Newgrounds.IO/assets/scoreBoards/_ngio_high_score_show_self.xml" loadImmediate="false"/>
+          <Include href="Newgrounds.IO/assets/scoreBoards/_ngio_high_score_show_self_btn.xml" itemIcon="0" loadImmediate="false"/>
+          <Include href="Newgrounds.IO/assets/scoreBoards/_ngio_scoreboard_drop_options_bg.xml" loadImmediate="false"/>
+          <Include href="Newgrounds.IO/assets/scoreBoards/_ngio_scoreboard_line_btn.xml" itemIcon="0" loadImmediate="false"/>
+          <Include href="Newgrounds.IO/assets/scoreBoards/_ngio_scoreboard_list.xml" loadImmediate="false"/>
+          <Include href="Newgrounds.IO/assets/scoreBoards/_ngio_scoreboard_name.xml" loadImmediate="false"/>
+          <Include href="Newgrounds.IO/assets/scoreBoards/_ngio_scoreboard_period_btn.xml" itemIcon="0" loadImmediate="false"/>
+          <Include href="Newgrounds.IO/assets/scoreBoards/_ngio_scoreboard_period_select.xml" loadImmediate="false"/>
+          <Include href="Newgrounds.IO/assets/scoreBoards/_ngio_scoreboard_score_row.xml" loadImmediate="false"/>
+          <Include href="Newgrounds.IO/assets/scoreBoards/_ngio_scoreboard_select_option.xml" loadImmediate="false"/>
+          <Include href="Newgrounds.IO/assets/scoreBoards/_ngio_scoreboard_select_scroll_btn.xml" itemIcon="0" loadImmediate="false"/>
+          <Include href="Newgrounds.IO/assets/scoreBoards/_ngio_scoreboard_selector.xml" loadImmediate="false"/>
+          <Include href="Newgrounds.IO/assets/scoreBoards/_ngio_scoreboard_selector_scrollabr.xml" loadImmediate="false"/>
+          <Include href="Newgrounds.IO/assets/scoreBoards/Scoreboard Tester.xml" loadImmediate="false"/>
+          <Include href="Newgrounds.IO/assets/shared/_demo_btn.xml" itemIcon="0" loadImmediate="false"/>
+          <Include href="Newgrounds.IO/assets/shared/_ngio_close_btn.xml" itemIcon="0" loadImmediate="false"/>
+          <Include href="Newgrounds.IO/assets/shared/_ngio_close_btn_container.xml" loadImmediate="false"/>
+          <Include href="Newgrounds.IO/assets/shared/_ngio_confirm_button.xml" itemIcon="0" loadImmediate="false"/>
+          <Include href="Newgrounds.IO/assets/shared/_ngio_loader_ring.xml" loadImmediate="false"/>
+          <Include href="Newgrounds.IO/components/Newgrounds.IO Connector.xml" loadImmediate="false"/>
+          <Include href="Newgrounds.IO/components/Newgrounds.IO Medal Popup.xml" loadImmediate="false"/>
+          <Include href="Newgrounds.IO/components/Newgrounds.IO SaveSlot Manager.xml" loadImmediate="false"/>
+          <Include href="Newgrounds.IO/components/Newgrounds.IO SaveSlot Manager Large.xml" loadImmediate="false"/>
+          <Include href="Newgrounds.IO/components/Newgrounds.IO Scoreboard Full.xml" loadImmediate="false"/>
+          <Include href="Newgrounds.IO/components/Newgrounds.IO Scoreboard Minimal.xml" loadImmediate="false"/>
+          <Include href="Newgrounds.IO/components/Newgrounds.IO Scoreboard Single.xml" loadImmediate="false"/>
+          <Include href="Newgrounds.IO/library/NgioLibraryComponent.xml" loadImmediate="false"/>
+     </symbols>
+     <timelines>
+          <DOMTimeline name="Scene 1" currentFrame="96">
+               <layers>
+                    <DOMLayer name="help" color="#4FFF4F" autoNamed="false" layerType="guide">
+                         <frames>
+                              <DOMFrame index="0" duration="10" keyMode="9728">
+                                   <elements>
+                                        <DOMStaticText fontRenderingMode="standard" width="369.8" height="28.8" autoExpand="true" isSelectable="false">
+                                             <matrix>
+                                                  <Matrix tx="2.05" ty="-37.15"/>
+                                             </matrix>
+                                             <textRuns>
+                                                  <DOMTextRun>
+                                                       <characters>For help installing these components, read the documentation at&#xD;https://github.com/PsychoGoldfishNG/NewgroundsIO-AS3</characters>
+                                                       <textAttrs>
+                                                            <DOMTextAttrs aliasText="false" face="LiberationSans-Bold"/>
+                                                       </textAttrs>
+                                                  </DOMTextRun>
+                                             </textRuns>
+                                        </DOMStaticText>
+                                        <DOMStaticText fontRenderingMode="standard" width="365.2" height="57.7" autoExpand="true" isSelectable="false">
+                                             <matrix>
+                                                  <Matrix tx="110.75" ty="61.1"/>
+                                             </matrix>
+                                             <textRuns>
+                                                  <DOMTextRun>
+                                                       <characters>Copy and paste this to the start of your game.&#xD;Be sure and fill out the 'Component Parameters'&#xD;in the properties tab with your App details.</characters>
+                                                       <textAttrs>
+                                                            <DOMTextAttrs aliasText="false" size="16" face="LiberationSans-Bold"/>
+                                                       </textAttrs>
+                                                  </DOMTextRun>
+                                             </textRuns>
+                                        </DOMStaticText>
+                                   </elements>
+                              </DOMFrame>
+                              <DOMFrame index="10" duration="13" keyMode="9728">
+                                   <elements>
+                                        <DOMSymbolInstance libraryItemName="Newgrounds.IO/assets/medalPopup/_ngio_medal_sounds" centerPoint3DX="69.5" centerPoint3DY="64.25">
+                                             <matrix>
+                                                  <Matrix tx="69.55" ty="64.25"/>
+                                             </matrix>
+                                             <transformationPoint>
+                                                  <Point x="-0.05"/>
+                                             </transformationPoint>
+                                        </DOMSymbolInstance>
+                                        <DOMStaticText fontRenderingMode="standard" width="332.9" height="77.6" autoExpand="true" includeOutlines="true" isSelectable="false">
+                                             <matrix>
+                                                  <Matrix tx="170.1" ty="29.95"/>
+                                             </matrix>
+                                             <textRuns>
+                                                  <DOMTextRun>
+                                                       <characters>Copy and paste this to easily &#xD;import the medal sound effects.&#xD;(once you've imported this to your &#xD;library, you can remove it from the timeline)</characters>
+                                                       <textAttrs>
+                                                            <DOMTextAttrs aliasText="false" autoKern="false" size="16" face="LiberationSans-Bold"/>
+                                                       </textAttrs>
+                                                  </DOMTextRun>
+                                             </textRuns>
+                                        </DOMStaticText>
+                                        <DOMStaticText fontRenderingMode="standard" width="443.9" height="97.5" autoExpand="true" includeOutlines="true" isSelectable="false">
+                                             <matrix>
+                                                  <Matrix tx="176.05" ty="520.1"/>
+                                             </matrix>
+                                             <textRuns>
+                                                  <DOMTextRun>
+                                                       <characters>Copy and paste this to a layer that covers all frames &#xD;where medals could be unlocked.&#xD;&#xD;If you have muliple scenes, add this to every scene where &#xD;medals could be unlocked.</characters>
+                                                       <textAttrs>
+                                                            <DOMTextAttrs aliasText="false" autoKern="false" size="16" face="LiberationSans-Bold"/>
+                                                       </textAttrs>
+                                                  </DOMTextRun>
+                                             </textRuns>
+                                        </DOMStaticText>
+                                        <DOMGroup>
+                                             <members>
+                                                  <DOMShape>
+                                                       <strokes>
+                                                            <StrokeStyle index="1">
+                                                                 <SolidStroke scaleMode="normal" weight="4">
+                                                                      <fill>
+                                                                           <SolidColor/>
+                                                                      </fill>
+                                                                 </SolidStroke>
+                                                            </StrokeStyle>
+                                                       </strokes>
+                                                       <edges>
+                                                            <Edge strokeStyle="1" edges="!2654 1654|2431 1404!2431 1404|2639 1146!3175 1404|2431 1404"/>
+                                                            <Edge cubics="!3175 1404(3175,1404;3175,1404 2431,1404 2431,1404q3175 1404 2431 1404);"/>
+                                                            <Edge cubics="!2431 1404(;2431,1404 2639,1146 2639,1146q2431 1404 2639 1146)2639,1146;"/>
+                                                            <Edge cubics="!2654 1654(;2654,1654 2431,1404 2431,1404q2654 1654 2431 1404)2431,1404;"/>
+                                                       </edges>
+                                                  </DOMShape>
+                                             </members>
+                                        </DOMGroup>
+                                        <DOMGroup>
+                                             <members>
+                                                  <DOMShape>
+                                                       <strokes>
+                                                            <StrokeStyle index="1">
+                                                                 <SolidStroke scaleMode="normal" weight="4">
+                                                                      <fill>
+                                                                           <SolidColor/>
+                                                                      </fill>
+                                                                 </SolidStroke>
+                                                            </StrokeStyle>
+                                                       </strokes>
+                                                       <edges>
+                                                            <Edge strokeStyle="1" edges="!3529 9670|3779 9447!3779 9447|4037 9655!3779 10191|3779 9447"/>
+                                                            <Edge cubics="!3779 10191(3779,10191;3779,10191 3779,9447 3779,9447q3779 10191 3779 9447);"/>
+                                                            <Edge cubics="!3779 9447(;3779,9447 4037,9655 4037,9655q3779 9447 4037 9655)4037,9655;"/>
+                                                            <Edge cubics="!3529 9670(;3529,9670 3779,9447 3779,9447q3529 9670 3779 9447)3779,9447;"/>
+                                                       </edges>
+                                                  </DOMShape>
+                                             </members>
+                                        </DOMGroup>
+                                        <DOMGroup>
+                                             <members>
+                                                  <DOMShape>
+                                                       <strokes>
+                                                            <StrokeStyle index="1">
+                                                                 <SolidStroke scaleMode="normal" weight="4">
+                                                                      <fill>
+                                                                           <SolidColor/>
+                                                                      </fill>
+                                                                 </SolidStroke>
+                                                            </StrokeStyle>
+                                                       </strokes>
+                                                       <edges>
+                                                            <Edge strokeStyle="1" edges="!6107 5267|6107 6011!6107 6011|6357 5788!6107 6011|5849 5803"/>
+                                                            <Edge cubics="!6107 5267(6107,5267;6107,5267 6107,6011 6107,6011q6107 5267 6107 6011);"/>
+                                                            <Edge cubics="!6107 6011(;6107,6011 5849,5803 5849,5803q6107 6011 5849 5803)5849,5803;"/>
+                                                            <Edge cubics="!6357 5788(;6357,5788 6107,6011 6107,6011q6357 5788 6107 6011)6107,6011;"/>
+                                                       </edges>
+                                                  </DOMShape>
+                                             </members>
+                                        </DOMGroup>
+                                        <DOMStaticText fontRenderingMode="standard" width="320.1" height="37.8" autoExpand="true" includeOutlines="true" isSelectable="false">
+                                             <matrix>
+                                                  <Matrix tx="166.05" ty="216.15"/>
+                                             </matrix>
+                                             <textRuns>
+                                                  <DOMTextRun>
+                                                       <characters>This clip has example code for how&#xD;to unlock a medal using the widget below.</characters>
+                                                       <textAttrs>
+                                                            <DOMTextAttrs aliasText="false" autoKern="false" size="16" face="LiberationSans-Bold"/>
+                                                       </textAttrs>
+                                                  </DOMTextRun>
+                                             </textRuns>
+                                        </DOMStaticText>
+                                   </elements>
+                              </DOMFrame>
+                              <DOMFrame index="23" duration="49" keyMode="9728">
+                                   <elements>
+                                        <DOMStaticText fontRenderingMode="standard" width="430.4" height="37.8" autoExpand="true" includeOutlines="true" isSelectable="false">
+                                             <matrix>
+                                                  <Matrix tx="104.8" ty="-24.85"/>
+                                             </matrix>
+                                             <textRuns>
+                                                  <DOMTextRun>
+                                                       <characters>Copy and paste the appropriate board for your use case.&#xD;</characters>
+                                                       <textAttrs>
+                                                            <DOMTextAttrs aliasText="false" autoKern="false" size="16" face="LiberationSans-Bold"/>
+                                                       </textAttrs>
+                                                  </DOMTextRun>
+                                             </textRuns>
+                                        </DOMStaticText>
+                                        <DOMGroup>
+                                             <members>
+                                                  <DOMShape>
+                                                       <strokes>
+                                                            <StrokeStyle index="1">
+                                                                 <SolidStroke scaleMode="normal" weight="4">
+                                                                      <fill>
+                                                                           <SolidColor/>
+                                                                      </fill>
+                                                                 </SolidStroke>
+                                                            </StrokeStyle>
+                                                       </strokes>
+                                                       <edges>
+                                                            <Edge strokeStyle="1" edges="!6218 10242|6218 9498!6218 9498|5968 9721!6218 9498|6476 9706"/>
+                                                            <Edge cubics="!6218 10242(6218,10242;6218,10242 6218,9498 6218,9498q6218 10242 6218 9498);"/>
+                                                            <Edge cubics="!6218 9498(;6218,9498 6476,9706 6476,9706q6218 9498 6476 9706)6476,9706;"/>
+                                                            <Edge cubics="!5968 9721(;5968,9721 6218,9498 6218,9498q5968 9721 6218 9498)6218,9498;"/>
+                                                       </edges>
+                                                  </DOMShape>
+                                             </members>
+                                        </DOMGroup>
+                                        <DOMStaticText fontRenderingMode="standard" width="269.5" height="37.8" autoExpand="true" includeOutlines="true" isSelectable="false">
+                                             <matrix>
+                                                  <Matrix tx="172" ty="520.7"/>
+                                             </matrix>
+                                             <textRuns>
+                                                  <DOMTextRun>
+                                                       <characters>This clip has example code for how&#xD;to post a high score.</characters>
+                                                       <textAttrs>
+                                                            <DOMTextAttrs aliasText="false" autoKern="false" size="16" face="LiberationSans-Bold"/>
+                                                       </textAttrs>
+                                                  </DOMTextRun>
+                                             </textRuns>
+                                        </DOMStaticText>
+                                   </elements>
+                              </DOMFrame>
+                              <DOMFrame index="72" duration="37" keyMode="9728">
+                                   <elements>
+                                        <DOMGroup>
+                                             <members>
+                                                  <DOMShape>
+                                                       <strokes>
+                                                            <StrokeStyle index="1">
+                                                                 <SolidStroke scaleMode="normal" weight="4">
+                                                                      <fill>
+                                                                           <SolidColor/>
+                                                                      </fill>
+                                                                 </SolidStroke>
+                                                            </StrokeStyle>
+                                                       </strokes>
+                                                       <edges>
+                                                            <Edge strokeStyle="1" edges="!4618 10147|4618 9403!4618 9403|4368 9626!4618 9403|4876 9611"/>
+                                                            <Edge cubics="!4618 10147(4618,10147;4618,10147 4618,9403 4618,9403q4618 10147 4618 9403);"/>
+                                                            <Edge cubics="!4618 9403(;4618,9403 4876,9611 4876,9611q4618 9403 4876 9611)4876,9611;"/>
+                                                            <Edge cubics="!4368 9626(;4368,9626 4618,9403 4618,9403q4368 9626 4618 9403)4618,9403;"/>
+                                                       </edges>
+                                                  </DOMShape>
+                                             </members>
+                                        </DOMGroup>
+                                        <DOMStaticText fontRenderingMode="standard" width="312.1" height="37.8" autoExpand="true" includeOutlines="true" isSelectable="false">
+                                             <matrix>
+                                                  <Matrix tx="81" ty="515.95"/>
+                                             </matrix>
+                                             <textRuns>
+                                                  <DOMTextRun>
+                                                       <characters>This clip has example code for how to&#xD;save and load with the above component</characters>
+                                                       <textAttrs>
+                                                            <DOMTextAttrs aliasText="false" autoKern="false" size="16" face="LiberationSans-Bold"/>
+                                                       </textAttrs>
+                                                  </DOMTextRun>
+                                             </textRuns>
+                                        </DOMStaticText>
+                                        <DOMStaticText fontRenderingMode="standard" width="472.15" height="37.8" autoExpand="true" includeOutlines="true" isSelectable="false">
+                                             <matrix>
+                                                  <Matrix tx="79" ty="-37.95"/>
+                                             </matrix>
+                                             <textRuns>
+                                                  <DOMTextRun>
+                                                       <characters>Copy and paste the appropriate component for your use case.&#xD;</characters>
+                                                       <textAttrs>
+                                                            <DOMTextAttrs aliasText="false" autoKern="false" size="16" face="LiberationSans-Bold"/>
+                                                       </textAttrs>
+                                                  </DOMTextRun>
+                                             </textRuns>
+                                        </DOMStaticText>
+                                   </elements>
+                              </DOMFrame>
+                         </frames>
+                    </DOMLayer>
+                    <DOMLayer name="frames" color="#9933CC" autoNamed="false" layerType="guide">
+                         <frames>
+                              <DOMFrame index="0" duration="10" name=" connector" labelType="comment" keyMode="9728">
+                                   <Actionscript>
+                                        <script><![CDATA[import NGIO]]></script>
+                                   </Actionscript>
+                                   <elements/>
+                              </DOMFrame>
+                              <DOMFrame index="10" duration="13" name=" medal popup" labelType="comment" keyMode="9728">
+                                   <elements/>
+                              </DOMFrame>
+                              <DOMFrame index="23" duration="14" name=" scoreboard full" labelType="comment" keyMode="9728">
+                                   <elements/>
+                              </DOMFrame>
+                              <DOMFrame index="37" duration="17" name=" scoreboard single" labelType="comment" keyMode="9728">
+                                   <elements/>
+                              </DOMFrame>
+                              <DOMFrame index="54" duration="18" name=" scoreboard minimalist" labelType="comment" keyMode="9728">
+                                   <elements/>
+                              </DOMFrame>
+                              <DOMFrame index="72" duration="17" name=" save manager basic" labelType="comment" keyMode="9728">
+                                   <elements/>
+                              </DOMFrame>
+                              <DOMFrame index="89" duration="20" name=" save manager supporter" labelType="comment" keyMode="9728">
+                                   <elements/>
+                              </DOMFrame>
+                         </frames>
+                    </DOMLayer>
+                    <DOMLayer name="test tools" color="#4FFF4F" current="true" isSelected="true" autoNamed="false">
+                         <frames>
+                              <DOMFrame index="0" duration="10" keyMode="9728">
+                                   <elements/>
+                              </DOMFrame>
+                              <DOMFrame index="10" duration="13" keyMode="9728">
+                                   <elements>
+                                        <DOMSymbolInstance libraryItemName="Newgrounds.IO/assets/medalPopup/Medal Tester" centerPoint3DX="319.95" centerPoint3DY="324.75">
+                                             <matrix>
+                                                  <Matrix d="1.001708984375" tx="169" ty="310"/>
+                                             </matrix>
+                                             <transformationPoint>
+                                                  <Point x="150.95" y="14.65"/>
+                                             </transformationPoint>
+                                        </DOMSymbolInstance>
+                                   </elements>
+                              </DOMFrame>
+                              <DOMFrame index="23" duration="49" keyMode="9728">
+                                   <elements>
+                                        <DOMSymbolInstance libraryItemName="Newgrounds.IO/assets/scoreBoards/Scoreboard Tester" centerPoint3DX="229.95" centerPoint3DY="454.75">
+                                             <matrix>
+                                                  <Matrix d="1.001708984375" tx="79" ty="440"/>
+                                             </matrix>
+                                             <transformationPoint>
+                                                  <Point x="150.95" y="14.65"/>
+                                             </transformationPoint>
+                                        </DOMSymbolInstance>
+                                   </elements>
+                              </DOMFrame>
+                              <DOMFrame index="72" duration="37" keyMode="9728">
+                                   <elements>
+                                        <DOMSymbolInstance libraryItemName="Newgrounds.IO/assets/saveSlots/SaveSlot tester" centerPoint3DX="319.45" centerPoint3DY="385.45">
+                                             <matrix>
+                                                  <Matrix tx="26" ty="311.3"/>
+                                             </matrix>
+                                             <transformationPoint>
+                                                  <Point x="293.45" y="74.15"/>
+                                             </transformationPoint>
+                                        </DOMSymbolInstance>
+                                   </elements>
+                              </DOMFrame>
+                         </frames>
+                    </DOMLayer>
+                    <DOMLayer name="components" color="#FF800A" autoNamed="false">
+                         <frames>
+                              <DOMFrame index="0" duration="10" keyMode="9728">
+                                   <Actionscript>
+                                        <script><![CDATA[/*
+import io.newgrounds.NgioEvent;
+
+ngioConnector.addEventListener(io.newgrounds.NgioEvent.CONNECTOR_COMPLETED, function(e:*) {
+	e.target.parent.gotoAndStop(90); 
+});
+*/
+
+stop();]]></script>
+                                   </Actionscript>
+                                   <elements>
+                                        <DOMComponentInstance libraryItemName="Newgrounds.IO/components/Newgrounds.IO Connector" name="ngioConnector" centerPoint3DX="319.9" centerPoint3DY="237.95" uniqueID="8">
+                                             <matrix>
+                                                  <Matrix tx="97.6" ty="125.9"/>
+                                             </matrix>
+                                             <transformationPoint>
+                                                  <Point x="222.3" y="112.05"/>
+                                             </transformationPoint>
+                                             <dataBindingXML><![CDATA[<component metaDataFetched='true' schemaUrl='' schemaOperation='' sceneRootLabel='Scene 1' oldCopiedComponentPath='8'>
+</component>
+]]></dataBindingXML>
+                                             <parametersAsXML><![CDATA[   <property id="appId">
+      <Inspectable name="App ID" variable="appId" category="" verbose="0" defaultValue="61512:1uYiEl7d" type="String"/>
+   </property>
+   <property id="encryptionKey">
+      <Inspectable name="Encryption Key" variable="encryptionKey" category="" verbose="0" defaultValue="1FjdwbrBGZ4oBZuMPhXqBQ==" type="String"/>
+   </property>
+   <property id="appVersion">
+      <Inspectable name="App version" variable="appVersion" category="" verbose="0" defaultValue="" type="String"/>
+   </property>
+   <property id="debug">
+      <Inspectable name="Debug Mode" variable="debug" category="" verbose="0" defaultValue="false" type="Boolean"/>
+   </property>
+   <property id="showNetworkiMessages">
+      <Inspectable name="Show Network Messages" variable="showNetworkiMessages" category="" verbose="0" defaultValue="false" type="Boolean"/>
+   </property>
+]]></parametersAsXML>
+                                        </DOMComponentInstance>
+                                   </elements>
+                              </DOMFrame>
+                              <DOMFrame index="10" duration="13" keyMode="9728">
+                                   <Actionscript>
+                                        <script><![CDATA[stop();]]></script>
+                                   </Actionscript>
+                                   <elements>
+                                        <DOMComponentInstance libraryItemName="Newgrounds.IO/components/Newgrounds.IO Medal Popup" name="ngioMedalPopup" centerPoint3DX="320" centerPoint3DY="427" uniqueID="55">
+                                             <matrix>
+                                                  <Matrix tx="150" ty="394"/>
+                                             </matrix>
+                                             <transformationPoint>
+                                                  <Point x="170" y="33"/>
+                                             </transformationPoint>
+                                             <dataBindingXML><![CDATA[<component metaDataFetched='true' schemaUrl='' schemaOperation='' sceneRootLabel='Scene 1' oldCopiedComponentPath='55'>
+</component>
+]]></dataBindingXML>
+                                             <parametersAsXML><![CDATA[   <property id="show_even_if_unlocked">
+      <Inspectable name="Show Even if Unlocked" variable="show_even_if_unlocked" category="" verbose="0" defaultValue="false" type="Boolean"/>
+   </property>
+]]></parametersAsXML>
+                                        </DOMComponentInstance>
+                                   </elements>
+                              </DOMFrame>
+                              <DOMFrame index="23" duration="14" keyMode="9728">
+                                   <Actionscript>
+                                        <script><![CDATA[stop();]]></script>
+                                   </Actionscript>
+                                   <elements>
+                                        <DOMComponentInstance libraryItemName="Newgrounds.IO/components/Newgrounds.IO Scoreboard Full" name="ngioScoreBoard" centerPoint3DX="320" centerPoint3DY="219" uniqueID="6">
+                                             <matrix>
+                                                  <Matrix tx="18" ty="5"/>
+                                             </matrix>
+                                             <transformationPoint>
+                                                  <Point x="302" y="214"/>
+                                             </transformationPoint>
+                                             <dataBindingXML><![CDATA[<component metaDataFetched='true' schemaUrl='' schemaOperation='' sceneRootLabel='Scene 1' oldCopiedComponentPath='6'>
+</component>
+]]></dataBindingXML>
+                                             <parametersAsXML><![CDATA[   <property id="board_id">
+      <Inspectable name="ScoreBoard ID" variable="board_id" category="" verbose="0" defaultValue="0" type="Number"/>
+   </property>
+   <property id="period">
+      <Inspectable name="Period" variable="period" category="" verbose="0" defaultValue="Today" enumeration="Today,Week,Month,Year,All" type="List"/>
+   </property>
+   <property id="show">
+      <Inspectable name="Show" variable="show" category="" verbose="0" defaultValue="Everybody" enumeration="My Best,Friends,Everybody" type="List"/>
+   </property>
+   <property id="tag">
+      <Inspectable name="Tag (optional)" variable="tag" category="" verbose="0" defaultValue="" type="String"/>
+   </property>
+]]></parametersAsXML>
+                                        </DOMComponentInstance>
+                                   </elements>
+                              </DOMFrame>
+                              <DOMFrame index="37" duration="17" keyMode="9728">
+                                   <Actionscript>
+                                        <script><![CDATA[stop();]]></script>
+                                   </Actionscript>
+                                   <elements>
+                                        <DOMComponentInstance libraryItemName="Newgrounds.IO/components/Newgrounds.IO Scoreboard Single" name="ngioScoreBoard" selected="true" centerPoint3DX="320" centerPoint3DY="219" uniqueID="10">
+                                             <matrix>
+                                                  <Matrix tx="18" ty="5"/>
+                                             </matrix>
+                                             <transformationPoint>
+                                                  <Point x="302" y="214"/>
+                                             </transformationPoint>
+                                             <dataBindingXML><![CDATA[<component metaDataFetched='true' schemaUrl='' schemaOperation='' sceneRootLabel='Scene 1' oldCopiedComponentPath='10'>
+</component>
+]]></dataBindingXML>
+                                             <parametersAsXML><![CDATA[   <property id="board_id">
+      <Inspectable name="ScoreBoard ID" variable="board_id" category="" verbose="0" defaultValue="0" type="Number"/>
+   </property>
+   <property id="period">
+      <Inspectable name="Period" variable="period" category="" verbose="0" defaultValue="Today" enumeration="Today,Week,Month,Year,All" type="List"/>
+   </property>
+   <property id="show">
+      <Inspectable name="Show" variable="show" category="" verbose="0" defaultValue="Everybody" enumeration="My Best,Friends,Everybody" type="List"/>
+   </property>
+   <property id="tag">
+      <Inspectable name="Tag (optional)" variable="tag" category="" verbose="0" defaultValue="" type="String"/>
+   </property>
+]]></parametersAsXML>
+                                        </DOMComponentInstance>
+                                   </elements>
+                              </DOMFrame>
+                              <DOMFrame index="54" duration="18" keyMode="9728">
+                                   <Actionscript>
+                                        <script><![CDATA[stop();]]></script>
+                                   </Actionscript>
+                                   <elements>
+                                        <DOMComponentInstance libraryItemName="Newgrounds.IO/components/Newgrounds.IO Scoreboard Minimal" name="ngioScoreBoard" centerPoint3DX="320" centerPoint3DY="231" uniqueID="12">
+                                             <matrix>
+                                                  <Matrix tx="18" ty="17"/>
+                                             </matrix>
+                                             <transformationPoint>
+                                                  <Point x="302" y="214"/>
+                                             </transformationPoint>
+                                             <dataBindingXML><![CDATA[<component metaDataFetched='true' schemaUrl='' schemaOperation='' sceneRootLabel='Scene 1' oldCopiedComponentPath='12'>
+</component>
+]]></dataBindingXML>
+                                             <parametersAsXML><![CDATA[   <property id="board_id">
+      <Inspectable name="ScoreBoard ID" variable="board_id" category="" verbose="0" defaultValue="0" type="Number"/>
+   </property>
+   <property id="period">
+      <Inspectable name="Period" variable="period" category="" verbose="0" defaultValue="Today" enumeration="Today,Week,Month,Year,All" type="List"/>
+   </property>
+   <property id="show">
+      <Inspectable name="Show" variable="show" category="" verbose="0" defaultValue="Everybody" enumeration="My Best,Friends,Everybody" type="List"/>
+   </property>
+   <property id="tag">
+      <Inspectable name="Tag (optional)" variable="tag" category="" verbose="0" defaultValue="" type="String"/>
+   </property>
+]]></parametersAsXML>
+                                        </DOMComponentInstance>
+                                   </elements>
+                              </DOMFrame>
+                              <DOMFrame index="72" duration="17" keyMode="9728">
+                                   <Actionscript>
+                                        <script><![CDATA[stop();]]></script>
+                                   </Actionscript>
+                                   <elements>
+                                        <DOMComponentInstance libraryItemName="Newgrounds.IO/components/Newgrounds.IO SaveSlot Manager" name="saveSlotManager" selected="true" centerPoint3DX="395" centerPoint3DY="215" uniqueID="5">
+                                             <matrix>
+                                                  <Matrix tx="93" ty="23"/>
+                                             </matrix>
+                                             <transformationPoint>
+                                                  <Point/>
+                                             </transformationPoint>
+                                             <dataBindingXML><![CDATA[<component metaDataFetched='true' schemaUrl='' schemaOperation='' sceneRootLabel='Scene 1' oldCopiedComponentPath='5'>
+</component>
+]]></dataBindingXML>
+                                             <parametersAsXML><![CDATA[   <property id="action">
+      <Inspectable name="Action" variable="action" category="" verbose="0" defaultValue="Load Data" enumeration="Load Data,Save Data" type="List"/>
+   </property>
+   <property id="sort_by">
+      <Inspectable name="Sort By" variable="sort_by" category="" verbose="0" defaultValue="Slot ID" enumeration="Last Updated,Slot ID" type="List"/>
+   </property>
+   <property id="show_slot_numbers">
+      <Inspectable name="Show Slot Numbers" variable="show_slot_numbers" category="" verbose="0" defaultValue="true" type="Boolean"/>
+   </property>
+   <property id="use_raw">
+      <Inspectable name="Use Raw Data" variable="use_raw" category="" verbose="0" defaultValue="false" type="Boolean"/>
+   </property>
+]]></parametersAsXML>
+                                        </DOMComponentInstance>
+                                   </elements>
+                              </DOMFrame>
+                              <DOMFrame index="89" duration="20" keyMode="9728">
+                                   <elements>
+                                        <DOMComponentInstance libraryItemName="Newgrounds.IO/components/Newgrounds.IO SaveSlot Manager Large" name="saveSlotManager" centerPoint3DX="395" centerPoint3DY="195" uniqueID="5">
+                                             <matrix>
+                                                  <Matrix tx="93" ty="3"/>
+                                             </matrix>
+                                             <transformationPoint>
+                                                  <Point/>
+                                             </transformationPoint>
+                                             <dataBindingXML><![CDATA[<component metaDataFetched='true' schemaUrl='' schemaOperation='' sceneRootLabel='Scene 1' oldCopiedComponentPath='5'>
+</component>
+]]></dataBindingXML>
+                                             <parametersAsXML><![CDATA[   <property id="action">
+      <Inspectable name="Action" variable="action" category="" verbose="0" defaultValue="Load Data" enumeration="Load Data,Save Data" type="List"/>
+   </property>
+   <property id="sort_by">
+      <Inspectable name="Sort By" variable="sort_by" category="" verbose="0" defaultValue="Slot ID" enumeration="Last Updated,Slot ID" type="List"/>
+   </property>
+   <property id="show_slot_numbers">
+      <Inspectable name="Show Slot Numbers" variable="show_slot_numbers" category="" verbose="0" defaultValue="true" type="Boolean"/>
+   </property>
+   <property id="use_raw">
+      <Inspectable name="Use Raw Data" variable="use_raw" category="" verbose="0" defaultValue="false" type="Boolean"/>
+   </property>
+]]></parametersAsXML>
+                                        </DOMComponentInstance>
+                                   </elements>
+                              </DOMFrame>
+                         </frames>
+                    </DOMLayer>
+               </layers>
+          </DOMTimeline>
+     </timelines>
+     <swatchLists>
+          <swatchList>
+               <swatches>
+                    <SolidSwatchItem/>
+                    <SolidSwatchItem/>
+                    <SolidSwatchItem/>
+                    <SolidSwatchItem/>
+                    <SolidSwatchItem color="#003300" hue="80" saturation="239" brightness="24"/>
+                    <SolidSwatchItem color="#006600" hue="80" saturation="239" brightness="48"/>
+                    <SolidSwatchItem color="#009900" hue="80" saturation="239" brightness="72"/>
+                    <SolidSwatchItem color="#00CC00" hue="80" saturation="239" brightness="96"/>
+                    <SolidSwatchItem color="#00FF00" hue="80" saturation="239" brightness="120"/>
+                    <SolidSwatchItem color="#330000" saturation="239" brightness="24"/>
+                    <SolidSwatchItem color="#333300" hue="40" saturation="239" brightness="24"/>
+                    <SolidSwatchItem color="#336600" hue="60" saturation="239" brightness="48"/>
+                    <SolidSwatchItem color="#339900" hue="67" saturation="239" brightness="72"/>
+                    <SolidSwatchItem color="#33CC00" hue="70" saturation="239" brightness="96"/>
+                    <SolidSwatchItem color="#33FF00" hue="72" saturation="239" brightness="120"/>
+                    <SolidSwatchItem color="#660000" saturation="239" brightness="48"/>
+                    <SolidSwatchItem color="#663300" hue="20" saturation="239" brightness="48"/>
+                    <SolidSwatchItem color="#666600" hue="40" saturation="239" brightness="48"/>
+                    <SolidSwatchItem color="#669900" hue="53" saturation="239" brightness="72"/>
+                    <SolidSwatchItem color="#66CC00" hue="60" saturation="239" brightness="96"/>
+                    <SolidSwatchItem color="#66FF00" hue="64" saturation="239" brightness="120"/>
+                    <SolidSwatchItem/>
+                    <SolidSwatchItem color="#333333" brightness="48"/>
+                    <SolidSwatchItem/>
+                    <SolidSwatchItem color="#000033" hue="160" saturation="239" brightness="24"/>
+                    <SolidSwatchItem color="#003333" hue="120" saturation="239" brightness="24"/>
+                    <SolidSwatchItem color="#006633" hue="100" saturation="239" brightness="48"/>
+                    <SolidSwatchItem color="#009933" hue="93" saturation="239" brightness="72"/>
+                    <SolidSwatchItem color="#00CC33" hue="90" saturation="239" brightness="96"/>
+                    <SolidSwatchItem color="#00FF33" hue="88" saturation="239" brightness="120"/>
+                    <SolidSwatchItem color="#330033" hue="200" saturation="239" brightness="24"/>
+                    <SolidSwatchItem color="#333333" brightness="48"/>
+                    <SolidSwatchItem color="#336633" hue="80" saturation="80" brightness="72"/>
+                    <SolidSwatchItem color="#339933" hue="80" saturation="120" brightness="96"/>
+                    <SolidSwatchItem color="#33CC33" hue="80" saturation="144" brightness="120"/>
+                    <SolidSwatchItem color="#33FF33" hue="80" saturation="239" brightness="144"/>
+                    <SolidSwatchItem color="#660033" hue="220" saturation="239" brightness="48"/>
+                    <SolidSwatchItem color="#663333" saturation="80" brightness="72"/>
+                    <SolidSwatchItem color="#666633" hue="40" saturation="80" brightness="72"/>
+                    <SolidSwatchItem color="#669933" hue="60" saturation="120" brightness="96"/>
+                    <SolidSwatchItem color="#66CC33" hue="67" saturation="144" brightness="120"/>
+                    <SolidSwatchItem color="#66FF33" hue="70" saturation="239" brightness="144"/>
+                    <SolidSwatchItem/>
+                    <SolidSwatchItem color="#666666" brightness="96"/>
+                    <SolidSwatchItem/>
+                    <SolidSwatchItem color="#000066" hue="160" saturation="239" brightness="48"/>
+                    <SolidSwatchItem color="#003366" hue="140" saturation="239" brightness="48"/>
+                    <SolidSwatchItem color="#006666" hue="120" saturation="239" brightness="48"/>
+                    <SolidSwatchItem color="#009966" hue="107" saturation="239" brightness="72"/>
+                    <SolidSwatchItem color="#00CC66" hue="100" saturation="239" brightness="96"/>
+                    <SolidSwatchItem color="#00FF66" hue="96" saturation="239" brightness="120"/>
+                    <SolidSwatchItem color="#330066" hue="180" saturation="239" brightness="48"/>
+                    <SolidSwatchItem color="#333366" hue="160" saturation="80" brightness="72"/>
+                    <SolidSwatchItem color="#336666" hue="120" saturation="80" brightness="72"/>
+                    <SolidSwatchItem color="#339966" hue="100" saturation="120" brightness="96"/>
+                    <SolidSwatchItem color="#33CC66" hue="93" saturation="144" brightness="120"/>
+                    <SolidSwatchItem color="#33FF66" hue="90" saturation="239" brightness="144"/>
+                    <SolidSwatchItem color="#660066" hue="200" saturation="239" brightness="48"/>
+                    <SolidSwatchItem color="#663366" hue="200" saturation="80" brightness="72"/>
+                    <SolidSwatchItem color="#666666" brightness="96"/>
+                    <SolidSwatchItem color="#669966" hue="80" saturation="48" brightness="120"/>
+                    <SolidSwatchItem color="#66CC66" hue="80" saturation="120" brightness="144"/>
+                    <SolidSwatchItem color="#66FF66" hue="80" saturation="239" brightness="168"/>
+                    <SolidSwatchItem/>
+                    <SolidSwatchItem color="#999999" brightness="144"/>
+                    <SolidSwatchItem/>
+                    <SolidSwatchItem color="#000099" hue="160" saturation="239" brightness="72"/>
+                    <SolidSwatchItem color="#003399" hue="147" saturation="239" brightness="72"/>
+                    <SolidSwatchItem color="#006699" hue="133" saturation="239" brightness="72"/>
+                    <SolidSwatchItem color="#009999" hue="120" saturation="239" brightness="72"/>
+                    <SolidSwatchItem color="#00CC99" hue="110" saturation="239" brightness="96"/>
+                    <SolidSwatchItem color="#00FF99" hue="104" saturation="239" brightness="120"/>
+                    <SolidSwatchItem color="#330099" hue="173" saturation="239" brightness="72"/>
+                    <SolidSwatchItem color="#333399" hue="160" saturation="120" brightness="96"/>
+                    <SolidSwatchItem color="#336699" hue="140" saturation="120" brightness="96"/>
+                    <SolidSwatchItem color="#339999" hue="120" saturation="120" brightness="96"/>
+                    <SolidSwatchItem color="#33CC99" hue="107" saturation="144" brightness="120"/>
+                    <SolidSwatchItem color="#33FF99" hue="100" saturation="239" brightness="144"/>
+                    <SolidSwatchItem color="#660099" hue="187" saturation="239" brightness="72"/>
+                    <SolidSwatchItem color="#663399" hue="180" saturation="120" brightness="96"/>
+                    <SolidSwatchItem color="#666699" hue="160" saturation="48" brightness="120"/>
+                    <SolidSwatchItem color="#669999" hue="120" saturation="48" brightness="120"/>
+                    <SolidSwatchItem color="#66CC99" hue="100" saturation="120" brightness="144"/>
+                    <SolidSwatchItem color="#66FF99" hue="93" saturation="239" brightness="168"/>
+                    <SolidSwatchItem/>
+                    <SolidSwatchItem color="#CCCCCC" brightness="192"/>
+                    <SolidSwatchItem/>
+                    <SolidSwatchItem color="#0000CC" hue="160" saturation="239" brightness="96"/>
+                    <SolidSwatchItem color="#0033CC" hue="150" saturation="239" brightness="96"/>
+                    <SolidSwatchItem color="#0066CC" hue="140" saturation="239" brightness="96"/>
+                    <SolidSwatchItem color="#0099CC" hue="130" saturation="239" brightness="96"/>
+                    <SolidSwatchItem color="#00CCCC" hue="120" saturation="239" brightness="96"/>
+                    <SolidSwatchItem color="#00FFCC" hue="112" saturation="239" brightness="120"/>
+                    <SolidSwatchItem color="#3300CC" hue="170" saturation="239" brightness="96"/>
+                    <SolidSwatchItem color="#3333CC" hue="160" saturation="144" brightness="120"/>
+                    <SolidSwatchItem color="#3366CC" hue="147" saturation="144" brightness="120"/>
+                    <SolidSwatchItem color="#3399CC" hue="133" saturation="144" brightness="120"/>
+                    <SolidSwatchItem color="#33CCCC" hue="120" saturation="144" brightness="120"/>
+                    <SolidSwatchItem color="#33FFCC" hue="110" saturation="239" brightness="144"/>
+                    <SolidSwatchItem color="#6600CC" hue="180" saturation="239" brightness="96"/>
+                    <SolidSwatchItem color="#6633CC" hue="173" saturation="144" brightness="120"/>
+                    <SolidSwatchItem color="#6666CC" hue="160" saturation="120" brightness="144"/>
+                    <SolidSwatchItem color="#6699CC" hue="140" saturation="120" brightness="144"/>
+                    <SolidSwatchItem color="#66CCCC" hue="120" saturation="120" brightness="144"/>
+                    <SolidSwatchItem color="#66FFCC" hue="107" saturation="239" brightness="168"/>
+                    <SolidSwatchItem/>
+                    <SolidSwatchItem color="#FFFFFF" brightness="240"/>
+                    <SolidSwatchItem/>
+                    <SolidSwatchItem color="#0000FF" hue="160" saturation="239" brightness="120"/>
+                    <SolidSwatchItem color="#0033FF" hue="152" saturation="239" brightness="120"/>
+                    <SolidSwatchItem color="#0066FF" hue="144" saturation="239" brightness="120"/>
+                    <SolidSwatchItem color="#0099FF" hue="136" saturation="239" brightness="120"/>
+                    <SolidSwatchItem color="#00CCFF" hue="128" saturation="239" brightness="120"/>
+                    <SolidSwatchItem color="#00FFFF" hue="120" saturation="239" brightness="120"/>
+                    <SolidSwatchItem color="#3300FF" hue="168" saturation="239" brightness="120"/>
+                    <SolidSwatchItem color="#3333FF" hue="160" saturation="239" brightness="144"/>
+                    <SolidSwatchItem color="#3366FF" hue="150" saturation="239" brightness="144"/>
+                    <SolidSwatchItem color="#3399FF" hue="140" saturation="239" brightness="144"/>
+                    <SolidSwatchItem color="#33CCFF" hue="130" saturation="239" brightness="144"/>
+                    <SolidSwatchItem color="#33FFFF" hue="120" saturation="239" brightness="144"/>
+                    <SolidSwatchItem color="#6600FF" hue="176" saturation="239" brightness="120"/>
+                    <SolidSwatchItem color="#6633FF" hue="170" saturation="239" brightness="144"/>
+                    <SolidSwatchItem color="#6666FF" hue="160" saturation="239" brightness="168"/>
+                    <SolidSwatchItem color="#6699FF" hue="147" saturation="239" brightness="168"/>
+                    <SolidSwatchItem color="#66CCFF" hue="133" saturation="239" brightness="168"/>
+                    <SolidSwatchItem color="#66FFFF" hue="120" saturation="239" brightness="168"/>
+                    <SolidSwatchItem/>
+                    <SolidSwatchItem color="#FF0000" saturation="239" brightness="120"/>
+                    <SolidSwatchItem/>
+                    <SolidSwatchItem color="#990000" saturation="239" brightness="72"/>
+                    <SolidSwatchItem color="#993300" hue="13" saturation="239" brightness="72"/>
+                    <SolidSwatchItem color="#996600" hue="27" saturation="239" brightness="72"/>
+                    <SolidSwatchItem color="#999900" hue="40" saturation="239" brightness="72"/>
+                    <SolidSwatchItem color="#99CC00" hue="50" saturation="239" brightness="96"/>
+                    <SolidSwatchItem color="#99FF00" hue="56" saturation="239" brightness="120"/>
+                    <SolidSwatchItem color="#CC0000" saturation="239" brightness="96"/>
+                    <SolidSwatchItem color="#CC3300" hue="10" saturation="239" brightness="96"/>
+                    <SolidSwatchItem color="#CC6600" hue="20" saturation="239" brightness="96"/>
+                    <SolidSwatchItem color="#CC9900" hue="30" saturation="239" brightness="96"/>
+                    <SolidSwatchItem color="#CCCC00" hue="40" saturation="239" brightness="96"/>
+                    <SolidSwatchItem color="#CCFF00" hue="48" saturation="239" brightness="120"/>
+                    <SolidSwatchItem color="#FF0000" saturation="239" brightness="120"/>
+                    <SolidSwatchItem color="#FF3300" hue="8" saturation="239" brightness="120"/>
+                    <SolidSwatchItem color="#FF6600" hue="16" saturation="239" brightness="120"/>
+                    <SolidSwatchItem color="#FF9900" hue="24" saturation="239" brightness="120"/>
+                    <SolidSwatchItem color="#FFCC00" hue="32" saturation="239" brightness="120"/>
+                    <SolidSwatchItem color="#FFFF00" hue="40" saturation="239" brightness="120"/>
+                    <SolidSwatchItem/>
+                    <SolidSwatchItem color="#00FF00" hue="80" saturation="239" brightness="120"/>
+                    <SolidSwatchItem/>
+                    <SolidSwatchItem color="#990033" hue="227" saturation="239" brightness="72"/>
+                    <SolidSwatchItem color="#993333" saturation="120" brightness="96"/>
+                    <SolidSwatchItem color="#996633" hue="20" saturation="120" brightness="96"/>
+                    <SolidSwatchItem color="#999933" hue="40" saturation="120" brightness="96"/>
+                    <SolidSwatchItem color="#99CC33" hue="53" saturation="144" brightness="120"/>
+                    <SolidSwatchItem color="#99FF33" hue="60" saturation="239" brightness="144"/>
+                    <SolidSwatchItem color="#CC0033" hue="230" saturation="239" brightness="96"/>
+                    <SolidSwatchItem color="#CC3333" saturation="144" brightness="120"/>
+                    <SolidSwatchItem color="#CC6633" hue="13" saturation="144" brightness="120"/>
+                    <SolidSwatchItem color="#CC9933" hue="27" saturation="144" brightness="120"/>
+                    <SolidSwatchItem color="#CCCC33" hue="40" saturation="144" brightness="120"/>
+                    <SolidSwatchItem color="#CCFF33" hue="50" saturation="239" brightness="144"/>
+                    <SolidSwatchItem color="#FF0033" hue="232" saturation="239" brightness="120"/>
+                    <SolidSwatchItem color="#FF3333" saturation="239" brightness="144"/>
+                    <SolidSwatchItem color="#FF6633" hue="10" saturation="239" brightness="144"/>
+                    <SolidSwatchItem color="#FF9933" hue="20" saturation="239" brightness="144"/>
+                    <SolidSwatchItem color="#FFCC33" hue="30" saturation="239" brightness="144"/>
+                    <SolidSwatchItem color="#FFFF33" hue="40" saturation="239" brightness="144"/>
+                    <SolidSwatchItem/>
+                    <SolidSwatchItem color="#0000FF" hue="160" saturation="239" brightness="120"/>
+                    <SolidSwatchItem/>
+                    <SolidSwatchItem color="#990066" hue="213" saturation="239" brightness="72"/>
+                    <SolidSwatchItem color="#993366" hue="220" saturation="120" brightness="96"/>
+                    <SolidSwatchItem color="#996666" saturation="48" brightness="120"/>
+                    <SolidSwatchItem color="#999966" hue="40" saturation="48" brightness="120"/>
+                    <SolidSwatchItem color="#99CC66" hue="60" saturation="120" brightness="144"/>
+                    <SolidSwatchItem color="#99FF66" hue="67" saturation="239" brightness="168"/>
+                    <SolidSwatchItem color="#CC0066" hue="220" saturation="239" brightness="96"/>
+                    <SolidSwatchItem color="#CC3366" hue="227" saturation="144" brightness="120"/>
+                    <SolidSwatchItem color="#CC6666" saturation="120" brightness="144"/>
+                    <SolidSwatchItem color="#CC9966" hue="20" saturation="120" brightness="144"/>
+                    <SolidSwatchItem color="#CCCC66" hue="40" saturation="120" brightness="144"/>
+                    <SolidSwatchItem color="#CCFF66" hue="53" saturation="239" brightness="168"/>
+                    <SolidSwatchItem color="#FF0066" hue="224" saturation="239" brightness="120"/>
+                    <SolidSwatchItem color="#FF3366" hue="230" saturation="239" brightness="144"/>
+                    <SolidSwatchItem color="#FF6666" saturation="239" brightness="168"/>
+                    <SolidSwatchItem color="#FF9966" hue="13" saturation="239" brightness="168"/>
+                    <SolidSwatchItem color="#FFCC66" hue="27" saturation="239" brightness="168"/>
+                    <SolidSwatchItem color="#FFFF66" hue="40" saturation="239" brightness="168"/>
+                    <SolidSwatchItem/>
+                    <SolidSwatchItem color="#FFFF00" hue="40" saturation="239" brightness="120"/>
+                    <SolidSwatchItem/>
+                    <SolidSwatchItem color="#990099" hue="200" saturation="239" brightness="72"/>
+                    <SolidSwatchItem color="#993399" hue="200" saturation="120" brightness="96"/>
+                    <SolidSwatchItem color="#996699" hue="200" saturation="48" brightness="120"/>
+                    <SolidSwatchItem color="#999999" brightness="144"/>
+                    <SolidSwatchItem color="#99CC99" hue="80" saturation="80" brightness="168"/>
+                    <SolidSwatchItem color="#99FF99" hue="80" saturation="239" brightness="192"/>
+                    <SolidSwatchItem color="#CC0099" hue="210" saturation="239" brightness="96"/>
+                    <SolidSwatchItem color="#CC3399" hue="213" saturation="144" brightness="120"/>
+                    <SolidSwatchItem color="#CC6699" hue="220" saturation="120" brightness="144"/>
+                    <SolidSwatchItem color="#CC9999" saturation="80" brightness="168"/>
+                    <SolidSwatchItem color="#CCCC99" hue="40" saturation="80" brightness="168"/>
+                    <SolidSwatchItem color="#CCFF99" hue="60" saturation="239" brightness="192"/>
+                    <SolidSwatchItem color="#FF0099" hue="216" saturation="239" brightness="120"/>
+                    <SolidSwatchItem color="#FF3399" hue="220" saturation="239" brightness="144"/>
+                    <SolidSwatchItem color="#FF6699" hue="227" saturation="239" brightness="168"/>
+                    <SolidSwatchItem color="#FF9999" saturation="239" brightness="192"/>
+                    <SolidSwatchItem color="#FFCC99" hue="20" saturation="239" brightness="192"/>
+                    <SolidSwatchItem color="#FFFF99" hue="40" saturation="239" brightness="192"/>
+                    <SolidSwatchItem/>
+                    <SolidSwatchItem color="#00FFFF" hue="120" saturation="239" brightness="120"/>
+                    <SolidSwatchItem/>
+                    <SolidSwatchItem color="#9900CC" hue="190" saturation="239" brightness="96"/>
+                    <SolidSwatchItem color="#9933CC" hue="187" saturation="144" brightness="120"/>
+                    <SolidSwatchItem color="#9966CC" hue="180" saturation="120" brightness="144"/>
+                    <SolidSwatchItem color="#9999CC" hue="160" saturation="80" brightness="168"/>
+                    <SolidSwatchItem color="#99CCCC" hue="120" saturation="80" brightness="168"/>
+                    <SolidSwatchItem color="#99FFCC" hue="100" saturation="239" brightness="192"/>
+                    <SolidSwatchItem color="#CC00CC" hue="200" saturation="239" brightness="96"/>
+                    <SolidSwatchItem color="#CC33CC" hue="200" saturation="144" brightness="120"/>
+                    <SolidSwatchItem color="#CC66CC" hue="200" saturation="120" brightness="144"/>
+                    <SolidSwatchItem color="#CC99CC" hue="200" saturation="80" brightness="168"/>
+                    <SolidSwatchItem color="#CCCCCC" brightness="192"/>
+                    <SolidSwatchItem color="#CCFFCC" hue="80" saturation="239" brightness="216"/>
+                    <SolidSwatchItem color="#FF00CC" hue="208" saturation="239" brightness="120"/>
+                    <SolidSwatchItem color="#FF33CC" hue="210" saturation="239" brightness="144"/>
+                    <SolidSwatchItem color="#FF66CC" hue="213" saturation="239" brightness="168"/>
+                    <SolidSwatchItem color="#FF99CC" hue="220" saturation="239" brightness="192"/>
+                    <SolidSwatchItem color="#FFCCCC" saturation="239" brightness="216"/>
+                    <SolidSwatchItem color="#FFFFCC" hue="40" saturation="239" brightness="216"/>
+                    <SolidSwatchItem/>
+                    <SolidSwatchItem color="#FF00FF" hue="200" saturation="239" brightness="120"/>
+                    <SolidSwatchItem/>
+                    <SolidSwatchItem color="#9900FF" hue="184" saturation="239" brightness="120"/>
+                    <SolidSwatchItem color="#9933FF" hue="180" saturation="239" brightness="144"/>
+                    <SolidSwatchItem color="#9966FF" hue="173" saturation="239" brightness="168"/>
+                    <SolidSwatchItem color="#9999FF" hue="160" saturation="239" brightness="192"/>
+                    <SolidSwatchItem color="#99CCFF" hue="140" saturation="239" brightness="192"/>
+                    <SolidSwatchItem color="#99FFFF" hue="120" saturation="239" brightness="192"/>
+                    <SolidSwatchItem color="#CC00FF" hue="192" saturation="239" brightness="120"/>
+                    <SolidSwatchItem color="#CC33FF" hue="190" saturation="239" brightness="144"/>
+                    <SolidSwatchItem color="#CC66FF" hue="187" saturation="239" brightness="168"/>
+                    <SolidSwatchItem color="#CC99FF" hue="180" saturation="239" brightness="192"/>
+                    <SolidSwatchItem color="#CCCCFF" hue="160" saturation="239" brightness="216"/>
+                    <SolidSwatchItem color="#CCFFFF" hue="120" saturation="239" brightness="216"/>
+                    <SolidSwatchItem color="#FF00FF" hue="200" saturation="239" brightness="120"/>
+                    <SolidSwatchItem color="#FF33FF" hue="200" saturation="239" brightness="144"/>
+                    <SolidSwatchItem color="#FF66FF" hue="200" saturation="239" brightness="168"/>
+                    <SolidSwatchItem color="#FF99FF" hue="200" saturation="239" brightness="192"/>
+                    <SolidSwatchItem color="#FFCCFF" hue="200" saturation="239" brightness="216"/>
+                    <SolidSwatchItem color="#FFFFFF" brightness="240"/>
+                    <SolidSwatchItem color="#9AABB1" hue="131" saturation="31" brightness="156"/>
+                    <SolidSwatchItem color="#2C2527" hue="227" saturation="19" brightness="38"/>
+               </swatches>
+          </swatchList>
+     </swatchLists>
+     <extendedSwatchLists>
+          <swatchList>
+               <swatches>
+                    <LinearGradientSwatchItem>
+                         <GradientEntry color="#FFFFFF" ratio="0"/>
+                         <GradientEntry ratio="1"/>
+                    </LinearGradientSwatchItem>
+                    <RadialGradientSwatchItem>
+                         <GradientEntry color="#FFFFFF" ratio="0"/>
+                         <GradientEntry ratio="1"/>
+                    </RadialGradientSwatchItem>
+                    <RadialGradientSwatchItem>
+                         <GradientEntry color="#FF0000" ratio="0"/>
+                         <GradientEntry ratio="1"/>
+                    </RadialGradientSwatchItem>
+                    <RadialGradientSwatchItem>
+                         <GradientEntry color="#00FF00" ratio="0"/>
+                         <GradientEntry ratio="1"/>
+                    </RadialGradientSwatchItem>
+                    <RadialGradientSwatchItem>
+                         <GradientEntry color="#0000FF" ratio="0"/>
+                         <GradientEntry ratio="1"/>
+                    </RadialGradientSwatchItem>
+                    <LinearGradientSwatchItem>
+                         <GradientEntry color="#0066FD" ratio="0"/>
+                         <GradientEntry color="#FFFFFF" ratio="0.376470588235294"/>
+                         <GradientEntry color="#FFFFFF" ratio="0.47843137254902"/>
+                         <GradientEntry color="#996600" ratio="0.501960784313725"/>
+                         <GradientEntry color="#FFCC00" ratio="0.666666666666667"/>
+                         <GradientEntry color="#FFFFFF" ratio="1"/>
+                    </LinearGradientSwatchItem>
+                    <LinearGradientSwatchItem>
+                         <GradientEntry color="#FF0000" ratio="0"/>
+                         <GradientEntry color="#FFFF00" ratio="0.164705882352941"/>
+                         <GradientEntry color="#00FF00" ratio="0.364705882352941"/>
+                         <GradientEntry color="#00FFFF" ratio="0.498039215686275"/>
+                         <GradientEntry color="#0000FF" ratio="0.666666666666667"/>
+                         <GradientEntry color="#FF00FF" ratio="0.831372549019608"/>
+                         <GradientEntry color="#FF0000" ratio="1"/>
+                    </LinearGradientSwatchItem>
+                    <LinearGradientSwatchItem>
+                         <GradientEntry color="#32383D" ratio="0"/>
+                         <GradientEntry color="#212529" ratio="0.447058823529412"/>
+                         <GradientEntry color="#3F4649" ratio="0.572549019607843"/>
+                         <GradientEntry color="#434B4E" ratio="0.83921568627451"/>
+                         <GradientEntry color="#626F73" ratio="1"/>
+                    </LinearGradientSwatchItem>
+               </swatches>
+          </swatchList>
+     </extendedSwatchLists>
+     <PrinterSettings/>
+     <publishHistory>
+          <PublishItem publishSize="374469" publishTime="1772326063"/>
+          <PublishItem publishSize="374435" publishTime="1772326051"/>
+          <PublishItem publishSize="374319" publishTime="1772326016"/>
+          <PublishItem publishSize="286420" publishTime="1772325680"/>
+          <PublishItem publishSize="374119" publishTime="1772325540"/>
+          <PublishItem publishSize="374172" publishTime="1772325123"/>
+          <PublishItem publishSize="374183" publishTime="1772325023"/>
+          <PublishItem publishSize="374124" publishTime="1772324972"/>
+          <PublishItem publishSize="374175" publishTime="1772324946"/>
+          <PublishItem publishSize="374111" publishTime="1772324876"/>
+          <PublishItem publishSize="374066" publishTime="1772324847"/>
+          <PublishItem publishSize="374106" publishTime="1772324818"/>
+          <PublishItem publishSize="374149" publishTime="1772323700"/>
+          <PublishItem publishSize="374363" publishTime="1772323375"/>
+          <PublishItem publishSize="374364" publishTime="1772323221"/>
+          <PublishItem publishSize="374362" publishTime="1772261450"/>
+          <PublishItem publishSize="286421" publishTime="1772261428"/>
+          <PublishItem publishSize="374343" publishTime="1772261371"/>
+          <PublishItem publishSize="374346" publishTime="1772261284"/>
+          <PublishItem publishSize="374284" publishTime="1772126345"/>
+     </publishHistory>
+     <swcCache>
+          <Swc hashKey="vAEZieHAqhp40EFv99SsO0" href="imeckb73hq.swc">
+               <classDefinitions>
+                    <ClassDefinition value="io.newgrounds.helpers.HttpRequestHelper"/>
+                    <ClassDefinition value="io.newgrounds.models.components.Event.logEvent"/>
+                    <ClassDefinition value="io.newgrounds.models.components.Loader.loadOfficialUrl"/>
+                    <ClassDefinition value="io.newgrounds.models.objects.Request"/>
+                    <ClassDefinition value="com.hurlant.crypto.symmetric.OFBMode"/>
+                    <ClassDefinition value="com.hurlant.crypto.symmetric.SimpleIVMode"/>
+                    <ClassDefinition value="io.newgrounds.models.components.Medal.getMedalScore"/>
+                    <ClassDefinition value="com.hurlant.crypto.hash.SHA1"/>
+                    <ClassDefinition value="io.newgrounds.helpers.AppStateSessionHelper"/>
+                    <ClassDefinition value="io.newgrounds.models.components.Loader.loadNewgrounds"/>
+                    <ClassDefinition value="io.newgrounds.models.objects.SaveSlot"/>
+                    <ClassDefinition value="io.newgrounds.models.results.Loader.loadReferralResult"/>
+                    <ClassDefinition value="com.hurlant.crypto.symmetric.ICipher"/>
+                    <ClassDefinition value="com.hurlant.crypto.tls.TLSError"/>
+                    <ClassDefinition value="io.newgrounds.models.results.App.getCurrentVersionResult"/>
+                    <ClassDefinition value="io.newgrounds.models.components.Gateway.getDatetime"/>
+                    <ClassDefinition value="io.newgrounds.models.components.CloudSave.clearSlot"/>
+                    <ClassDefinition value="com.hurlant.crypto.Crypto"/>
+                    <ClassDefinition value="fl.livepreview.LivePreviewParent"/>
+                    <ClassDefinition value="io.newgrounds.AppState"/>
+                    <ClassDefinition value="io.newgrounds.models.results.Gateway.pingResult"/>
+                    <ClassDefinition value="io.newgrounds.models.components.App.checkSession"/>
+                    <ClassDefinition value="io.newgrounds.models.objects.Response"/>
+                    <ClassDefinition value="com.hurlant.crypto.symmetric.CBCMode"/>
+                    <ClassDefinition value="io.newgrounds.models.objects.Debug"/>
+                    <ClassDefinition value="io.newgrounds.BaseResult"/>
+                    <ClassDefinition value="io.newgrounds.models.components.ScoreBoard.getScores"/>
+                    <ClassDefinition value="io.newgrounds.helpers.AppStateSessionResetHelper"/>
+                    <ClassDefinition value="io.newgrounds.models.results.Medal.unlockResult"/>
+                    <ClassDefinition value="com.hurlant.math.ClassicReduction"/>
+                    <ClassDefinition value="com.hurlant.crypto.hash.MAC"/>
+                    <ClassDefinition value="com.hurlant.math.BarrettReduction"/>
+                    <ClassDefinition value="com.hurlant.crypto.prng.Random"/>
+                    <ClassDefinition value="com.hurlant.crypto.symmetric.TripleDESKey"/>
+                    <ClassDefinition value="io.newgrounds.models.components.Gateway.ping"/>
+                    <ClassDefinition value="io.newgrounds.models.components.ScoreBoard.getBoards"/>
+                    <ClassDefinition value="io.newgrounds.models.objects.User"/>
+                    <ClassDefinition value="io.newgrounds.helpers.CoreComponentCallHelper"/>
+                    <ClassDefinition value="io.newgrounds.helpers.NgioGatewayHelper"/>
+                    <ClassDefinition value="io.newgrounds.models.components.Loader.loadAuthorUrl"/>
+                    <ClassDefinition value="NgioClassLib"/>
+                    <ClassDefinition value="com.hurlant.crypto.symmetric.BlowFishKey"/>
+                    <ClassDefinition value="io.newgrounds.models.results.ScoreBoard.getScoresResult"/>
+                    <ClassDefinition value="io.newgrounds.models.results.ScoreBoard.postScoreResult"/>
+                    <ClassDefinition value="io.newgrounds.models.components.ScoreBoard.postScore"/>
+                    <ClassDefinition value="io.newgrounds.models.objects.NgioError"/>
+                    <ClassDefinition value="io.newgrounds.models.results.Loader.loadOfficialUrlResult"/>
+                    <ClassDefinition value="io.newgrounds.models.objects.Score"/>
+                    <ClassDefinition value="com.hurlant.crypto.hash.SHA224"/>
+                    <ClassDefinition value="io.newgrounds.models.results.Gateway.getVersionResult"/>
+                    <ClassDefinition value="io.newgrounds.models.components.CloudSave.loadSlots"/>
+                    <ClassDefinition value="com.hurlant.crypto.hash.MD5"/>
+                    <ClassDefinition value="com.hurlant.crypto.prng.ARC4"/>
+                    <ClassDefinition value="io.newgrounds.models.results.Event.logEventResult"/>
+                    <ClassDefinition value="com.hurlant.crypto.hash.MD2"/>
+                    <ClassDefinition value="io.newgrounds.helpers.NgioAuthHelper"/>
+                    <ClassDefinition value="io.newgrounds.Core"/>
+                    <ClassDefinition value="com.hurlant.crypto.symmetric.PKCS5"/>
+                    <ClassDefinition value="com.hurlant.util.Hex"/>
+                    <ClassDefinition value="com.hurlant.math.NullReduction"/>
+                    <ClassDefinition value="io.newgrounds.BaseComponent"/>
+                    <ClassDefinition value="NGIO"/>
+                    <ClassDefinition value="com.hurlant.crypto.symmetric.ISymmetricKey"/>
+                    <ClassDefinition value="io.newgrounds.models.components.Gateway.getVersion"/>
+                    <ClassDefinition value="io.newgrounds.helpers.CoreTransportHelper"/>
+                    <ClassDefinition value="io.newgrounds.models.results.Gateway.getDatetimeResult"/>
+                    <ClassDefinition value="io.newgrounds.helpers.NgioEventHelper"/>
+                    <ClassDefinition value="io.newgrounds.models.results.App.checkSessionResult"/>
+                    <ClassDefinition value="io.newgrounds.BaseObject"/>
+                    <ClassDefinition value="com.hurlant.crypto.symmetric.NullPad"/>
+                    <ClassDefinition value="io.newgrounds.helpers.NgioLoaderHelper"/>
+                    <ClassDefinition value="io.newgrounds.helpers.AppStateResultUpdateHelper"/>
+                    <ClassDefinition value="com.hurlant.crypto.symmetric.IVMode"/>
+                    <ClassDefinition value="io.newgrounds.models.results.App.logViewResult"/>
+                    <ClassDefinition value="io.newgrounds.models.results.App.getHostLicenseResult"/>
+                    <ClassDefinition value="io.newgrounds.NGJSON"/>
+                    <ClassDefinition value="NGJSON.as$50.NGJSONFallback"/>
+                    <ClassDefinition value="NGJSON.as$50.NGJSONParser"/>
+                    <ClassDefinition value="com.hurlant.util.Memory"/>
+                    <ClassDefinition value="io.newgrounds.models.results.ScoreBoard.getBoardsResult"/>
+                    <ClassDefinition value="io.newgrounds.models.components.Loader.loadMoreGames"/>
+                    <ClassDefinition value="io.newgrounds.models.objects.ObjectFactory"/>
+                    <ClassDefinition value="com.hurlant.crypto.symmetric.DESKey"/>
+                    <ClassDefinition value="io.newgrounds.models.objects.ScoreBoard"/>
+                    <ClassDefinition value="io.newgrounds.models.results.CloudSave.clearSlotResult"/>
+                    <ClassDefinition value="io.newgrounds.helpers.AppStateBootstrapHelper"/>
+                    <ClassDefinition value="io.newgrounds.models.components.CloudSave.loadSlot"/>
+                    <ClassDefinition value="io.newgrounds.models.results.App.endSessionResult"/>
+                    <ClassDefinition value="io.newgrounds.models.components.App.endSession"/>
+                    <ClassDefinition value="io.newgrounds.models.results.Loader.loadMoreGamesResult"/>
+                    <ClassDefinition value="com.hurlant.crypto.hash.IHMAC"/>
+                    <ClassDefinition value="com.hurlant.crypto.symmetric.CFB8Mode"/>
+                    <ClassDefinition value="io.newgrounds.helpers.CoreQueueExecutionHelper"/>
+                    <ClassDefinition value="io.newgrounds.models.components.CloudSave.setData"/>
+                    <ClassDefinition value="io.newgrounds.models.components.Medal.unlock"/>
+                    <ClassDefinition value="io.newgrounds.Errors"/>
+                    <ClassDefinition value="com.hurlant.crypto.rsa.RSAKey"/>
+                    <ClassDefinition value="io.newgrounds.models.components.App.logView"/>
+                    <ClassDefinition value="com.hurlant.crypto.symmetric.XTeaKey"/>
+                    <ClassDefinition value="io.newgrounds.models.results.CloudSave.loadSlotResult"/>
+                    <ClassDefinition value="io.newgrounds.models.objects.Execute"/>
+                    <ClassDefinition value="io.newgrounds.models.components.Medal.getList"/>
+                    <ClassDefinition value="com.hurlant.crypto.symmetric.CTRMode"/>
+                    <ClassDefinition value="io.newgrounds.models.components.App.getHostLicense"/>
+                    <ClassDefinition value="io.newgrounds.helpers.HttpResponseHelper"/>
+                    <ClassDefinition value="io.newgrounds.models.results.App.startSessionResult"/>
+                    <ClassDefinition value="com.hurlant.util.Base64"/>
+                    <ClassDefinition value="com.hurlant.crypto.symmetric.ECBMode"/>
+                    <ClassDefinition value="io.newgrounds.models.results.CloudSave.setDataResult"/>
+                    <ClassDefinition value="com.hurlant.crypto.hash.SHA256"/>
+                    <ClassDefinition value="com.hurlant.crypto.symmetric.IStreamCipher"/>
+                    <ClassDefinition value="io.newgrounds.helpers.NgioBootstrapHelper"/>
+                    <ClassDefinition value="io.newgrounds.models.components.App.getCurrentVersion"/>
+                    <ClassDefinition value="io.newgrounds.helpers.AppStateComponentHelper"/>
+                    <ClassDefinition value="com.hurlant.math.MontgomeryReduction"/>
+                    <ClassDefinition value="com.hurlant.crypto.symmetric.CFBMode"/>
+                    <ClassDefinition value="io.newgrounds.models.objects.Session"/>
+                    <ClassDefinition value="io.newgrounds.models.components.App.startSession"/>
+                    <ClassDefinition value="com.hurlant.math.IReduction"/>
+                    <ClassDefinition value="com.hurlant.crypto.symmetric.AESKey"/>
+                    <ClassDefinition value="com.hurlant.math.BigInteger"/>
+                    <ClassDefinition value="io.newgrounds.models.results.Medal.getListResult"/>
+                    <ClassDefinition value="io.newgrounds.models.results.Loader.loadNewgroundsResult"/>
+                    <ClassDefinition value="com.hurlant.crypto.hash.SHABase"/>
+                    <ClassDefinition value="com.hurlant.crypto.prng.IPRNG"/>
+                    <ClassDefinition value="io.newgrounds.models.objects.Medal"/>
+                    <ClassDefinition value="io.newgrounds.models.results.Medal.getMedalScoreResult"/>
+                    <ClassDefinition value="io.newgrounds.models.results.Loader.loadAuthorUrlResult"/>
+                    <ClassDefinition value="com.hurlant.crypto.hash.IHash"/>
+                    <ClassDefinition value="io.newgrounds.models.components.Loader.loadReferral"/>
+                    <ClassDefinition value="com.hurlant.crypto.symmetric.IMode"/>
+                    <ClassDefinition value="com.hurlant.crypto.hash.HMAC"/>
+                    <ClassDefinition value="io.newgrounds.SessionStatus"/>
+                    <ClassDefinition value="io.newgrounds.models.results.CloudSave.loadSlotsResult"/>
+                    <ClassDefinition value="com.hurlant.crypto.symmetric.IPad"/>
+                    <ClassDefinition value="io.newgrounds.NgioEvent"/>
+               </classDefinitions>
+          </Swc>
+     </swcCache>
+</DOMDocument>

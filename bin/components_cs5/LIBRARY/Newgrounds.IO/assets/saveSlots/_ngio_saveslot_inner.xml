@@ -1,0 +1,40 @@
+<DOMSymbolItem xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://ns.adobe.com/xfl/2008/" name="Newgrounds.IO/assets/saveSlots/_ngio_saveslot_inner" itemID="69951d41-000002ad" lastModified="1771384293" lastUniqueIdentifier="6">
+  <timeline>
+    <DOMTimeline name="_ngio_saveslot_inner">
+      <layers>
+        <DOMLayer name="Layer 1" color="#4FFF4F" current="true" isSelected="true">
+          <frames>
+            <DOMFrame index="0" keyMode="9728">
+              <Actionscript>
+                <script><![CDATA[stop();]]></script>
+              </Actionscript>
+              <elements>
+                <DOMSymbolInstance libraryItemName="Newgrounds.IO/assets/saveSlots/_ngio_saveslot_bar" name="bar_0" centerPoint3DX="218" centerPoint3DY="33">
+                  <transformationPoint>
+                    <Point x="218" y="33"/>
+                  </transformationPoint>
+                </DOMSymbolInstance>
+                <DOMSymbolInstance libraryItemName="Newgrounds.IO/assets/saveSlots/_ngio_saveslot_bar" name="bar_1" centerPoint3DX="218" centerPoint3DY="107">
+                  <matrix>
+                    <Matrix ty="74"/>
+                  </matrix>
+                  <transformationPoint>
+                    <Point x="218" y="33"/>
+                  </transformationPoint>
+                </DOMSymbolInstance>
+                <DOMSymbolInstance libraryItemName="Newgrounds.IO/assets/saveSlots/_ngio_saveslot_bar" name="bar_2" centerPoint3DX="218" centerPoint3DY="181">
+                  <matrix>
+                    <Matrix ty="148"/>
+                  </matrix>
+                  <transformationPoint>
+                    <Point x="218" y="33"/>
+                  </transformationPoint>
+                </DOMSymbolInstance>
+              </elements>
+            </DOMFrame>
+          </frames>
+        </DOMLayer>
+      </layers>
+    </DOMTimeline>
+  </timeline>
+</DOMSymbolItem>

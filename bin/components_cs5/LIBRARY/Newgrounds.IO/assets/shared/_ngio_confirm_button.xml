@@ -1,0 +1,135 @@
+<DOMSymbolItem xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://ns.adobe.com/xfl/2008/" name="Newgrounds.IO/assets/shared/_ngio_confirm_button" itemID="6995258a-000002c0" symbolType="button" lastModified="1771382243">
+  <timeline>
+    <DOMTimeline name="_ngio_confirm_button" currentFrame="1">
+      <layers>
+        <DOMLayer name="Layer 2" color="#9933CC" current="true" isSelected="true">
+          <frames>
+            <DOMFrame index="0" keyMode="9728">
+              <elements>
+                <DOMGroup selected="true">
+                  <members>
+                    <DOMShape selected="true">
+                      <fills>
+                        <FillStyle index="1">
+                          <SolidColor color="#FDA238"/>
+                        </FillStyle>
+                      </fills>
+                      <edges>
+                        <Edge fillStyle0="1" edges="!890 -299S1[766 -422 592 -422!592 -422|-592 -422!-592 -422[-767 -422 -890 -299!-890 -299[-1013 -176 -1013 -1!-1013 -1|-1013 0!-1013 0[-1013 175 -890 298!-890 298[-767 422 -592 422!-592 422|592 422!592 422[766 422 890 298!890 298[1013
+ 175 1013 0!1013 0|1013 -1!1013 -1[1013 -176 890 -299"/>
+                      </edges>
+                    </DOMShape>
+                  </members>
+                </DOMGroup>
+              </elements>
+            </DOMFrame>
+            <DOMFrame index="1" keyMode="9728">
+              <elements>
+                <DOMGroup>
+                  <members>
+                    <DOMShape>
+                      <fills>
+                        <FillStyle index="1">
+                          <SolidColor color="#FFFFFF"/>
+                        </FillStyle>
+                      </fills>
+                      <edges>
+                        <Edge fillStyle0="1" edges="
+!890 -299[766 -422 592 -422!592 -422|-592 -422!-592 -422[-767 -422 -890 -299!-890 -299[-1013 -176 -1013 -1!-1013 -1|-1013 0!-1013 0[-1013 175 -890 298!-890 298[-767 422 -592 422!-592 422|592 422!592 422[766 422 890 298!890 298[1013 175
+ 1013 0!1013 0|1013 -1!1013 -1[1013 -176 890 -299"/>
+                      </edges>
+                    </DOMShape>
+                  </members>
+                </DOMGroup>
+              </elements>
+            </DOMFrame>
+            <DOMFrame index="2" keyMode="9728">
+              <elements>
+                <DOMGroup>
+                  <members>
+                    <DOMShape>
+                      <fills>
+                        <FillStyle index="1">
+                          <SolidColor color="#FFFFFF"/>
+                        </FillStyle>
+                      </fills>
+                      <edges>
+                        <Edge fillStyle0="1" edges="
+!612 -392|-572 -392!-572 -392[-747 -392 -870 -269!-870 -269[-993 -146 -993 29!-993 29|-993 30!-993 30[-993 205 -870 328!-870 328[-747 452 -572 452!-572 452|612 452!612 452[786 452 910 328!910 328[1033 205 1033 30!1033 30|1033 29!1033
+ 29[1033 -146 910 -269!910 -269[786 -392 612 -392"/>
+                      </edges>
+                    </DOMShape>
+                  </members>
+                </DOMGroup>
+              </elements>
+            </DOMFrame>
+            <DOMFrame index="3" keyMode="9728">
+              <elements>
+                <DOMGroup>
+                  <members>
+                    <DOMShape>
+                      <fills>
+                        <FillStyle index="1">
+                          <SolidColor color="#FDA238"/>
+                        </FillStyle>
+                      </fills>
+                      <edges>
+                        <Edge fillStyle0="1" edges="
+!890 -299[766 -422 592 -422!592 -422|-592 -422!-592 -422[-767 -422 -890 -299!-890 -299[-1013 -176 -1013 -1!-1013 -1|-1013 0!-1013 0[-1013 175 -890 298!-890 298[-767 422 -592 422!-592 422|592 422!592 422[766 422 890 298!890 298[1013 175
+ 1013 0!1013 0|1013 -1!1013 -1[1013 -176 890 -299"/>
+                      </edges>
+                    </DOMShape>
+                  </members>
+                </DOMGroup>
+              </elements>
+            </DOMFrame>
+          </frames>
+        </DOMLayer>
+        <DOMLayer name="Layer 1" color="#4FFF4F">
+          <frames>
+            <DOMFrame index="0" duration="3" keyMode="9728">
+              <elements>
+                <DOMGroup>
+                  <members>
+                    <DOMShape>
+                      <fills>
+                        <FillStyle index="1">
+                          <SolidColor/>
+                        </FillStyle>
+                      </fills>
+                      <edges>
+                        <Edge fillStyle0="1" edges="
+!612 -392|-572 -392!-572 -392[-747 -392 -870 -269!-870 -269[-993 -146 -993 29!-993 29|-993 30!-993 30[-993 205 -870 328!-870 328[-747 452 -572 452!-572 452|612 452!612 452[786 452 910 328!910 328[1033 205 1033 30!1033 30|1033 29!1033
+ 29[1033 -146 910 -269!910 -269[786 -392 612 -392"/>
+                      </edges>
+                    </DOMShape>
+                  </members>
+                </DOMGroup>
+              </elements>
+            </DOMFrame>
+            <DOMFrame index="3" keyMode="9728">
+              <elements>
+                <DOMGroup>
+                  <members>
+                    <DOMShape>
+                      <fills>
+                        <FillStyle index="1">
+                          <SolidColor/>
+                        </FillStyle>
+                      </fills>
+                      <edges>
+                        <Edge fillStyle0="1" edges="
+!612 -392|-572 -392!-572 -392[-747 -392 -870 -269!-870 -269[-993 -146 -993 29!-993 29|-993 30!-993 30[-993 205 -870 328!-870 328[-747 452 -572 452!-572 452|612 452!612 452[786 452 910 328!910 328[1033 205 1033 30!1033 30|1033 29!1033
+ 29[1033 -146 910 -269!910 -269[786 -392 612 -392"/>
+                      </edges>
+                    </DOMShape>
+                  </members>
+                </DOMGroup>
+              </elements>
+            </DOMFrame>
+          </frames>
+        </DOMLayer>
+      </layers>
+    </DOMTimeline>
+  </timeline>
+</DOMSymbolItem>

@@ -1,0 +1,100 @@
+<DOMSymbolItem xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://ns.adobe.com/xfl/2008/" name="Newgrounds.IO/assets/saveSlots/_ngio_saveslot_inner_tall" itemID="699771fd-0000048f" lastModified="1771533249" lastUniqueIdentifier="23">
+  <timeline>
+    <DOMTimeline name="_ngio_saveslot_inner_tall">
+      <layers>
+        <DOMLayer name="Layer 1" color="#4FFF4F" current="true" isSelected="true">
+          <frames>
+            <DOMFrame index="0" keyMode="9728">
+              <Actionscript>
+                <script><![CDATA[stop();]]></script>
+              </Actionscript>
+              <elements>
+                <DOMSymbolInstance libraryItemName="Newgrounds.IO/assets/saveSlots/_ngio_saveslot_bar" name="bar_5" centerPoint3DX="218" centerPoint3DY="403">
+                  <matrix>
+                    <Matrix ty="370"/>
+                  </matrix>
+                  <transformationPoint>
+                    <Point x="218" y="33"/>
+                  </transformationPoint>
+                </DOMSymbolInstance>
+                <DOMSymbolInstance libraryItemName="Newgrounds.IO/assets/saveSlots/_ngio_saveslot_bar" name="bar_6" centerPoint3DX="218" centerPoint3DY="477">
+                  <matrix>
+                    <Matrix ty="444"/>
+                  </matrix>
+                  <transformationPoint>
+                    <Point x="218" y="33"/>
+                  </transformationPoint>
+                </DOMSymbolInstance>
+                <DOMSymbolInstance libraryItemName="Newgrounds.IO/assets/saveSlots/_ngio_saveslot_bar" name="bar_7" centerPoint3DX="218" centerPoint3DY="551">
+                  <matrix>
+                    <Matrix ty="518"/>
+                  </matrix>
+                  <transformationPoint>
+                    <Point x="218" y="33"/>
+                  </transformationPoint>
+                </DOMSymbolInstance>
+                <DOMSymbolInstance libraryItemName="Newgrounds.IO/assets/saveSlots/_ngio_saveslot_bar" name="bar_8" centerPoint3DX="218" centerPoint3DY="625">
+                  <matrix>
+                    <Matrix ty="592"/>
+                  </matrix>
+                  <transformationPoint>
+                    <Point x="218" y="33"/>
+                  </transformationPoint>
+                </DOMSymbolInstance>
+                <DOMSymbolInstance libraryItemName="Newgrounds.IO/assets/saveSlots/_ngio_saveslot_bar" name="bar_9" centerPoint3DX="218" centerPoint3DY="699">
+                  <matrix>
+                    <Matrix ty="666"/>
+                  </matrix>
+                  <transformationPoint>
+                    <Point x="218" y="33"/>
+                  </transformationPoint>
+                </DOMSymbolInstance>
+                <DOMGroup>
+                  <members>
+                    <DOMSymbolInstance libraryItemName="Newgrounds.IO/assets/saveSlots/_ngio_saveslot_bar" name="bar_0" centerPoint3DX="218" centerPoint3DY="33">
+                      <transformationPoint>
+                        <Point x="218" y="33"/>
+                      </transformationPoint>
+                    </DOMSymbolInstance>
+                    <DOMSymbolInstance libraryItemName="Newgrounds.IO/assets/saveSlots/_ngio_saveslot_bar" name="bar_1" centerPoint3DX="218" centerPoint3DY="107">
+                      <matrix>
+                        <Matrix ty="74"/>
+                      </matrix>
+                      <transformationPoint>
+                        <Point x="218" y="33"/>
+                      </transformationPoint>
+                    </DOMSymbolInstance>
+                    <DOMSymbolInstance libraryItemName="Newgrounds.IO/assets/saveSlots/_ngio_saveslot_bar" name="bar_2" centerPoint3DX="218" centerPoint3DY="181">
+                      <matrix>
+                        <Matrix ty="148"/>
+                      </matrix>
+                      <transformationPoint>
+                        <Point x="218" y="33"/>
+                      </transformationPoint>
+                    </DOMSymbolInstance>
+                    <DOMSymbolInstance libraryItemName="Newgrounds.IO/assets/saveSlots/_ngio_saveslot_bar" name="bar_3" centerPoint3DX="218" centerPoint3DY="255">
+                      <matrix>
+                        <Matrix ty="222"/>
+                      </matrix>
+                      <transformationPoint>
+                        <Point x="218" y="33"/>
+                      </transformationPoint>
+                    </DOMSymbolInstance>
+                    <DOMSymbolInstance libraryItemName="Newgrounds.IO/assets/saveSlots/_ngio_saveslot_bar" name="bar_4" centerPoint3DX="218" centerPoint3DY="329">
+                      <matrix>
+                        <Matrix ty="296"/>
+                      </matrix>
+                      <transformationPoint>
+                        <Point x="218" y="33"/>
+                      </transformationPoint>
+                    </DOMSymbolInstance>
+                  </members>
+                </DOMGroup>
+              </elements>
+            </DOMFrame>
+          </frames>
+        </DOMLayer>
+      </layers>
+    </DOMTimeline>
+  </timeline>
+</DOMSymbolItem>

@@ -1,0 +1,318 @@
+<DOMSymbolItem xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://ns.adobe.com/xfl/2008/" name="Newgrounds.IO/assets/saveSlots/SaveSlot tester" itemID="69962b54-000003b4" lastModified="1772123562">
+  <timeline>
+    <DOMTimeline name="SaveSlot tester">
+      <layers>
+        <DOMLayer name="toggle" color="#9933CC" current="true" isSelected="true" autoNamed="false">
+          <frames>
+            <DOMFrame index="0" duration="10" name="load_mode" labelType="name" keyMode="9728">
+              <Actionscript>
+                <script><![CDATA[// this test works better using raw string data
+_parent['saveSlotManager'].use_raw = true;
+
+// set up our handlers once
+if (this.ready === undefined) {
+	this.ready = true;
+
+	var _this = this;
+
+	// refreshes what is displayed in the component
+	function resetComponent():Void {
+		_this._parent['saveSlotManager'].setData(null);
+		_this.dataText.text = "";
+
+		// pop this to the error frame just to unload any information
+		_this._parent['saveSlotManager'].gotoAndStop('error');
+
+		// go back to the display frame to re-render everything
+		_this._parent['saveSlotManager'].gotoAndStop('display');
+	}
+
+	// force a visual refresh of the component when reset is clicked
+	resetBtn.onRelease = function() {
+		resetComponent();
+	};
+
+	// handle when data is loaded from the slot manager component
+	_parent['saveSlotManager'].onSlotLoaded = function(_data, error) {
+		// all we really want to do is pop the loaded text into our text input
+		_this.dataText.text = _data ? _data : "No Data Found.";
+	};
+
+	// handle when data is saved from the slot manager component
+	_parent['saveSlotManager'].onSlotSaved = function(error) {
+		// all we really want to do is clear the input and reset the component
+		resetComponent();
+		_this.dataText.text = "Saved!";
+	};
+
+	// catch when someone types something
+	this.dataText.onChanged = function() {
+		_this._parent['saveSlotManager'].setData(this.text);
+	};
+}
+
+if (_parent['saveSlotManager'].action !== 'Load Data') {
+	this.gotoAndStop('save_mode');
+}
+
+saveModeBtn.onRelease = function() {
+	_parent['saveSlotManager'].action = 'Save Data';
+	resetComponent();
+	this._parent.gotoAndStop('save_mode');
+};
+
+stop();]]></script>
+              </Actionscript>
+              <elements>
+                <DOMGroup>
+                  <members>
+                    <DOMShape>
+                      <fills>
+                        <FillStyle index="1">
+                          <SolidColor/>
+                        </FillStyle>
+                        <FillStyle index="2">
+                          <SolidColor color="#666666"/>
+                        </FillStyle>
+                      </fills>
+                      <edges>
+                        <Edge fillStyle0="1" edges="!365 652[305 592 220 592!220 592[135 592 75 652!75 652[15 712 15 797!15 797[15 882 75 942!75 942[135 1002 220 1002!220 1002[305 1002 365 942!365 942[387 921 400 897!400 897[425 852 425 797!425 797[425 742 400 698!400 698[387 673 365 652"/>
+                        <Edge fillStyle0="1" fillStyle1="2" edges="!351 666[389 704 400 753!400 753[405 774 405 797!405 797[405 821 400 842!400 842[389 891 351 928!351 928[297 982 220 982!220 982[143 982 89 928!89 928[35 874 35 797!35 797[35 720 89 666!89 666[143 612 220 612!220 612[297 612 351 666"/>
+                      </edges>
+                    </DOMShape>
+                    <DOMGroup selected="true">
+                      <transformationPoint>
+                        <Point x="11" y="39.85"/>
+                      </transformationPoint>
+                      <members>
+                        <DOMShape selected="true">
+                          <transformationPoint>
+                            <Point x="11" y="39.85"/>
+                          </transformationPoint>
+                          <fills>
+                            <FillStyle index="1">
+                              <SolidColor color="#FFFFFF"/>
+                            </FillStyle>
+                          </fills>
+                          <edges>
+                            <Edge fillStyle1="1" edges="!305 882S2[270 917 220 917!220 917[170 917 135 882!135 882[100 848 100 798!100 798[100 749 135 714!135 714[170 679 220 679!220 679[270 679 305 714!305 714[340 749 340 798!340 798[340 848 305 882"/>
+                          </edges>
+                        </DOMShape>
+                      </members>
+                    </DOMGroup>
+                  </members>
+                </DOMGroup>
+                <DOMGroup>
+                  <members>
+                    <DOMShape>
+                      <fills>
+                        <FillStyle index="1">
+                          <SolidColor/>
+                        </FillStyle>
+                        <FillStyle index="2">
+                          <SolidColor color="#666666"/>
+                        </FillStyle>
+                      </fills>
+                      <edges>
+                        <Edge fillStyle0="1" edges="!75 1252[15 1312 15 1397!15 1397[15 1482 75 1542!75 1542[135 1602 220 1602!220 1602[305 1602 365 1542!365 1542[387 1521 400 1497!400 1497[425 1452 425 1397!425 1397[425 1342 400 1298!400 1298[387 1273 365 1252!365 1252[305 1192 220 1192
+!220 1192[135 1192 75 1252"/>
+                        <Edge fillStyle0="1" fillStyle1="2" edges="
+!220 1212[297 1212 351 1266!351 1266[389 1304 400 1353!400 1353[405 1374 405 1397!405 1397[405 1421 400 1442!400 1442[389 1491 351 1528!351 1528[297 1582 220 1582!220 1582[143 1582 89 1528!89 1528[35 1474 35 1397!35 1397[35 1320 89 1266
+!89 1266[143 1212 220 1212"/>
+                      </edges>
+                    </DOMShape>
+                  </members>
+                </DOMGroup>
+                <DOMSymbolInstance libraryItemName="Newgrounds.IO/assets/saveSlots/_ngio_saveslot_select_btn" name="saveModeBtn" symbolType="button">
+                  <matrix>
+                    <Matrix a="0.307571411132813" d="0.379547119140625" tx="-3.7" ty="56.95"/>
+                  </matrix>
+                  <transformationPoint>
+                    <Point/>
+                  </transformationPoint>
+                </DOMSymbolInstance>
+              </elements>
+            </DOMFrame>
+            <DOMFrame index="10" duration="11" name="save_mode" labelType="name" keyMode="9728">
+              <Actionscript>
+                <script><![CDATA[loadModeBtn.onRelease = function() {
+	_parent['saveSlotManager'].action = 'Load Data';
+	resetComponent();
+	this._parent.gotoAndStop('load_mode');
+};]]></script>
+              </Actionscript>
+              <elements>
+                <DOMGroup selected="true">
+                  <members>
+                    <DOMShape selected="true">
+                      <fills>
+                        <FillStyle index="1">
+                          <SolidColor/>
+                        </FillStyle>
+                        <FillStyle index="2">
+                          <SolidColor color="#666666"/>
+                        </FillStyle>
+                      </fills>
+                      <edges>
+                        <Edge fillStyle0="1" edges="
+!365 652S1[305 592 220 592!220 592[135 592 75 652!75 652[15 712 15 797!15 797[15 882 75 942!75 942[135 1002 220 1002!220 1002[305 1002 365 942!365 942[387 921 400 897!400 897[425 852 425 797!425 797[425 742 400 698!400 698[387 673 365
+ 652"/>
+                        <Edge fillStyle0="1" fillStyle1="2" edges="
+!351 666S3[389 704 400 753!400 753[405 774 405 797!405 797[405 821 400 842!400 842[389 891 351 928!351 928[297 982 220 982!220 982[143 982 89 928!89 928[35 874 35 797!35 797[35 720 89 666!89 666[143 612 220 612!220 612[297 612 351 666"/>
+                      </edges>
+                    </DOMShape>
+                  </members>
+                </DOMGroup>
+                <DOMSymbolInstance libraryItemName="Newgrounds.IO/assets/saveSlots/_ngio_saveslot_select_btn" name="loadModeBtn" selected="true" symbolType="button">
+                  <matrix>
+                    <Matrix a="0.307571411132813" d="0.379547119140625" tx="-3.7" ty="26.95"/>
+                  </matrix>
+                  <transformationPoint>
+                    <Point/>
+                  </transformationPoint>
+                </DOMSymbolInstance>
+                <DOMGroup selected="true">
+                  <members>
+                    <DOMShape selected="true">
+                      <fills>
+                        <FillStyle index="1">
+                          <SolidColor/>
+                        </FillStyle>
+                        <FillStyle index="2">
+                          <SolidColor color="#666666"/>
+                        </FillStyle>
+                      </fills>
+                      <edges>
+                        <Edge fillStyle0="1" fillStyle1="2" edges="
+!220 1212S3[297 1212 351 1266!351 1266[389 1304 400 1353!400 1353[405 1374 405 1397!405 1397[405 1421 400 1442!400 1442[389 1491 351 1528!351 1528[297 1582 220 1582!220 1582[143 1582 89 1528!89 1528[35 1474 35 1397!35 1397[35 1320 89
+ 1266!89 1266[143 1212 220 1212"/>
+                        <Edge fillStyle0="1" edges="
+!75 1252S1[15 1312 15 1397!15 1397[15 1482 75 1542!75 1542[135 1602 220 1602!220 1602[305 1602 365 1542!365 1542[387 1521 400 1497!400 1497[425 1452 425 1397!425 1397[425 1342 400 1298!400 1298[387 1273 365 1252!365 1252[305 1192 220
+ 1192!220 1192[135 1192 75 1252"/>
+                      </edges>
+                    </DOMShape>
+                    <DOMGroup selected="true">
+                      <transformationPoint>
+                        <Point x="11" y="69.85"/>
+                      </transformationPoint>
+                      <members>
+                        <DOMShape selected="true">
+                          <transformationPoint>
+                            <Point x="11" y="69.85"/>
+                          </transformationPoint>
+                          <fills>
+                            <FillStyle index="1">
+                              <SolidColor color="#FFFFFF"/>
+                            </FillStyle>
+                          </fills>
+                          <edges>
+                            <Edge fillStyle1="1" edges="
+!220 1517S2[170 1517 135 1482!135 1482[100 1448 100 1398!100 1398[100 1349 135 1314!135 1314[170 1279 220 1279!220 1279[270 1279 305 1314!305 1314[340 1349 340 1398!340 1398[340 1448 305 1482!305 1482[270 1517 220 1517"/>
+                          </edges>
+                        </DOMShape>
+                      </members>
+                    </DOMGroup>
+                  </members>
+                </DOMGroup>
+              </elements>
+            </DOMFrame>
+          </frames>
+        </DOMLayer>
+        <DOMLayer name="main" color="#4FFF4F" autoNamed="false">
+          <frames>
+            <DOMFrame index="0" duration="21" keyMode="9728">
+              <elements>
+                <DOMInputText name="dataText" fontRenderingMode="device" width="403.95" height="112.6" border="true" lineType="multiline no wrap">
+                  <matrix>
+                    <Matrix tx="181" ty="33.05"/>
+                  </matrix>
+                  <textRuns>
+                    <DOMTextRun>
+                      <characters></characters>
+                      <textAttrs>
+                        <DOMTextAttrs aliasText="false" autoKern="false" size="14" bitmapSize="280" face="Liberation Sans*"/>
+                      </textAttrs>
+                    </DOMTextRun>
+                  </textRuns>
+                </DOMInputText>
+                <DOMStaticText fontRenderingMode="standard" width="94.4" height="19.05" autoExpand="true" isSelectable="false">
+                  <matrix>
+                    <Matrix tx="29" ty="30"/>
+                  </matrix>
+                  <textRuns>
+                    <DOMTextRun>
+                      <characters>Loading Data</characters>
+                      <textAttrs>
+                        <DOMTextAttrs aliasText="false" autoKern="false" bold="true" size="14" bitmapSize="280" face="Helotypo-Regular"/>
+                      </textAttrs>
+                    </DOMTextRun>
+                  </textRuns>
+                </DOMStaticText>
+                <DOMStaticText fontRenderingMode="standard" width="85.65" height="19.05" autoExpand="true" isSelectable="false">
+                  <matrix>
+                    <Matrix tx="29" ty="60"/>
+                  </matrix>
+                  <textRuns>
+                    <DOMTextRun>
+                      <characters>Saving Data</characters>
+                      <textAttrs>
+                        <DOMTextAttrs aliasText="false" autoKern="false" bold="true" size="14" bitmapSize="280" face="Helotypo-Regular"/>
+                      </textAttrs>
+                    </DOMTextRun>
+                  </textRuns>
+                </DOMStaticText>
+                <DOMStaticText fontRenderingMode="standard" width="150.15" height="21.75" autoExpand="true" isSelectable="false">
+                  <matrix>
+                    <Matrix tx="2" ty="2"/>
+                  </matrix>
+                  <textRuns>
+                    <DOMTextRun>
+                      <characters>Component Mode:</characters>
+                      <textAttrs>
+                        <DOMTextAttrs aliasText="false" autoKern="false" bold="true" size="16" bitmapSize="320" face="Helotypo-Regular"/>
+                      </textAttrs>
+                    </DOMTextRun>
+                  </textRuns>
+                </DOMStaticText>
+                <DOMStaticText fontRenderingMode="standard" width="42.3" height="21.75" autoExpand="true" isSelectable="false">
+                  <matrix>
+                    <Matrix tx="182" ty="2"/>
+                  </matrix>
+                  <textRuns>
+                    <DOMTextRun>
+                      <characters>Data:</characters>
+                      <textAttrs>
+                        <DOMTextAttrs aliasText="false" autoKern="false" bold="true" size="16" bitmapSize="320" face="Helotypo-Regular"/>
+                      </textAttrs>
+                    </DOMTextRun>
+                  </textRuns>
+                </DOMStaticText>
+                <DOMSymbolInstance libraryItemName="Newgrounds.IO/assets/shared/_demo_btn" name="resetBtn" symbolType="button">
+                  <matrix>
+                    <Matrix tx="51.35" ty="131.3"/>
+                  </matrix>
+                  <transformationPoint>
+                    <Point/>
+                  </transformationPoint>
+                </DOMSymbolInstance>
+                <DOMStaticText fontRenderingMode="standard" width="51.9" height="21.25" autoExpand="true" isSelectable="false">
+                  <matrix>
+                    <Matrix a="0.999832153320313" tx="25.7" ty="120.7"/>
+                  </matrix>
+                  <textRuns>
+                    <DOMTextRun>
+                      <characters>Reset</characters>
+                      <textAttrs>
+                        <DOMTextAttrs aliasText="false" autoKern="false" size="19" face="LiberationSans-BoldItalic" fillColor="#FFFFFF"/>
+                      </textAttrs>
+                    </DOMTextRun>
+                  </textRuns>
+                </DOMStaticText>
+              </elements>
+            </DOMFrame>
+          </frames>
+        </DOMLayer>
+      </layers>
+    </DOMTimeline>
+  </timeline>
+</DOMSymbolItem>

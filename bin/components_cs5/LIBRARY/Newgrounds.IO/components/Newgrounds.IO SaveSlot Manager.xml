@@ -1,0 +1,751 @@
+<DOMComponentItem xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://ns.adobe.com/xfl/2008/" name="Newgrounds.IO/components/Newgrounds.IO SaveSlot Manager" itemID="6995e11d-000002d6" lastModified="1772126009" lastUniqueIdentifier="10" displayAsComponent="false" customIconID="0" descriptionType="text" persistLivePreview11="true" symbolDescription="Displays SaveSlot informaton and allows the user to load and clear slots" editFrameIndex="1" requiredMinimumPlayerVersion="0" requiredMinimumASVersion="0" parametersAreLocked="true">
+  <timeline>
+    <DOMTimeline name="Newgrounds.IO SaveSlot Manager" currentFrame="1">
+      <layers>
+        <DOMLayer name="actions" color="#FF4FFF" locked="true" current="true" isSelected="true" autoNamed="false">
+          <frames>
+            <DOMFrame index="0" keyMode="9728">
+              <Actionscript>
+                <script><![CDATA[var _this = this;
+gotoAndPlay(2);]]></script>
+              </Actionscript>
+              <elements/>
+            </DOMFrame>
+            <DOMFrame index="1" keyMode="9728">
+              <Actionscript>
+                <script><![CDATA[NGIO.scoreboardComponent = this;
+
+// default action is loading data
+if (this.action === undefined) this.action = "Load Data";
+
+// sort by slot id by default
+if (this.sort_by === undefined) this.sort_by = "Slot ID";
+
+// show visual slot numbers by default
+if (this.show_slot_numbers === undefined) this.show_slot_numbers = true;
+
+// use native objects (instead of raw strng data) by default
+if (this.use_raw === undefined) this.use_raw = false;
+
+// default handler functions
+if (this.onClose === undefined) this.onClose = function() {};
+if (this.onSlotSaved === undefined) this.onSlotSaved = function(error) { if (error == undefined) error = null; };
+if (this.onSlotLoaded === undefined) this.onSlotLoaded = function(_data, error) { if (error == undefined) error = null; };
+if (this.onSlotCleared === undefined) this.onSlotCleared = function(error) { if (error == undefined) error = null; };
+
+this.setData = function(_data) {
+	this.dataToSave = _data;
+};
+
+// base accounts can only use 3 save slots
+this.max_slots = 3;
+
+this.saveSlots = [];
+
+this.dispose = function() {
+	NGIO.scoreboardComponent = null;
+	_this.onClose = null;
+	_this.onSlotSaved = null;
+	_this.onSlotLoaded = null;
+}
+
+this.onUnload = this.dispose;
+
+this.doOnClose = function() {
+	this.onClose();
+	this._visible = false;
+}
+
+// get save slots from AppState
+var sortMe = NGIO.getSaveSlots();
+
+// if we have no slot information, assume null
+if (sortMe === undefined || sortMe === null || sortMe.length < 1) {
+	this.saveSlots = null;
+	this.gotoAndStop('error');
+} else {
+	// Sort save slots in sortMe based on this.sort_by
+	if (this.sort_by === "Last Updated") {
+		sortMe.sort(function(a, b) {
+			var at:Number = (a && a.timestamp != null) ? Number(a.timestamp) : 0;
+			var bt:Number = (b && b.timestamp != null) ? Number(b.timestamp) : 0;
+			if (at > bt) return -1; // descending
+			if (at < bt) return 1;
+			return 0;
+		});
+	} else {
+		sortMe.sort(function(a, b) {
+			var ai:Number = (a && a.id != null) ? Number(a.id) : 0;
+			var bi:Number = (b && b.id != null) ? Number(b.id) : 0;
+			if (ai < bi) return -1; // ascending
+			if (ai > bi) return 1;
+			return 0;
+		});
+	}
+
+	// ready to use now!
+	this.saveSlots = sortMe;
+	this.gotoAndStop('display');
+}
+
+// lock all the unselected bars so they can't be clicked on
+this.lockOtherBars = function(slot_id, selected_bar):Void {
+	var _min = Math.min(this.max_slots, this.saveSlots.length);
+	for(var i=0; i<_min; i++) {
+		var _bar = this.bars['bar_'+i];
+		if (_bar.slot_id === undefined || _bar.slot_id === null || _bar.slot_id < 1) continue;
+
+		var _slot = NGIO.getSaveSlot(_bar.slot_id);
+		if (_slot.hasData() && _bar !== selected_bar) {
+			_bar.gotoAndStop('locked');
+		}
+	}
+}
+
+this.onSlotSelected = function(slot_id, bar):Void {
+
+	var slot = NGIO.getSaveSlot(slot_id);
+	if (!slot) throw new Error("Could not find save slot with id "+slot_id);
+
+	var method;
+
+	// handle loading mode
+	if (this.action === 'Load Data') {
+
+		if (!slot.hasData()) throw new Error("Could not load empty slot with id "+slot_id);
+		bar.gotoAndStop('loading');
+		this.lockOtherBars(slot_id, bar);
+
+		method = this.use_raw ? 'loadDataRaw':'loadData';
+		slot[method](function(_data, error) {
+			if (this.onSlotLoaded) this.onSlotLoaded(_data, error);
+
+			_this.gotoAndStop('success');
+		}, this);
+
+	// handle save mode
+	} else {
+
+		// empty slots need no manual confirmation
+		if (!slot.hasData()) {
+			this.onSlotReplaceConfirmed(slot_id, bar);
+
+		// prompt to overwrite existing data
+		} else {
+			this.confirm.show('replace');
+			this.confirm.slot_id = slot_id;
+			this.confirm.bar = bar;
+		}
+	}
+}
+
+this.onSlotReplaceConfirmed = function(slot_id, bar):Void {
+
+	bar.gotoAndStop('saving');
+	this.lockOtherBars(slot_id, bar);
+
+	var slot = NGIO.getSaveSlot(slot_id);
+	if (!slot) throw new Error("Could not find save slot with id " + slot_id);
+
+	if (this.dataToSave === undefined) throw new Error('You must provide data to save using saveSlotManager.setData(data)');
+
+	var method = this.use_raw ? 'saveDataRaw' : 'saveData';
+
+	// if we have no data, treat this as a delete
+	if (this.dataToSave === null || this.dataToSave === "") {
+		slot.clearData(function(error) {
+			if (this.onSlotLoaded) this.onSlotSaved(error);
+
+			_this.gotoAndStop('success');
+		}, this);
+	} else {
+		slot[method](this.dataToSave, function(error) {
+			if (this.onSlotSaved) this.onSlotSaved(error);
+
+			_this.gotoAndStop('success');
+		}, this);
+	}
+
+	// prevent any accidental double saves
+	this.dataToSave = undefined;
+}
+
+this.onSlotDeleted = function(slot_id, bar):Void {
+	this.confirm.show('clear');
+	this.confirm.slot_id = slot_id;
+	this.confirm.bar = bar;
+}
+
+this.onSlotDeleteConfirmed = function(slot_id, bar):Void {
+
+	var slot = NGIO.getSaveSlot(slot_id);
+
+	if (this.action === "Load Data") {
+		bar.gotoAndStop('no_data');
+		bar.slotId.text = this.show_slot_numbers ? String(slot.id) : "";
+	} else {
+		bar.slotId.text = this.show_slot_numbers ? String(slot.id) : "";
+		bar.saveDate.text = "";
+		bar.fileSize.text = "";
+		bar.saveMsg.text = "New File";
+	}
+
+	slot.clearData(function(error) {
+		if (_this.onSlotCleared) _this.onSlotCleared();
+	}, this);
+}
+]]></script>
+              </Actionscript>
+              <elements/>
+            </DOMFrame>
+            <DOMFrame index="2" duration="8" name="display" labelType="name" keyMode="9728">
+              <Actionscript>
+                <script><![CDATA[this.header.text = this.action === "Load Data" ? "Select Slot To Load" : "Select Slot To Save";
+
+for (var i=0; i<this.max_slots; i++) {
+	var slot = this.saveSlots[i];
+
+	if (i >= this.saveSlots.length) {
+		this.bars['bar_'+i].gotoAndStop('reset');
+	} else if (!slot.hasData() && this.action === "Load Data") {
+		this.bars['bar_'+i].gotoAndStop('no_data');
+		this.bars['bar_'+i].slotId.text = this.show_slot_numbers ? String(slot.id) : "";
+		this.bars['bar_'+i].slot_id = slot.id;
+	} else {
+		
+		var saveDate = new Date(slot.timestamp * 1000);
+		var dateString:String = "";
+		var sizeString:String = "";
+		var msgString:String = "";
+		
+		if (slot.hasData()) {
+			var months:Array = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", 
+						"Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+			
+			// 2. Calculate 12-hour format and AM/PM
+			var hours24:Number = saveDate.getHours();
+			var ampm:String = (hours24 >= 12) ? "PM" : "AM";
+			var hours12:Number = hours24 % 12;
+			if (hours12 == 0) hours12 = 12; // Handle midnight/noon
+			
+			// 3. Pad minutes with a leading zero if needed
+			var minutes:String = (saveDate.getMinutes() < 10) ? "0" + saveDate.getMinutes() : String(saveDate.getMinutes());
+			
+			// 4. Assemble the string
+			dateString = months[saveDate.getMonth()] + " " + saveDate.getDate() + ", " +
+									saveDate.getFullYear() + " - " + hours12 + ":" + minutes + " " + ampm;
+	
+			
+			
+			// 1 MB = 1024 * 1024 = 1,048,576 bytes
+			if (slot.size >= 1048576) {
+				var mb:Number = Math.ceil((slot.size / 1048576) * 100) / 100;
+				sizeString = mb + " mb";
+			} else {
+				// 1 KB = 1024 bytes
+				var kb:Number = Math.ceil((slot.size / 1024) * 100) / 100;
+				sizeString = kb + " kb";
+			}
+		} else {
+			msgString = "New File";
+			this.bars['bar_'+i].deleteBtn._visible = false;
+		}
+		
+		this.bars['bar_'+i].slotId.text = this.show_slot_numbers ? String(slot.id) : "";
+		this.bars['bar_'+i].saveDate.text = dateString;
+		this.bars['bar_'+i].fileSize.text = sizeString;
+		this.bars['bar_'+i].saveMsg.text = msgString;
+		
+		this.bars['bar_'+i].slot_id = slot.id;
+	}
+}
+
+stop();]]></script>
+              </Actionscript>
+              <elements/>
+            </DOMFrame>
+            <DOMFrame index="10" duration="8" name="success" labelType="name" keyMode="9728">
+              <Actionscript>
+                <script><![CDATA[this.msg.text = this.action === "Load Data" ? "Your game was loaded!" : "Your game was saved!";]]></script>
+              </Actionscript>
+              <elements/>
+            </DOMFrame>
+            <DOMFrame index="18" duration="5" name="error" labelType="name" keyMode="9728">
+              <elements/>
+            </DOMFrame>
+          </frames>
+        </DOMLayer>
+        <DOMLayer name="confirm" color="#808080" autoNamed="false">
+          <frames>
+            <DOMFrame index="0" duration="2" keyMode="9728">
+              <elements/>
+            </DOMFrame>
+            <DOMFrame index="2" duration="8" keyMode="9728">
+              <elements>
+                <DOMSymbolInstance libraryItemName="Newgrounds.IO/assets/saveSlots/_ngio_saveslot_delete_confirm_short" name="confirm" centerPoint3DX="214.5" centerPoint3DY="98.5">
+                  <transformationPoint>
+                    <Point/>
+                  </transformationPoint>
+                </DOMSymbolInstance>
+              </elements>
+            </DOMFrame>
+          </frames>
+        </DOMLayer>
+        <DOMLayer name="header" color="#9933CC" autoNamed="false">
+          <frames>
+            <DOMFrame index="0" keyMode="9728">
+              <elements>
+                <DOMStaticText width="231.15" height="31.3" autoExpand="true" includeOutlines="true" isSelectable="false">
+                  <matrix>
+                    <Matrix tx="12" ty="5"/>
+                  </matrix>
+                  <textRuns>
+                    <DOMTextRun>
+                      <characters>Select Slot to Save/Load</characters>
+                      <textAttrs>
+                        <DOMTextAttrs aliasText="false" size="26" bitmapSize="520" face="PakenhamRg-Regular" fillColor="#FFFFFF"/>
+                      </textAttrs>
+                    </DOMTextRun>
+                  </textRuns>
+                </DOMStaticText>
+              </elements>
+            </DOMFrame>
+            <DOMFrame index="1" duration="9" keyMode="9728">
+              <elements>
+                <DOMDynamicText name="header" width="386.95" height="31.3" includeOutlines="true" isSelectable="false" lineType="multiline">
+                  <matrix>
+                    <Matrix tx="12" ty="5"/>
+                  </matrix>
+                  <textRuns>
+                    <DOMTextRun>
+                      <characters>Select Slot to Save/Load</characters>
+                      <textAttrs>
+                        <DOMTextAttrs aliasText="false" size="26" bitmapSize="520" face="PakenhamRg-Regular" fillColor="#FFFFFF"/>
+                      </textAttrs>
+                    </DOMTextRun>
+                  </textRuns>
+                </DOMDynamicText>
+              </elements>
+            </DOMFrame>
+            <DOMFrame index="10" duration="8" keyMode="9728">
+              <elements>
+                <DOMStaticText width="88" height="31.3" autoExpand="true" includeOutlines="true" isSelectable="false">
+                  <matrix>
+                    <Matrix tx="12" ty="5"/>
+                  </matrix>
+                  <textRuns>
+                    <DOMTextRun>
+                      <characters>SUCCESS!</characters>
+                      <textAttrs>
+                        <DOMTextAttrs aliasText="false" size="26" face="PakenhamRg-Regular" fillColor="#FFFFFF"/>
+                      </textAttrs>
+                    </DOMTextRun>
+                  </textRuns>
+                </DOMStaticText>
+              </elements>
+            </DOMFrame>
+            <DOMFrame index="18" duration="5" keyMode="9728">
+              <elements>
+                <DOMStaticText width="70.55" height="31.3" autoExpand="true" includeOutlines="true" isSelectable="false">
+                  <matrix>
+                    <Matrix tx="12" ty="5"/>
+                  </matrix>
+                  <textRuns>
+                    <DOMTextRun>
+                      <characters>ERROR!</characters>
+                      <textAttrs>
+                        <DOMTextAttrs aliasText="false" size="26" face="PakenhamRg-Regular" fillColor="#FFFFFF"/>
+                      </textAttrs>
+                    </DOMTextRun>
+                  </textRuns>
+                </DOMStaticText>
+              </elements>
+            </DOMFrame>
+          </frames>
+        </DOMLayer>
+        <DOMLayer name="closeButton" color="#FF800A" autoNamed="false">
+          <frames>
+            <DOMFrame index="0" keyMode="9728">
+              <elements>
+                <DOMSymbolInstance libraryItemName="Newgrounds.IO/assets/shared/_ngio_close_btn_container" centerPoint3DX="426" centerPoint3DY="21">
+                  <matrix>
+                    <Matrix tx="426" ty="21"/>
+                  </matrix>
+                  <transformationPoint>
+                    <Point/>
+                  </transformationPoint>
+                </DOMSymbolInstance>
+              </elements>
+            </DOMFrame>
+            <DOMFrame index="1" duration="9" keyMode="9728">
+              <elements>
+                <DOMSymbolInstance libraryItemName="Newgrounds.IO/assets/shared/_ngio_close_btn_container" centerPoint3DX="426" centerPoint3DY="21">
+                  <matrix>
+                    <Matrix tx="426" ty="21"/>
+                  </matrix>
+                  <transformationPoint>
+                    <Point/>
+                  </transformationPoint>
+                </DOMSymbolInstance>
+              </elements>
+            </DOMFrame>
+          </frames>
+        </DOMLayer>
+        <DOMLayer name="slot mask" color="#4F80FF" locked="true" autoNamed="false" visible="false" layerType="mask">
+          <frames>
+            <DOMFrame index="0" keyMode="9728">
+              <elements/>
+            </DOMFrame>
+            <DOMFrame index="1" duration="22" keyMode="9728">
+              <elements>
+                <DOMSymbolInstance libraryItemName="Newgrounds.IO/assets/saveSlots/_ngio_saveslot_item_mask" name="itemMask">
+                  <matrix>
+                    <Matrix tx="4" ty="44"/>
+                  </matrix>
+                  <transformationPoint>
+                    <Point x="221" y="111"/>
+                  </transformationPoint>
+                </DOMSymbolInstance>
+              </elements>
+            </DOMFrame>
+          </frames>
+        </DOMLayer>
+        <DOMLayer name="slots" color="#4FFFFF" parentLayerIndex="4" autoNamed="false">
+          <frames>
+            <DOMFrame index="0" keyMode="9728">
+              <elements>
+                <DOMSymbolInstance libraryItemName="Newgrounds.IO/assets/saveSlots/_ngio_saveslot_select_bg" name="selectBg" centerPoint3DX="225" centerPoint3DY="81">
+                  <matrix>
+                    <Matrix tx="7" ty="48"/>
+                  </matrix>
+                  <transformationPoint>
+                    <Point x="218" y="33"/>
+                  </transformationPoint>
+                </DOMSymbolInstance>
+                <DOMStaticText left="-110.75" width="269.05" height="24.5" includeOutlines="true" isSelectable="false">
+                  <matrix>
+                    <Matrix tx="185.75" ty="59"/>
+                  </matrix>
+                  <textRuns>
+                    <DOMTextRun>
+                      <characters>Feb 24, 2026</characters>
+                      <textAttrs>
+                        <DOMTextAttrs aliasText="false" size="18" bitmapSize="360" face="Helotypo-Regular" fillColor="#FFFFFF"/>
+                      </textAttrs>
+                    </DOMTextRun>
+                  </textRuns>
+                </DOMStaticText>
+                <DOMStaticText left="-110.75" width="269.05" height="24.5" includeOutlines="true" isSelectable="false">
+                  <matrix>
+                    <Matrix tx="185.75" ty="68"/>
+                  </matrix>
+                  <textRuns>
+                    <DOMTextRun>
+                      <characters></characters>
+                      <textAttrs>
+                        <DOMTextAttrs aliasText="false" size="18" bitmapSize="360" face="Helotypo-Regular" fillColor="#FFFFFF"/>
+                      </textAttrs>
+                    </DOMTextRun>
+                  </textRuns>
+                </DOMStaticText>
+                <DOMStaticText left="-0.85" width="125.45" height="16.8" includeOutlines="true" isSelectable="false">
+                  <matrix>
+                    <Matrix tx="75.85" ty="84"/>
+                  </matrix>
+                  <textRuns>
+                    <DOMTextRun>
+                      <characters>932.6 kb</characters>
+                      <textAttrs>
+                        <DOMTextAttrs aliasText="false" size="15" bitmapSize="300" face="LiberationSans-Bold" fillColor="#FDA238"/>
+                      </textAttrs>
+                    </DOMTextRun>
+                  </textRuns>
+                </DOMStaticText>
+                <DOMStaticText width="32" height="38.1" includeOutlines="true" isSelectable="false">
+                  <matrix>
+                    <Matrix tx="25" ty="63"/>
+                  </matrix>
+                  <textRuns>
+                    <DOMTextRun>
+                      <characters>1</characters>
+                      <textAttrs>
+                        <DOMTextAttrs alignment="center" aliasText="false" size="28" bitmapSize="560" face="Helotypo-Regular" fillColor="#FFFFFF"/>
+                      </textAttrs>
+                    </DOMTextRun>
+                  </textRuns>
+                </DOMStaticText>
+                <DOMSymbolInstance libraryItemName="Newgrounds.IO/assets/saveSlots/_ngio_saveslot_select_bg" name="selectBg" centerPoint3DX="225" centerPoint3DY="155">
+                  <matrix>
+                    <Matrix tx="7" ty="122"/>
+                  </matrix>
+                  <transformationPoint>
+                    <Point x="218" y="33"/>
+                  </transformationPoint>
+                </DOMSymbolInstance>
+                <DOMStaticText left="-110.75" width="269.05" height="24.5" includeOutlines="true" isSelectable="false">
+                  <matrix>
+                    <Matrix tx="185.75" ty="133"/>
+                  </matrix>
+                  <textRuns>
+                    <DOMTextRun>
+                      <characters>Feb 24, 2026</characters>
+                      <textAttrs>
+                        <DOMTextAttrs aliasText="false" size="18" bitmapSize="360" face="Helotypo-Regular" fillColor="#FFFFFF"/>
+                      </textAttrs>
+                    </DOMTextRun>
+                  </textRuns>
+                </DOMStaticText>
+                <DOMStaticText left="-0.85" width="125.45" height="16.8" includeOutlines="true" isSelectable="false">
+                  <matrix>
+                    <Matrix tx="75.85" ty="158"/>
+                  </matrix>
+                  <textRuns>
+                    <DOMTextRun>
+                      <characters>932.6 kb</characters>
+                      <textAttrs>
+                        <DOMTextAttrs aliasText="false" size="15" bitmapSize="300" face="LiberationSans-Bold" fillColor="#FDA238"/>
+                      </textAttrs>
+                    </DOMTextRun>
+                  </textRuns>
+                </DOMStaticText>
+                <DOMStaticText width="32" height="38.1" includeOutlines="true" isSelectable="false">
+                  <matrix>
+                    <Matrix tx="25" ty="137"/>
+                  </matrix>
+                  <textRuns>
+                    <DOMTextRun>
+                      <characters>2</characters>
+                      <textAttrs>
+                        <DOMTextAttrs alignment="center" aliasText="false" size="28" bitmapSize="560" face="Helotypo-Regular" fillColor="#FFFFFF"/>
+                      </textAttrs>
+                    </DOMTextRun>
+                  </textRuns>
+                </DOMStaticText>
+                <DOMSymbolInstance libraryItemName="Newgrounds.IO/assets/saveSlots/_ngio_saveslot_select_bg" name="selectBg" centerPoint3DX="225" centerPoint3DY="229">
+                  <matrix>
+                    <Matrix tx="7" ty="196"/>
+                  </matrix>
+                  <transformationPoint>
+                    <Point x="218" y="33"/>
+                  </transformationPoint>
+                </DOMSymbolInstance>
+                <DOMStaticText left="-110.75" width="269.05" height="24.5" includeOutlines="true" isSelectable="false">
+                  <matrix>
+                    <Matrix tx="185.75" ty="207"/>
+                  </matrix>
+                  <textRuns>
+                    <DOMTextRun>
+                      <characters>Feb 24, 2026</characters>
+                      <textAttrs>
+                        <DOMTextAttrs aliasText="false" size="18" bitmapSize="360" face="Helotypo-Regular" fillColor="#FFFFFF"/>
+                      </textAttrs>
+                    </DOMTextRun>
+                  </textRuns>
+                </DOMStaticText>
+                <DOMStaticText left="-110.75" width="269.05" height="24.5" includeOutlines="true" isSelectable="false">
+                  <matrix>
+                    <Matrix tx="185.75" ty="216"/>
+                  </matrix>
+                  <textRuns>
+                    <DOMTextRun>
+                      <characters></characters>
+                      <textAttrs>
+                        <DOMTextAttrs aliasText="false" size="18" bitmapSize="360" face="Helotypo-Regular" fillColor="#FFFFFF"/>
+                      </textAttrs>
+                    </DOMTextRun>
+                  </textRuns>
+                </DOMStaticText>
+                <DOMStaticText left="-0.85" width="125.45" height="16.8" includeOutlines="true" isSelectable="false">
+                  <matrix>
+                    <Matrix tx="75.85" ty="232"/>
+                  </matrix>
+                  <textRuns>
+                    <DOMTextRun>
+                      <characters>932.6 kb</characters>
+                      <textAttrs>
+                        <DOMTextAttrs aliasText="false" size="15" bitmapSize="300" face="LiberationSans-Bold" fillColor="#FDA238"/>
+                      </textAttrs>
+                    </DOMTextRun>
+                  </textRuns>
+                </DOMStaticText>
+                <DOMStaticText width="32" height="38.1" includeOutlines="true" isSelectable="false">
+                  <matrix>
+                    <Matrix tx="25" ty="211"/>
+                  </matrix>
+                  <textRuns>
+                    <DOMTextRun>
+                      <characters>3</characters>
+                      <textAttrs>
+                        <DOMTextAttrs alignment="center" aliasText="false" size="28" bitmapSize="560" face="Helotypo-Regular" fillColor="#FFFFFF"/>
+                      </textAttrs>
+                    </DOMTextRun>
+                  </textRuns>
+                </DOMStaticText>
+              </elements>
+            </DOMFrame>
+            <DOMFrame index="1" duration="9" keyMode="9728">
+              <elements>
+                <DOMSymbolInstance libraryItemName="Newgrounds.IO/assets/saveSlots/_ngio_saveslot_inner" name="bars" centerPoint3DX="225" centerPoint3DY="155">
+                  <matrix>
+                    <Matrix tx="7" ty="48"/>
+                  </matrix>
+                  <transformationPoint>
+                    <Point x="218" y="107"/>
+                  </transformationPoint>
+                </DOMSymbolInstance>
+              </elements>
+            </DOMFrame>
+            <DOMFrame index="10" duration="8" keyMode="9728">
+              <elements>
+                <DOMDynamicText name="msg" left="-0.85" width="405.15" height="20.1" includeOutlines="true" isSelectable="false">
+                  <matrix>
+                    <Matrix tx="15.7" ty="58.55"/>
+                  </matrix>
+                  <textRuns>
+                    <DOMTextRun>
+                      <characters>Your game was saved!</characters>
+                      <textAttrs>
+                        <DOMTextAttrs aliasText="false" size="18" bitmapSize="360" face="LiberationSans-Bold" fillColor="#FFFFFF"/>
+                      </textAttrs>
+                    </DOMTextRun>
+                  </textRuns>
+                </DOMDynamicText>
+              </elements>
+            </DOMFrame>
+            <DOMFrame index="18" duration="5" keyMode="9728">
+              <elements>
+                <DOMStaticText left="-0.85" width="327.2" height="20.1" autoExpand="true" includeOutlines="true" isSelectable="false">
+                  <matrix>
+                    <Matrix tx="15.7" ty="58.55"/>
+                  </matrix>
+                  <textRuns>
+                    <DOMTextRun>
+                      <characters>No save slot data exists for this game.</characters>
+                      <textAttrs>
+                        <DOMTextAttrs aliasText="false" size="18" face="LiberationSans-Bold" fillColor="#FF0000"/>
+                      </textAttrs>
+                    </DOMTextRun>
+                  </textRuns>
+                </DOMStaticText>
+              </elements>
+            </DOMFrame>
+          </frames>
+        </DOMLayer>
+        <DOMLayer name="background" color="#4FFF4F" autoNamed="false">
+          <frames>
+            <DOMFrame index="0" duration="23" keyMode="9728">
+              <elements>
+                <DOMGroup>
+                  <members>
+                    <DOMGroup>
+                      <members>
+                        <DOMShape>
+                          <fills>
+                            <FillStyle index="1">
+                              <SolidColor alpha="0.752941176470588"/>
+                            </FillStyle>
+                          </fills>
+                          <edges>
+                            <Edge fillStyle1="1" edges="!9080 340|9080 5460!9080 5460[9080 5468 9074 5474!9074 5474[9068 5480 9060 5480!9060 5480|100 5480!100 5480[92 5480 86 5474!86 5474[80 5468 80 5460!80 5460|80 340!80 340[80 80 340 80!340 80|8820 80!8820 80[9080 80 9080 340"/>
+                            <Edge cubics="!80 340(;80,167 167,80 340,80q80 340Q80 80q340 80);"/>
+                            <Edge cubics="!80 3500(;80,3500 80,1300 80,1300q80 3500 80 1300);"/>
+                            <Edge cubics="!80 1300(;80,1300 80,340 80,340q80 1300 80 340);"/>
+                            <Edge cubics="!8820 80(;8993,80 9080,167 9080,340q8820 80Q9080 80q9080 340);"/>
+                            <Edge cubics="!9080 340(;9080,340 9080,1300 9080,1300q9080 340 9080 1300);"/>
+                            <Edge cubics="!9080 1300(;9080,1300 9080,3500 9080,3500q9080 1300 9080 3500);"/>
+                            <Edge cubics="!100 5480(;95,5480 90,5478 86,5474q100 5480Q92 5480q86 5474);"/>
+                            <Edge cubics="!86 5474(;82,5470 80,5465 80,5460q86 5474Q80 5468q80 5460);"/>
+                            <Edge cubics="!80 5460(;80,5460 80,3500 80,3500q80 5460 80 3500);"/>
+                            <Edge cubics="!9080 5460(;9080,5465 9078,5470 9074,5474q9080 5460Q9080 5468q9074 5474);"/>
+                            <Edge cubics="!9074 5474(;9070,5478 9065,5480 9060,5480q9074 5474Q9068 5480q9060 5480);"/>
+                            <Edge cubics="!9080 3500(;9080,3500 9080,5460 9080,5460q9080 3500 9080 5460);"/>
+                            <Edge cubics="!9060 5480(9060,5480;9060,5480 100,5480 100,5480q9060 5480 100 5480);"/>
+                            <Edge cubics="!80 1300(;80,1300 9080,1300 9080,1300q80 1300 9080 1300);"/>
+                            <Edge cubics="!80 3500(;80,3500 9080,3500 9080,3500q80 3500 9080 3500);"/>
+                            <Edge cubics="!340 80(;340,80 8820,80 8820,80q340 80 8820 80);"/>
+                          </edges>
+                        </DOMShape>
+                      </members>
+                    </DOMGroup>
+                    <DOMGroup>
+                      <members>
+                        <DOMShape>
+                          <fills>
+                            <FillStyle index="1">
+                              <SolidColor/>
+                            </FillStyle>
+                            <FillStyle index="2">
+                              <LinearGradient>
+                                <matrix>
+                                  <Matrix a="0" b="-0.02685546875" c="0.0244140625" d="0" tx="434.5" ty="21"/>
+                                </matrix>
+                                <GradientEntry color="#32383D" ratio="0"/>
+                                <GradientEntry color="#212529" ratio="0.447058823529412"/>
+                                <GradientEntry color="#3F4649" ratio="0.572549019607843"/>
+                                <GradientEntry color="#434B4E" ratio="0.83921568627451"/>
+                                <GradientEntry color="#626F73" ratio="1"/>
+                              </LinearGradient>
+                            </FillStyle>
+                            <FillStyle index="3">
+                              <SolidColor color="#171314"/>
+                            </FillStyle>
+                            <FillStyle index="4">
+                              <SolidColor color="#0F0B0C"/>
+                            </FillStyle>
+                          </fills>
+                          <edges>
+                            <Edge fillStyle0="1" fillStyle1="2" edges="!8960 800|40 800!40 800|40 260!40 260[40 40 260 40!260 40|8740 40!8740 40[8960 40 8960 260!8960 260|8960 800"/>
+                            <Edge fillStyle1="1" edges="!9000 260|9000 5380!9000 5380[9000 5388 8994 5394!8994 5394[8988 5400 8980 5400!8980 5400|20 5400!20 5400[12 5400 6 5394!6 5394[0 5388 0 5380!0 5380|0 260!0 260[0 0 260 0!260 0|8740 0!8740 0[9000 0 9000 260"/>
+                            <Edge fillStyle0="3" fillStyle1="4" edges="!8920 5320|80 5320!80 5320|80 880!80 880|8920 880!8920 880|8920 5320"/>
+                            <Edge fillStyle0="1" fillStyle1="3" edges="!8960 5360|40 5360!40 5360|40 840!40 840|8960 840!8960 840|8960 5360"/>
+                            <Edge cubics="!0 260(;0,87 87,0 260,0q0 260Q0 0q260 0);"/>
+                            <Edge cubics="!40 800(;40,800 40,260 40,260q40 800 40 260);"/>
+                            <Edge cubics="!40 260(;40,113 113,40 260,40q40 260Q40 40q260 40);"/>
+                            <Edge cubics="!8740 0(;8913,0 9000,87 9000,260q8740 0Q9000 0q9000 260);"/>
+                            <Edge cubics="!8740 40(;8887,40 8960,113 8960,260q8740 40Q8960 40q8960 260);"/>
+                            <Edge cubics="!8960 260(;8960,260 8960,800 8960,800q8960 260 8960 800);"/>
+                            <Edge cubics="!8960 800(;8960,800 40,800 40,800q8960 800 40 800);"/>
+                            <Edge cubics="!260 40(;260,40 8740,40 8740,40q260 40 8740 40);"/>
+                            <Edge cubics="!80 880(;80,880 8920,880 8920,880q80 880 8920 880);"/>
+                            <Edge cubics="!40 840(;40,840 8960,840 8960,840q40 840 8960 840);"/>
+                            <Edge cubics="!260 0(;260,0 8740,0 8740,0q260 0 8740 0);"/>
+                            <Edge cubics="!20 5400(;15,5400 10,5398 6,5394q20 5400Q12 5400q6 5394);"/>
+                            <Edge cubics="!6 5394(;2,5390 0,5385 0,5380q6 5394Q0 5388q0 5380);"/>
+                            <Edge cubics="!9000 5380(;9000,5385 8998,5390 8994,5394q9000 5380Q9000 5388q8994 5394);"/>
+                            <Edge cubics="!8994 5394(;8990,5398 8985,5400 8980,5400q8994 5394Q8988 5400q8980 5400);"/>
+                            <Edge cubics="!8920 5320(8920,5320;8920,5320 80,5320 80,5320q8920 5320 80 5320);"/>
+                            <Edge cubics="!8980 5400(;8980,5400 20,5400 20,5400q8980 5400 20 5400);"/>
+                            <Edge cubics="!8960 5360(;8960,5360 40,5360 40,5360q8960 5360 40 5360);"/>
+                            <Edge cubics="!8920 880(;8920,880 8920,5320 8920,5320q8920 880 8920 5320);"/>
+                            <Edge cubics="!8960 840(;8960,840 8960,5360 8960,5360q8960 840 8960 5360);"/>
+                            <Edge cubics="!9000 260(;9000,260 9000,5380 9000,5380q9000 260 9000 5380);"/>
+                            <Edge cubics="!40 5360(;40,5360 40,840 40,840q40 5360 40 840);"/>
+                            <Edge cubics="!0 5380(;0,5380 0,260 0,260q0 5380 0 260);"/>
+                            <Edge cubics="!80 5320(;80,5320 80,880 80,880q80 5320 80 880);"/>
+                          </edges>
+                        </DOMShape>
+                      </members>
+                    </DOMGroup>
+                  </members>
+                </DOMGroup>
+              </elements>
+            </DOMFrame>
+          </frames>
+        </DOMLayer>
+      </layers>
+    </DOMTimeline>
+  </timeline>
+  <parametersAsXML><![CDATA[   <property id="action">
+      <Inspectable name="Action" variable="action" category="" verbose="0" defaultValue="Load Data" enumeration="Load Data,Save Data" type="List"/>
+   </property>
+   <property id="sort_by">
+      <Inspectable name="Sort By" variable="sort_by" category="" verbose="0" defaultValue="Slot ID" enumeration="Slot ID,Last Updated" type="List"/>
+   </property>
+   <property id="show_slot_numbers">
+      <Inspectable name="Show Slot Numbers" variable="show_slot_numbers" category="" verbose="0" defaultValue="true" type="Boolean"/>
+   </property>
+   <property id="use_raw">
+      <Inspectable name="Use Raw Data" variable="use_raw" category="" verbose="0" defaultValue="false" type="Boolean"/>
+   </property>
+]]></parametersAsXML>
+</DOMComponentItem>

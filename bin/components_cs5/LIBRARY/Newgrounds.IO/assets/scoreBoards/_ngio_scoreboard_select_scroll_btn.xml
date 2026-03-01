@@ -1,0 +1,53 @@
+<DOMSymbolItem xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://ns.adobe.com/xfl/2008/" name="Newgrounds.IO/assets/scoreBoards/_ngio_scoreboard_select_scroll_btn" itemID="67c74b08-00000197" symbolType="button" lastModified="1741114172">
+  <timeline>
+    <DOMTimeline name="_ngio_scoreboard_select_scroll_btn">
+      <layers>
+        <DOMLayer name="Layer 1" color="#4FFF4F" current="true" isSelected="true">
+          <frames>
+            <DOMFrame index="0" duration="3" keyMode="9728">
+              <elements>
+                <DOMGroup>
+                  <transformationPoint>
+                    <Point/>
+                  </transformationPoint>
+                  <members>
+                    <DOMShape>
+                      <transformationPoint>
+                        <Point/>
+                      </transformationPoint>
+                      <fills>
+                        <FillStyle index="1">
+                          <SolidColor color="#5C7178"/>
+                        </FillStyle>
+                      </fills>
+                      <edges>
+                        <Edge fillStyle0="1" edges="!86 -230|-85 -230!-85 -230[-145 -230 -187 -188!-187 -188[-230 -145 -230 -85!-230 -85|-230 85!-230 85[-230 145 -187 187!-187 187[-145 230 -85 230!-85 230|86 230!86 230[146 230 188 187!188 187[230 145 230 85!230 85|230 -85!230 -85[230 -145
+ 188 -188!188 -188[146 -230 86 -230!0 124|-138 -78!-138 -78|138 -78!138 -78|0 124"/>
+                      </edges>
+                    </DOMShape>
+                  </members>
+                </DOMGroup>
+              </elements>
+            </DOMFrame>
+            <DOMFrame index="3" keyMode="9728">
+              <elements>
+                <DOMShape>
+                  <fills>
+                    <FillStyle index="1">
+                      <SolidColor color="#5C7178"/>
+                    </FillStyle>
+                  </fills>
+                  <edges>
+                    <Edge fillStyle0="1" edges="
+!188 -188[146 -230 86 -230!86 -230|-85 -230!-85 -230[-145 -230 -187 -188!-187 -188[-230 -145 -230 -85!-230 -85|-230 85!-230 85[-230 145 -187 187!-187 187[-145 230 -85 230!-85 230|86 230!86 230[146 230 188 187!188 187[230 145 230 85!230
+ 85|230 -85!230 -85[230 -145 188 -188"/>
+                  </edges>
+                </DOMShape>
+              </elements>
+            </DOMFrame>
+          </frames>
+        </DOMLayer>
+      </layers>
+    </DOMTimeline>
+  </timeline>
+</DOMSymbolItem>

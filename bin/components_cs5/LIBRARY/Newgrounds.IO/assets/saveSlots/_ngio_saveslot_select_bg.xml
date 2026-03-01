@@ -1,0 +1,76 @@
+<DOMSymbolItem xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://ns.adobe.com/xfl/2008/" name="Newgrounds.IO/assets/saveSlots/_ngio_saveslot_select_bg" itemID="6995e708-000002e6" lastModified="1771431744">
+  <timeline>
+    <DOMTimeline name="_ngio_saveslot_select_bg">
+      <layers>
+        <DOMLayer name="Layer 1" color="#4FFF4F" current="true" isSelected="true">
+          <frames>
+            <DOMFrame index="0" duration="8" keyMode="9728">
+              <Actionscript>
+                <script><![CDATA[stop();]]></script>
+              </Actionscript>
+              <elements>
+                <DOMShape>
+                  <fills>
+                    <FillStyle index="1">
+                      <SolidColor color="#2C2527"/>
+                    </FillStyle>
+                  </fills>
+                  <edges>
+                    <Edge fillStyle0="1" edges="!8521 0|199 0!199 0[186 0 175 1!175 1[153 2 134 6!134 6|82 25!82 25[2 70 0 194!0 194|0 1135!0 1135[4 1320 199 1320!199 1320|8521 1320!8521 1320[8718 1320 8720 1130!8720 1130[8720 1128 8720 1126!8720 1126|8720 194!8720 194[8720 0 8521
+ 0"/>
+                  </edges>
+                </DOMShape>
+                <DOMGroup>
+                  <members>
+                    <DOMShape>
+                      <fills>
+                        <FillStyle index="1">
+                          <SolidColor color="#FDA238"/>
+                        </FillStyle>
+                      </fills>
+                      <edges>
+                        <Edge fillStyle1="1" edges="
+!1160 660[1160 859 1019 1000!1019 1000[879 1140 680 1140!680 1140[481 1140 340 1000!340 1000[200 859 200 660!200 660[200 461 340 321!340 321[481 180 680 180!680 180[879 180 1019 321!1019 321[1160 461 1160 660"/>
+                      </edges>
+                    </DOMShape>
+                  </members>
+                </DOMGroup>
+              </elements>
+            </DOMFrame>
+            <DOMFrame index="8" duration="7" name="hover" labelType="name" keyMode="9728">
+              <elements>
+                <DOMShape>
+                  <fills>
+                    <FillStyle index="1">
+                      <SolidColor color="#666666"/>
+                    </FillStyle>
+                  </fills>
+                  <edges>
+                    <Edge fillStyle0="1" edges="
+!8521 0|199 0!199 0[186 0 175 1!175 1[153 2 134 6!134 6|82 25!82 25[2 70 0 194!0 194|0 1135!0 1135[4 1320 199 1320!199 1320|8521 1320!8521 1320[8718 1320 8720 1130!8720 1130[8720 1128 8720 1126!8720 1126|8720 194!8720 194[8720 0 8521
+ 0"/>
+                  </edges>
+                </DOMShape>
+                <DOMGroup>
+                  <members>
+                    <DOMShape>
+                      <fills>
+                        <FillStyle index="1">
+                          <SolidColor color="#333333"/>
+                        </FillStyle>
+                      </fills>
+                      <edges>
+                        <Edge fillStyle1="1" edges="
+!1160 660[1160 859 1019 1000!1019 1000[879 1140 680 1140!680 1140[481 1140 340 1000!340 1000[200 859 200 660!200 660[200 461 340 321!340 321[481 180 680 180!680 180[879 180 1019 321!1019 321[1160 461 1160 660"/>
+                      </edges>
+                    </DOMShape>
+                  </members>
+                </DOMGroup>
+              </elements>
+            </DOMFrame>
+          </frames>
+        </DOMLayer>
+      </layers>
+    </DOMTimeline>
+  </timeline>
+</DOMSymbolItem>

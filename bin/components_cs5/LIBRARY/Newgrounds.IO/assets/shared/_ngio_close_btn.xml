@@ -1,0 +1,102 @@
+<DOMSymbolItem xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://ns.adobe.com/xfl/2008/" name="Newgrounds.IO/assets/shared/_ngio_close_btn" itemID="6996130b-0000038b" symbolType="button" lastModified="1771442955">
+  <timeline>
+    <DOMTimeline name="_ngio_close_btn">
+      <layers>
+        <DOMLayer name="Layer 2" color="#9933CC" current="true" isSelected="true">
+          <frames>
+            <DOMFrame index="0" keyMode="9728">
+              <elements>
+                <DOMGroup>
+                  <members>
+                    <DOMShape>
+                      <fills>
+                        <FillStyle index="1">
+                          <SolidColor color="#FC403B"/>
+                        </FillStyle>
+                      </fills>
+                      <edges>
+                        <Edge fillStyle1="1" edges="!111 -107|44 -3!44 -3|117 108!117 108|43 108!43 108|0 39!0 39|-42 108!-42 108|-116 108!-116 108|-42 -4!-42 -4|-110 -107!-110 -107|-37 -107!-37 -107|2 -41!2 -41|38 -107!38 -107|111 -107"/>
+                      </edges>
+                    </DOMShape>
+                  </members>
+                </DOMGroup>
+              </elements>
+            </DOMFrame>
+            <DOMFrame index="1" duration="2" keyMode="9728">
+              <elements>
+                <DOMGroup>
+                  <members>
+                    <DOMShape>
+                      <fills>
+                        <FillStyle index="1">
+                          <SolidColor/>
+                        </FillStyle>
+                      </fills>
+                      <edges>
+                        <Edge fillStyle1="1" edges="!111 -107|44 -3!44 -3|117 108!117 108|43 108!43 108|0 39!0 39|-42 108!-42 108|-116 108!-116 108|-42 -4!-42 -4|-110 -107!-110 -107|-37 -107!-37 -107|2 -41!2 -41|38 -107!38 -107|111 -107"/>
+                      </edges>
+                    </DOMShape>
+                  </members>
+                </DOMGroup>
+              </elements>
+            </DOMFrame>
+          </frames>
+        </DOMLayer>
+        <DOMLayer name="Layer 1" color="#4FFF4F">
+          <frames>
+            <DOMFrame index="0" keyMode="9728">
+              <elements>
+                <DOMGroup>
+                  <members>
+                    <DOMShape>
+                      <fills>
+                        <FillStyle index="1">
+                          <SolidColor alpha="0.501960784313725"/>
+                        </FillStyle>
+                      </fills>
+                      <edges>
+                        <Edge fillStyle0="1" edges="!120 -280|-120 -280!-120 -280[-280 -280 -280 -115!-280 -115|-280 114!-280 114[-280 280 -120 280!-120 280|120 280!120 280[280 280 280 114!280 114|280 -115!280 -115[280 -280 120 -280"/>
+                      </edges>
+                    </DOMShape>
+                  </members>
+                </DOMGroup>
+              </elements>
+            </DOMFrame>
+            <DOMFrame index="1" duration="2" keyMode="9728">
+              <elements>
+                <DOMGroup>
+                  <members>
+                    <DOMShape>
+                      <fills>
+                        <FillStyle index="1">
+                          <SolidColor color="#FDA238"/>
+                        </FillStyle>
+                      </fills>
+                      <edges>
+                        <Edge fillStyle0="1" edges="!120 -280|-120 -280!-120 -280[-280 -280 -280 -115!-280 -115|-280 114!-280 114[-280 280 -120 280!-120 280|120 280!120 280[280 280 280 114!280 114|280 -115!280 -115[280 -280 120 -280"/>
+                      </edges>
+                    </DOMShape>
+                  </members>
+                </DOMGroup>
+              </elements>
+            </DOMFrame>
+            <DOMFrame index="3" keyMode="9728">
+              <elements>
+                <DOMShape>
+                  <fills>
+                    <FillStyle index="1">
+                      <SolidColor color="#FDA238"/>
+                    </FillStyle>
+                  </fills>
+                  <edges>
+                    <Edge fillStyle0="1" edges="!760 -280|-760 -280!-760 -280[-920 -280 -920 -115!-920 -115|-920 114!-920 114[-920 280 -760 280!-760 280|760 280!760 280[920 280 920 114!920 114|920 -115!920 -115[920 -280 760 -280"/>
+                  </edges>
+                </DOMShape>
+              </elements>
+            </DOMFrame>
+          </frames>
+        </DOMLayer>
+      </layers>
+    </DOMTimeline>
+  </timeline>
+</DOMSymbolItem>

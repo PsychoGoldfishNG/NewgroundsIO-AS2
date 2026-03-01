@@ -1,0 +1,1404 @@
+<DOMComponentItem xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://ns.adobe.com/xfl/2008/" name="Newgrounds.IO/components/Newgrounds.IO Scoreboard Full" itemID="67cb2414-000003cd" lastModified="1772124524" lastUniqueIdentifier="70" displayAsComponent="false" customIconID="0" persistLivePreview11="true" editFrameIndex="1" requiredMinimumPlayerVersion="0" requiredMinimumASVersion="0">
+  <timeline>
+    <DOMTimeline name="Newgrounds.IO Scoreboard Full">
+      <layers>
+        <DOMLayer name="Code" color="#4F80FF" current="true" isSelected="true" autoNamed="false">
+          <frames>
+            <DOMFrame index="0" keyMode="9728">
+              <Actionscript>
+                <script><![CDATA[var _this = this;
+
+this.user_id = null;
+this.social = false;
+if (this.show === undefined) this.show = "Everybody";
+if (this.period === undefined) this.period = "A";
+if (this.board_id === undefined) this.board_id = 0;
+
+this.setPropsForShow = function() {
+	if (NGIO.hasUser() && (this.show === "My Best" || this.show === "Friends")) {
+		this.user_id = NGIO.getUser().id;
+		this.social = this.show === "Friends";
+		if (this.show === "My Best") this.period = "A";
+	} else {
+		this.user_id = null;
+		this.social = false;
+		this.show = "Everyone";
+	}
+}
+
+if (this.onClose === undefined) {
+	this.onClose = function() {};
+}
+
+this.dispose = function() {
+	_this.onClose = null;
+	NGIO.scoreboardComponent = null;
+}
+
+this.onUnload = this.dispose;
+
+this.doOnClose = function():Void {
+	this._visible = false;
+	this.onClose();
+}
+
+this.init = function() {
+	
+	NGIO.scoreboardComponent = this;
+
+	this.setPropsForShow();
+	
+	// get a proper period value
+	switch(this.period.toLowerCase()) {
+			
+		case 'd':
+		case 'day':
+		case 'today':
+			this.period = 'D';
+			break;
+		
+		case 'w':
+		case 'week':
+			this.period = 'W';
+			break;
+		
+		case 'm':
+		case 'month':
+			this.period = 'M';
+			break;
+		
+		case 'y':
+		case 'year':
+			this.period = 'Y';
+			break;
+		
+		default:
+			this.period = 'A';
+			break;
+	}
+	
+	var found = false;
+	
+	// if no board was provided, use the first one we can find
+	if (this.board_id < 1) {
+		
+		this.board_id = NGIO.getScoreBoards()[0].id;
+		found = this.board_id !== undefined;
+	
+	// otherwise, make sue the provided id actually exists
+	} else {
+		for (var i=0; i<NGIO.getScoreBoards().length; i++) {
+			if (NGIO.getScoreBoards()[i].id === this.board_id) {
+				found = true;
+				break;
+			}
+		}
+	}
+	
+	if (!this.tag) this.tag = null;
+	
+	// hopefully we found a board to load...
+	if (found) {
+		this.refreshBoard();
+	} else {
+		this.error = "Error: could not find any scoreboards with id "+this.board_id;
+		this.gotoAndStop('error');
+	}
+}
+
+// call this to refresh to board using the set properties or any replacement values
+this.refreshBoard = function(props) {
+	
+	// we can skip all of this if there's no properties passed
+	if (props !== undefined) {
+		
+		var changed = false;
+		
+		if (props.show !== undefined && props.show !== this.show) {
+			this.show = props.show;
+			this.setPropsForShow();
+			changed = true;
+		}
+		// apply any new properties
+		if (props.board_id !== undefined && props.board_id !== this.board_id) {
+			this.board_id = props.board_id;
+			changed = true;
+		}
+		if (props.period !== undefined && props.period !== this.period) {
+			this.period = props.period;
+			changed = true;
+		}
+		if (props.tag !== undefined && props.tag !== this.tag) {
+			this.tag = props.tag;
+			changed = true;
+		}
+
+		// if nothing was actually changed, do nothing
+		if (!changed) return;
+	}
+	
+	// if we get here, load the new scores and re-draw the list
+	this.gotoAndStop('load');
+}
+
+// when a new set of scores is loaded, go to the display frame
+this.onScoresLoaded = function(scores) {
+	this.scores = scores;
+	if (!NGIO.hasUser()) this.gotoAndStop('display_logged_out');
+	else if (this.show === "My Best") this.gotoAndStop('display_my_best');
+	else this.gotoAndStop('display');
+}
+
+// check for dependencies, and if we have everything, initialize the board
+if (!NGIO) {
+	this.error = 'Error: Unable to access NGIO library!';
+	this.gotoAndStop('error');
+} else if (NGIO.getScoreBoards() === null) {
+	this.error = 'Error: Scoreboards have not been loaded yet!';
+	this.gotoAndStop('error');
+} else if (NGIO.getScoreBoards().length < 1) {
+	this.error = 'Error: It appears this game does not have any scoreboards set up';
+	this.gotoAndStop('error');
+} else {
+	this.init();
+}
+
+stop();]]></script>
+              </Actionscript>
+              <elements/>
+            </DOMFrame>
+            <DOMFrame index="1" duration="6" name="load" labelType="name" keyMode="9728">
+              <Actionscript>
+                <script><![CDATA[// store a reference to the selected board's model object
+function loadScores() {
+	this.scoreBoard = NGIO.getScoreBoard(this.board_id);
+	
+	// or toss an error if the board isn't loaded
+	if (!this.scoreBoard) {
+		this.error = "Could not find scoreboard with ID "+this.board_id;
+		this.gotoAndStop('error');
+	}
+	
+	// By default we're only going to load the top 10 scores
+	var scoreFilters:Object = {limit: 10};
+	
+	// set our actual filter values for the comoonent
+	scoreFilters.user_id = this.user_id;
+	scoreFilters.social = this.social;
+	scoreFilters.period = this.period;
+	
+	if (this.tag) scoreFilters.tag = this.tag;
+
+	// load the scores from the server.  When this is done, we'll end up in the 'display' frame
+	this.scoreBoard.getScores(
+		scoreFilters,
+		this.onScoresLoaded,
+		this
+	);
+}
+
+loadScores.call(this);]]></script>
+              </Actionscript>
+              <elements/>
+            </DOMFrame>
+            <DOMFrame index="7" duration="8" name="display_my_best" labelType="name" keyMode="9728">
+              <elements/>
+            </DOMFrame>
+            <DOMFrame index="15" duration="10" name="display" labelType="name" keyMode="9728">
+              <elements/>
+            </DOMFrame>
+            <DOMFrame index="25" duration="16" name="display_logged_out" labelType="name" keyMode="9728">
+              <elements/>
+            </DOMFrame>
+            <DOMFrame index="41" duration="11" name="error" labelType="name" keyMode="9728">
+              <Actionscript>
+                <script><![CDATA[this.errorMsg.text = this.error;
+throw new Error(this.error);]]></script>
+              </Actionscript>
+              <elements>
+                <DOMDynamicText name="errorMsg" fontRenderingMode="device" width="565" height="326.2" includeOutlines="true" lineType="multiline">
+                  <matrix>
+                    <Matrix tx="13.95" ty="58.8"/>
+                  </matrix>
+                  <textRuns>
+                    <DOMTextRun>
+                      <characters>Error messages will show up here...</characters>
+                      <textAttrs>
+                        <DOMTextAttrs aliasText="false" bold="true" size="18" bitmapSize="360" face="Helotypo-Regular" fillColor="#FF0000"/>
+                      </textAttrs>
+                    </DOMTextRun>
+                  </textRuns>
+                </DOMDynamicText>
+              </elements>
+            </DOMFrame>
+          </frames>
+        </DOMLayer>
+        <DOMLayer name="Close Btn" color="#FF800A" autoNamed="false">
+          <frames>
+            <DOMFrame index="0" duration="52" keyMode="9728">
+              <elements>
+                <DOMSymbolInstance libraryItemName="Newgrounds.IO/assets/shared/_ngio_close_btn_container" centerPoint3DX="576" centerPoint3DY="21">
+                  <matrix>
+                    <Matrix tx="576" ty="21"/>
+                  </matrix>
+                  <transformationPoint>
+                    <Point/>
+                  </transformationPoint>
+                </DOMSymbolInstance>
+              </elements>
+            </DOMFrame>
+          </frames>
+        </DOMLayer>
+        <DOMLayer name="Header" color="#4FFFFF" autoNamed="false">
+          <frames>
+            <DOMFrame index="0" duration="41" keyMode="9728">
+              <elements>
+                <DOMStaticText width="109.4" height="31.3" autoExpand="true" isSelectable="false">
+                  <matrix>
+                    <Matrix tx="12" ty="5"/>
+                  </matrix>
+                  <textRuns>
+                    <DOMTextRun>
+                      <characters>High Scores</characters>
+                      <textAttrs>
+                        <DOMTextAttrs aliasText="false" bold="true" size="26" face="PakenhamRg-Regular" fillColor="#FFFFFF"/>
+                      </textAttrs>
+                    </DOMTextRun>
+                  </textRuns>
+                </DOMStaticText>
+              </elements>
+            </DOMFrame>
+            <DOMFrame index="41" duration="11" keyMode="9728">
+              <elements>
+                <DOMStaticText width="81.65" height="31.3" autoExpand="true" isSelectable="false">
+                  <matrix>
+                    <Matrix tx="12" ty="4.65"/>
+                  </matrix>
+                  <textRuns>
+                    <DOMTextRun>
+                      <characters>ERROR!!!</characters>
+                      <textAttrs>
+                        <DOMTextAttrs aliasText="false" bold="true" size="26" face="PakenhamRg-Regular" fillColor="#FFFFFF"/>
+                      </textAttrs>
+                    </DOMTextRun>
+                  </textRuns>
+                </DOMStaticText>
+              </elements>
+            </DOMFrame>
+          </frames>
+        </DOMLayer>
+        <DOMLayer name="Loading" color="#808080" autoNamed="false">
+          <frames>
+            <DOMFrame index="0" keyMode="9728">
+              <elements/>
+            </DOMFrame>
+            <DOMFrame index="1" duration="6" keyMode="9728">
+              <elements>
+                <DOMGroup>
+                  <members>
+                    <DOMSymbolInstance libraryItemName="Newgrounds.IO/assets/shared/_ngio_loader_ring">
+                      <matrix>
+                        <Matrix a="0.591140747070313" d="0.591140747070313" tx="232.35" ty="205.2"/>
+                      </matrix>
+                      <transformationPoint>
+                        <Point x="1.45" y="-1.45"/>
+                      </transformationPoint>
+                    </DOMSymbolInstance>
+                    <DOMStaticText width="216.85" height="29.05" autoExpand="true" includeOutlines="true" isSelectable="false">
+                      <matrix>
+                        <Matrix a="0.59136962890625" d="0.5926513671875" tx="261.2" ty="196.2"/>
+                      </matrix>
+                      <textRuns>
+                        <DOMTextRun>
+                          <characters>Loading Scores...</characters>
+                          <textAttrs>
+                            <DOMTextAttrs aliasText="false" size="26" face="LiberationSans-Bold" fillColor="#FFFFFF"/>
+                          </textAttrs>
+                        </DOMTextRun>
+                      </textRuns>
+                    </DOMStaticText>
+                  </members>
+                </DOMGroup>
+              </elements>
+            </DOMFrame>
+            <DOMFrame index="7" duration="34" keyMode="9728">
+              <elements/>
+            </DOMFrame>
+            <DOMFrame index="41" duration="11" keyMode="9728">
+              <elements/>
+            </DOMFrame>
+          </frames>
+        </DOMLayer>
+        <DOMLayer name="boardSelect" color="#9933CC" autoNamed="false">
+          <frames>
+            <DOMFrame index="0" duration="7" keyMode="9728">
+              <elements/>
+            </DOMFrame>
+            <DOMFrame index="7" duration="34" keyMode="9728">
+              <elements>
+                <DOMSymbolInstance libraryItemName="Newgrounds.IO/assets/scoreBoards/_ngio_scoreboard_selector" name="scoreboard_select" centerPoint3DX="115.9" centerPoint3DY="65.2">
+                  <matrix>
+                    <Matrix a="0.999755859375" tx="11" ty="53"/>
+                  </matrix>
+                  <transformationPoint>
+                    <Point x="104.9" y="11"/>
+                  </transformationPoint>
+                </DOMSymbolInstance>
+              </elements>
+            </DOMFrame>
+            <DOMFrame index="41" duration="11" keyMode="9728">
+              <elements/>
+            </DOMFrame>
+          </frames>
+        </DOMLayer>
+        <DOMLayer name="Base Nav" color="#FF4FFF" autoNamed="false">
+          <frames>
+            <DOMFrame index="0" keyMode="9728">
+              <elements>
+                <DOMSymbolInstance libraryItemName="Newgrounds.IO/assets/scoreBoards/_ngio_scoreboard_period_btn" symbolType="graphic" loop="single frame">
+                  <matrix>
+                    <Matrix a="0.59210205078125" tx="523.5" ty="64"/>
+                  </matrix>
+                  <transformationPoint>
+                    <Point/>
+                  </transformationPoint>
+                </DOMSymbolInstance>
+                <DOMStaticText left="12.5" width="32.7" height="16.8" autoExpand="true" includeOutlines="true" isSelectable="false">
+                  <matrix>
+                    <Matrix tx="495.1" ty="56"/>
+                  </matrix>
+                  <textRuns>
+                    <DOMTextRun>
+                      <characters>Year</characters>
+                      <textAttrs>
+                        <DOMTextAttrs alignment="center" aliasText="false" size="15" face="LiberationSans-Bold" fillColor="#FDA238"/>
+                      </textAttrs>
+                    </DOMTextRun>
+                  </textRuns>
+                </DOMStaticText>
+                <DOMSymbolInstance libraryItemName="Newgrounds.IO/assets/scoreBoards/_ngio_scoreboard_period_btn" symbolType="graphic" loop="single frame">
+                  <matrix>
+                    <Matrix a="0.750335693359375" tx="464.5" ty="64"/>
+                  </matrix>
+                  <transformationPoint>
+                    <Point/>
+                  </transformationPoint>
+                </DOMSymbolInstance>
+                <DOMStaticText left="6.3" width="45.1" height="16.8" autoExpand="true" includeOutlines="true" isSelectable="false">
+                  <matrix>
+                    <Matrix tx="435.7" ty="56"/>
+                  </matrix>
+                  <textRuns>
+                    <DOMTextRun>
+                      <characters>Month</characters>
+                      <textAttrs>
+                        <DOMTextAttrs alignment="center" aliasText="false" size="15" face="LiberationSans-Bold" fillColor="#FDA238"/>
+                      </textAttrs>
+                    </DOMTextRun>
+                  </textRuns>
+                </DOMStaticText>
+                <DOMSymbolInstance libraryItemName="Newgrounds.IO/assets/scoreBoards/_ngio_scoreboard_period_btn" symbolType="graphic" loop="single frame">
+                  <matrix>
+                    <Matrix a="0.684494018554688" tx="402" ty="64"/>
+                  </matrix>
+                  <transformationPoint>
+                    <Point/>
+                  </transformationPoint>
+                </DOMSymbolInstance>
+                <DOMStaticText left="9.15" width="39.4" height="16.8" autoExpand="true" includeOutlines="true" isSelectable="false">
+                  <matrix>
+                    <Matrix tx="372.7" ty="56"/>
+                  </matrix>
+                  <textRuns>
+                    <DOMTextRun>
+                      <characters>Week</characters>
+                      <textAttrs>
+                        <DOMTextAttrs alignment="center" aliasText="false" size="15" face="LiberationSans-Bold" fillColor="#FDA238"/>
+                      </textAttrs>
+                    </DOMTextRun>
+                  </textRuns>
+                </DOMStaticText>
+                <DOMSymbolInstance libraryItemName="Newgrounds.IO/assets/scoreBoards/_ngio_scoreboard_period_btn" symbolType="graphic" loop="single frame">
+                  <matrix>
+                    <Matrix a="0.736846923828125" tx="340" ty="64"/>
+                  </matrix>
+                  <transformationPoint>
+                    <Point/>
+                  </transformationPoint>
+                </DOMSymbolInstance>
+                <DOMStaticText left="6.7" width="44.3" height="16.8" autoExpand="true" includeOutlines="true" isSelectable="false">
+                  <matrix>
+                    <Matrix tx="310.75" ty="56"/>
+                  </matrix>
+                  <textRuns>
+                    <DOMTextRun>
+                      <characters>Today</characters>
+                      <textAttrs>
+                        <DOMTextAttrs alignment="center" aliasText="false" size="15" face="LiberationSans-Bold" fillColor="#FDA238"/>
+                      </textAttrs>
+                    </DOMTextRun>
+                  </textRuns>
+                </DOMStaticText>
+                <DOMSymbolInstance libraryItemName="Newgrounds.IO/assets/scoreBoards/_ngio_scoreboard_period_btn" symbolType="graphic" loop="single frame">
+                  <matrix>
+                    <Matrix a="0.473678588867188" tx="572" ty="64"/>
+                  </matrix>
+                  <transformationPoint>
+                    <Point/>
+                  </transformationPoint>
+                </DOMSymbolInstance>
+                <DOMStaticText left="19.2" width="19.3" height="16.8" autoExpand="true" includeOutlines="true" isSelectable="false">
+                  <matrix>
+                    <Matrix tx="541.8" ty="56"/>
+                  </matrix>
+                  <textRuns>
+                    <DOMTextRun>
+                      <characters>All</characters>
+                      <textAttrs>
+                        <DOMTextAttrs alignment="center" aliasText="false" size="15" face="LiberationSans-Bold" fillColor="#FDA238"/>
+                      </textAttrs>
+                    </DOMTextRun>
+                  </textRuns>
+                </DOMStaticText>
+                <DOMGroup>
+                  <transformationPoint>
+                    <Point x="115.95" y="64"/>
+                  </transformationPoint>
+                  <members>
+                    <DOMShape>
+                      <transformationPoint>
+                        <Point x="115.95" y="64"/>
+                      </transformationPoint>
+                      <fills>
+                        <FillStyle index="1">
+                          <LinearGradient>
+                            <matrix>
+                              <Matrix a="0" b="0.0141143798828125" c="-0.0198974609375" d="0" tx="115.9" ty="64"/>
+                            </matrix>
+                            <GradientEntry color="#667884" ratio="0.0313725490196078"/>
+                            <GradientEntry color="#A3B2B9" ratio="0.0980392156862745"/>
+                          </LinearGradient>
+                        </FillStyle>
+                      </fills>
+                      <edges>
+                        <Edge fillStyle1="1" edges="!4416 1499.5|220.5 1499.5!220.5 1499.5|220.5 1059.5!220.5 1059.5|4416 1059.5!4416 1059.5|4416 1499.5"/>
+                      </edges>
+                    </DOMShape>
+                  </members>
+                </DOMGroup>
+                <DOMGroup>
+                  <transformationPoint>
+                    <Point x="205.95" y="64"/>
+                  </transformationPoint>
+                  <members>
+                    <DOMShape>
+                      <transformationPoint>
+                        <Point x="205.95" y="64"/>
+                      </transformationPoint>
+                      <fills>
+                        <FillStyle index="1">
+                          <SolidColor/>
+                        </FillStyle>
+                      </fills>
+                      <edges>
+                        <Edge fillStyle0="1" edges="!4240 1220|4000 1220!4000 1220|4120 1340!4120 1340|4240 1220"/>
+                      </edges>
+                    </DOMShape>
+                  </members>
+                </DOMGroup>
+                <DOMStaticText width="173.9" height="16.8" includeOutlines="true" isSelectable="false">
+                  <matrix>
+                    <Matrix a="0.999755859375" tx="18.05" ty="56"/>
+                  </matrix>
+                  <textRuns>
+                    <DOMTextRun>
+                      <characters>Scoreboard Name</characters>
+                      <textAttrs>
+                        <DOMTextAttrs aliasText="false" size="15" face="LiberationSans-Bold"/>
+                      </textAttrs>
+                    </DOMTextRun>
+                  </textRuns>
+                </DOMStaticText>
+              </elements>
+            </DOMFrame>
+            <DOMFrame index="1" duration="14" keyMode="9728">
+              <elements/>
+            </DOMFrame>
+            <DOMFrame index="15" duration="26" keyMode="9728">
+              <elements>
+                <DOMSymbolInstance libraryItemName="Newgrounds.IO/assets/scoreBoards/_ngio_scoreboard_period_select" name="period_Y">
+                  <matrix>
+                    <Matrix a="0.59210205078125" tx="523.5" ty="64"/>
+                  </matrix>
+                  <transformationPoint>
+                    <Point/>
+                  </transformationPoint>
+                </DOMSymbolInstance>
+                <DOMStaticText left="12.5" width="32.7" height="16.8" autoExpand="true" includeOutlines="true" isSelectable="false">
+                  <matrix>
+                    <Matrix tx="495.1" ty="56"/>
+                  </matrix>
+                  <textRuns>
+                    <DOMTextRun>
+                      <characters>Year</characters>
+                      <textAttrs>
+                        <DOMTextAttrs alignment="center" aliasText="false" size="15" face="LiberationSans-Bold" fillColor="#FDA238"/>
+                      </textAttrs>
+                    </DOMTextRun>
+                  </textRuns>
+                </DOMStaticText>
+                <DOMSymbolInstance libraryItemName="Newgrounds.IO/assets/scoreBoards/_ngio_scoreboard_period_select" name="period_M">
+                  <matrix>
+                    <Matrix a="0.750335693359375" tx="464.5" ty="64"/>
+                  </matrix>
+                  <transformationPoint>
+                    <Point/>
+                  </transformationPoint>
+                </DOMSymbolInstance>
+                <DOMStaticText left="6.3" width="45.1" height="16.8" autoExpand="true" includeOutlines="true" isSelectable="false">
+                  <matrix>
+                    <Matrix tx="435.7" ty="56"/>
+                  </matrix>
+                  <textRuns>
+                    <DOMTextRun>
+                      <characters>Month</characters>
+                      <textAttrs>
+                        <DOMTextAttrs alignment="center" aliasText="false" size="15" face="LiberationSans-Bold" fillColor="#FDA238"/>
+                      </textAttrs>
+                    </DOMTextRun>
+                  </textRuns>
+                </DOMStaticText>
+                <DOMSymbolInstance libraryItemName="Newgrounds.IO/assets/scoreBoards/_ngio_scoreboard_period_select" name="period_W" centerPoint3DX="402" centerPoint3DY="64">
+                  <matrix>
+                    <Matrix a="0.684494018554688" tx="402" ty="64"/>
+                  </matrix>
+                  <transformationPoint>
+                    <Point/>
+                  </transformationPoint>
+                </DOMSymbolInstance>
+                <DOMStaticText left="9.15" width="39.4" height="16.8" autoExpand="true" includeOutlines="true" isSelectable="false">
+                  <matrix>
+                    <Matrix tx="372.7" ty="56"/>
+                  </matrix>
+                  <textRuns>
+                    <DOMTextRun>
+                      <characters>Week</characters>
+                      <textAttrs>
+                        <DOMTextAttrs alignment="center" aliasText="false" size="15" face="LiberationSans-Bold" fillColor="#FDA238"/>
+                      </textAttrs>
+                    </DOMTextRun>
+                  </textRuns>
+                </DOMStaticText>
+                <DOMSymbolInstance libraryItemName="Newgrounds.IO/assets/scoreBoards/_ngio_scoreboard_period_select" name="period_D" centerPoint3DX="340" centerPoint3DY="64">
+                  <matrix>
+                    <Matrix a="0.736846923828125" tx="340" ty="64"/>
+                  </matrix>
+                  <transformationPoint>
+                    <Point/>
+                  </transformationPoint>
+                </DOMSymbolInstance>
+                <DOMStaticText left="6.7" width="44.3" height="16.8" autoExpand="true" includeOutlines="true" isSelectable="false">
+                  <matrix>
+                    <Matrix tx="310.75" ty="56"/>
+                  </matrix>
+                  <textRuns>
+                    <DOMTextRun>
+                      <characters>Today</characters>
+                      <textAttrs>
+                        <DOMTextAttrs alignment="center" aliasText="false" size="15" face="LiberationSans-Bold" fillColor="#FDA238"/>
+                      </textAttrs>
+                    </DOMTextRun>
+                  </textRuns>
+                </DOMStaticText>
+                <DOMSymbolInstance libraryItemName="Newgrounds.IO/assets/scoreBoards/_ngio_scoreboard_period_select" name="period_A" centerPoint3DX="572" centerPoint3DY="64">
+                  <matrix>
+                    <Matrix a="0.473678588867188" tx="572" ty="64"/>
+                  </matrix>
+                  <transformationPoint>
+                    <Point/>
+                  </transformationPoint>
+                </DOMSymbolInstance>
+                <DOMStaticText left="19.2" width="19.3" height="16.8" autoExpand="true" includeOutlines="true" isSelectable="false">
+                  <matrix>
+                    <Matrix tx="541.8" ty="56"/>
+                  </matrix>
+                  <textRuns>
+                    <DOMTextRun>
+                      <characters>All</characters>
+                      <textAttrs>
+                        <DOMTextAttrs alignment="center" aliasText="false" size="15" face="LiberationSans-Bold" fillColor="#FDA238"/>
+                      </textAttrs>
+                    </DOMTextRun>
+                  </textRuns>
+                </DOMStaticText>
+              </elements>
+            </DOMFrame>
+            <DOMFrame index="41" duration="11" keyMode="9728">
+              <elements/>
+            </DOMFrame>
+          </frames>
+        </DOMLayer>
+        <DOMLayer name="Registered Nav" color="#FFFF4F" autoNamed="false">
+          <frames>
+            <DOMFrame index="0" keyMode="9728">
+              <elements>
+                <DOMSymbolInstance libraryItemName="Newgrounds.IO/assets/scoreBoards/_ngio_high_score_show_friends_btn" symbolType="graphic" loop="single frame">
+                  <matrix>
+                    <Matrix tx="407" ty="21"/>
+                  </matrix>
+                  <transformationPoint>
+                    <Point/>
+                  </transformationPoint>
+                </DOMSymbolInstance>
+                <DOMSymbolInstance libraryItemName="Newgrounds.IO/assets/scoreBoards/_ngio_high_score_show_everyone_btn" symbolType="graphic" loop="single frame">
+                  <matrix>
+                    <Matrix tx="506" ty="21"/>
+                  </matrix>
+                  <transformationPoint>
+                    <Point/>
+                  </transformationPoint>
+                </DOMSymbolInstance>
+                <DOMSymbolInstance libraryItemName="Newgrounds.IO/assets/scoreBoards/_ngio_high_score_show_self_btn" symbolType="graphic" loop="single frame">
+                  <matrix>
+                    <Matrix tx="308" ty="21"/>
+                  </matrix>
+                  <transformationPoint>
+                    <Point/>
+                  </transformationPoint>
+                </DOMSymbolInstance>
+              </elements>
+            </DOMFrame>
+            <DOMFrame index="1" duration="6" keyMode="9728">
+              <elements/>
+            </DOMFrame>
+            <DOMFrame index="7" duration="18" keyMode="9728">
+              <elements>
+                <DOMSymbolInstance libraryItemName="Newgrounds.IO/assets/scoreBoards/_ngio_high_score_show_friends" centerPoint3DX="407" centerPoint3DY="21">
+                  <matrix>
+                    <Matrix tx="407" ty="21"/>
+                  </matrix>
+                  <transformationPoint>
+                    <Point/>
+                  </transformationPoint>
+                </DOMSymbolInstance>
+                <DOMSymbolInstance libraryItemName="Newgrounds.IO/assets/scoreBoards/_ngio_high_score_show_everyone" centerPoint3DX="506" centerPoint3DY="21">
+                  <matrix>
+                    <Matrix tx="506" ty="21"/>
+                  </matrix>
+                  <transformationPoint>
+                    <Point/>
+                  </transformationPoint>
+                </DOMSymbolInstance>
+                <DOMSymbolInstance libraryItemName="Newgrounds.IO/assets/scoreBoards/_ngio_high_score_show_self" centerPoint3DX="308" centerPoint3DY="21">
+                  <matrix>
+                    <Matrix tx="308" ty="21"/>
+                  </matrix>
+                  <transformationPoint>
+                    <Point/>
+                  </transformationPoint>
+                </DOMSymbolInstance>
+              </elements>
+            </DOMFrame>
+            <DOMFrame index="25" duration="16" keyMode="9728">
+              <elements/>
+            </DOMFrame>
+            <DOMFrame index="41" duration="11" keyMode="9728">
+              <elements/>
+            </DOMFrame>
+          </frames>
+        </DOMLayer>
+        <DOMLayer name="List" color="#4FFF4F" autoNamed="false">
+          <frames>
+            <DOMFrame index="0" keyMode="9728">
+              <elements>
+                <DOMGroup>
+                  <members>
+                    <DOMStaticText width="31.9" height="16.8" includeOutlines="true" isSelectable="false">
+                      <matrix>
+                        <Matrix a="1.00199890136719" tx="20" ty="106"/>
+                      </matrix>
+                      <textRuns>
+                        <DOMTextRun>
+                          <characters>X.</characters>
+                          <textAttrs>
+                            <DOMTextAttrs aliasText="false" size="15" face="LiberationSans-Regular" fillColor="#FFFFFF"/>
+                          </textAttrs>
+                        </DOMTextRun>
+                      </textRuns>
+                    </DOMStaticText>
+                    <DOMStaticText width="316.45" height="16.8" includeOutlines="true" isSelectable="false">
+                      <matrix>
+                        <Matrix a="1.00199890136719" tx="60" ty="106"/>
+                      </matrix>
+                      <textRuns>
+                        <DOMTextRun>
+                          <characters>User-Name-Here</characters>
+                          <textAttrs>
+                            <DOMTextAttrs aliasText="false" size="15" face="LiberationSans-Bold" fillColor="#FDA238"/>
+                          </textAttrs>
+                        </DOMTextRun>
+                      </textRuns>
+                    </DOMStaticText>
+                    <DOMStaticText left="-104.3" width="197.25" height="16.8" includeOutlines="true" isSelectable="false">
+                      <matrix>
+                        <Matrix a="1.00224304199219" tx="484.5" ty="106"/>
+                      </matrix>
+                      <textRuns>
+                        <DOMTextRun>
+                          <characters>123,456,789.00</characters>
+                          <textAttrs>
+                            <DOMTextAttrs alignment="right" aliasText="false" size="15" face="LiberationSans-Regular" fillColor="#FFFFFF"/>
+                          </textAttrs>
+                        </DOMTextRun>
+                      </textRuns>
+                    </DOMStaticText>
+                    <DOMStaticText width="31.9" height="16.8" includeOutlines="true" isSelectable="false">
+                      <matrix>
+                        <Matrix a="1.00199890136719" tx="20" ty="138"/>
+                      </matrix>
+                      <textRuns>
+                        <DOMTextRun>
+                          <characters>X.</characters>
+                          <textAttrs>
+                            <DOMTextAttrs aliasText="false" size="15" face="LiberationSans-Regular" fillColor="#FFFFFF"/>
+                          </textAttrs>
+                        </DOMTextRun>
+                      </textRuns>
+                    </DOMStaticText>
+                    <DOMStaticText width="316.45" height="16.8" includeOutlines="true" isSelectable="false">
+                      <matrix>
+                        <Matrix a="1.00199890136719" tx="60" ty="138"/>
+                      </matrix>
+                      <textRuns>
+                        <DOMTextRun>
+                          <characters>User-Name-Here</characters>
+                          <textAttrs>
+                            <DOMTextAttrs aliasText="false" size="15" face="LiberationSans-Bold" fillColor="#FDA238"/>
+                          </textAttrs>
+                        </DOMTextRun>
+                      </textRuns>
+                    </DOMStaticText>
+                    <DOMStaticText left="-104.3" width="197.25" height="16.8" includeOutlines="true" isSelectable="false">
+                      <matrix>
+                        <Matrix a="1.00224304199219" tx="484.5" ty="138"/>
+                      </matrix>
+                      <textRuns>
+                        <DOMTextRun>
+                          <characters>123,456,789.00</characters>
+                          <textAttrs>
+                            <DOMTextAttrs alignment="right" aliasText="false" size="15" face="LiberationSans-Regular" fillColor="#FFFFFF"/>
+                          </textAttrs>
+                        </DOMTextRun>
+                      </textRuns>
+                    </DOMStaticText>
+                    <DOMStaticText width="31.9" height="16.8" includeOutlines="true" isSelectable="false">
+                      <matrix>
+                        <Matrix a="1.00199890136719" tx="20" ty="170"/>
+                      </matrix>
+                      <textRuns>
+                        <DOMTextRun>
+                          <characters>X.</characters>
+                          <textAttrs>
+                            <DOMTextAttrs aliasText="false" size="15" face="LiberationSans-Regular" fillColor="#FFFFFF"/>
+                          </textAttrs>
+                        </DOMTextRun>
+                      </textRuns>
+                    </DOMStaticText>
+                    <DOMStaticText width="316.45" height="16.8" includeOutlines="true" isSelectable="false">
+                      <matrix>
+                        <Matrix a="1.00199890136719" tx="60" ty="170"/>
+                      </matrix>
+                      <textRuns>
+                        <DOMTextRun>
+                          <characters>User-Name-Here</characters>
+                          <textAttrs>
+                            <DOMTextAttrs aliasText="false" size="15" face="LiberationSans-Bold" fillColor="#FDA238"/>
+                          </textAttrs>
+                        </DOMTextRun>
+                      </textRuns>
+                    </DOMStaticText>
+                    <DOMStaticText left="-104.3" width="197.25" height="16.8" includeOutlines="true" isSelectable="false">
+                      <matrix>
+                        <Matrix a="1.00224304199219" tx="484.5" ty="170"/>
+                      </matrix>
+                      <textRuns>
+                        <DOMTextRun>
+                          <characters>123,456,789.00</characters>
+                          <textAttrs>
+                            <DOMTextAttrs alignment="right" aliasText="false" size="15" face="LiberationSans-Regular" fillColor="#FFFFFF"/>
+                          </textAttrs>
+                        </DOMTextRun>
+                      </textRuns>
+                    </DOMStaticText>
+                    <DOMStaticText width="31.9" height="16.8" includeOutlines="true" isSelectable="false">
+                      <matrix>
+                        <Matrix a="1.00199890136719" tx="20" ty="202"/>
+                      </matrix>
+                      <textRuns>
+                        <DOMTextRun>
+                          <characters>X.</characters>
+                          <textAttrs>
+                            <DOMTextAttrs aliasText="false" size="15" face="LiberationSans-Regular" fillColor="#FFFFFF"/>
+                          </textAttrs>
+                        </DOMTextRun>
+                      </textRuns>
+                    </DOMStaticText>
+                    <DOMStaticText width="316.45" height="16.8" includeOutlines="true" isSelectable="false">
+                      <matrix>
+                        <Matrix a="1.00199890136719" tx="60" ty="202"/>
+                      </matrix>
+                      <textRuns>
+                        <DOMTextRun>
+                          <characters>User-Name-Here</characters>
+                          <textAttrs>
+                            <DOMTextAttrs aliasText="false" size="15" face="LiberationSans-Bold" fillColor="#FDA238"/>
+                          </textAttrs>
+                        </DOMTextRun>
+                      </textRuns>
+                    </DOMStaticText>
+                    <DOMStaticText left="-104.3" width="197.25" height="16.8" includeOutlines="true" isSelectable="false">
+                      <matrix>
+                        <Matrix a="1.00224304199219" tx="484.5" ty="202"/>
+                      </matrix>
+                      <textRuns>
+                        <DOMTextRun>
+                          <characters>123,456,789.00</characters>
+                          <textAttrs>
+                            <DOMTextAttrs alignment="right" aliasText="false" size="15" face="LiberationSans-Regular" fillColor="#FFFFFF"/>
+                          </textAttrs>
+                        </DOMTextRun>
+                      </textRuns>
+                    </DOMStaticText>
+                    <DOMStaticText width="31.9" height="16.8" includeOutlines="true" isSelectable="false">
+                      <matrix>
+                        <Matrix a="1.00199890136719" tx="20" ty="234"/>
+                      </matrix>
+                      <textRuns>
+                        <DOMTextRun>
+                          <characters>X.</characters>
+                          <textAttrs>
+                            <DOMTextAttrs aliasText="false" size="15" face="LiberationSans-Regular" fillColor="#FFFFFF"/>
+                          </textAttrs>
+                        </DOMTextRun>
+                      </textRuns>
+                    </DOMStaticText>
+                    <DOMStaticText width="316.45" height="16.8" includeOutlines="true" isSelectable="false">
+                      <matrix>
+                        <Matrix a="1.00199890136719" tx="60" ty="234"/>
+                      </matrix>
+                      <textRuns>
+                        <DOMTextRun>
+                          <characters>User-Name-Here</characters>
+                          <textAttrs>
+                            <DOMTextAttrs aliasText="false" size="15" face="LiberationSans-Bold" fillColor="#FDA238"/>
+                          </textAttrs>
+                        </DOMTextRun>
+                      </textRuns>
+                    </DOMStaticText>
+                    <DOMStaticText left="-104.3" width="197.25" height="16.8" includeOutlines="true" isSelectable="false">
+                      <matrix>
+                        <Matrix a="1.00224304199219" tx="484.5" ty="234"/>
+                      </matrix>
+                      <textRuns>
+                        <DOMTextRun>
+                          <characters>123,456,789.00</characters>
+                          <textAttrs>
+                            <DOMTextAttrs alignment="right" aliasText="false" size="15" face="LiberationSans-Regular" fillColor="#FFFFFF"/>
+                          </textAttrs>
+                        </DOMTextRun>
+                      </textRuns>
+                    </DOMStaticText>
+                    <DOMStaticText width="31.9" height="16.8" includeOutlines="true" isSelectable="false">
+                      <matrix>
+                        <Matrix a="1.00199890136719" tx="20" ty="266"/>
+                      </matrix>
+                      <textRuns>
+                        <DOMTextRun>
+                          <characters>X.</characters>
+                          <textAttrs>
+                            <DOMTextAttrs aliasText="false" size="15" face="LiberationSans-Regular" fillColor="#FFFFFF"/>
+                          </textAttrs>
+                        </DOMTextRun>
+                      </textRuns>
+                    </DOMStaticText>
+                    <DOMStaticText width="316.45" height="16.8" includeOutlines="true" isSelectable="false">
+                      <matrix>
+                        <Matrix a="1.00199890136719" tx="60" ty="266"/>
+                      </matrix>
+                      <textRuns>
+                        <DOMTextRun>
+                          <characters>User-Name-Here</characters>
+                          <textAttrs>
+                            <DOMTextAttrs aliasText="false" size="15" face="LiberationSans-Bold" fillColor="#FDA238"/>
+                          </textAttrs>
+                        </DOMTextRun>
+                      </textRuns>
+                    </DOMStaticText>
+                    <DOMStaticText left="-104.3" width="197.25" height="16.8" includeOutlines="true" isSelectable="false">
+                      <matrix>
+                        <Matrix a="1.00224304199219" tx="484.5" ty="266"/>
+                      </matrix>
+                      <textRuns>
+                        <DOMTextRun>
+                          <characters>123,456,789.00</characters>
+                          <textAttrs>
+                            <DOMTextAttrs alignment="right" aliasText="false" size="15" face="LiberationSans-Regular" fillColor="#FFFFFF"/>
+                          </textAttrs>
+                        </DOMTextRun>
+                      </textRuns>
+                    </DOMStaticText>
+                    <DOMStaticText width="31.9" height="16.8" includeOutlines="true" isSelectable="false">
+                      <matrix>
+                        <Matrix a="1.00199890136719" tx="20" ty="298"/>
+                      </matrix>
+                      <textRuns>
+                        <DOMTextRun>
+                          <characters>X.</characters>
+                          <textAttrs>
+                            <DOMTextAttrs aliasText="false" size="15" face="LiberationSans-Regular" fillColor="#FFFFFF"/>
+                          </textAttrs>
+                        </DOMTextRun>
+                      </textRuns>
+                    </DOMStaticText>
+                    <DOMStaticText width="316.45" height="16.8" includeOutlines="true" isSelectable="false">
+                      <matrix>
+                        <Matrix a="1.00199890136719" tx="60" ty="298"/>
+                      </matrix>
+                      <textRuns>
+                        <DOMTextRun>
+                          <characters>User-Name-Here</characters>
+                          <textAttrs>
+                            <DOMTextAttrs aliasText="false" size="15" face="LiberationSans-Bold" fillColor="#FDA238"/>
+                          </textAttrs>
+                        </DOMTextRun>
+                      </textRuns>
+                    </DOMStaticText>
+                    <DOMStaticText left="-104.3" width="197.25" height="16.8" includeOutlines="true" isSelectable="false">
+                      <matrix>
+                        <Matrix a="1.00224304199219" tx="484.5" ty="298"/>
+                      </matrix>
+                      <textRuns>
+                        <DOMTextRun>
+                          <characters>123,456,789.00</characters>
+                          <textAttrs>
+                            <DOMTextAttrs alignment="right" aliasText="false" size="15" face="LiberationSans-Regular" fillColor="#FFFFFF"/>
+                          </textAttrs>
+                        </DOMTextRun>
+                      </textRuns>
+                    </DOMStaticText>
+                    <DOMStaticText width="31.9" height="16.8" includeOutlines="true" isSelectable="false">
+                      <matrix>
+                        <Matrix a="1.00199890136719" tx="20" ty="330"/>
+                      </matrix>
+                      <textRuns>
+                        <DOMTextRun>
+                          <characters>X.</characters>
+                          <textAttrs>
+                            <DOMTextAttrs aliasText="false" size="15" face="LiberationSans-Regular" fillColor="#FFFFFF"/>
+                          </textAttrs>
+                        </DOMTextRun>
+                      </textRuns>
+                    </DOMStaticText>
+                    <DOMStaticText width="316.45" height="16.8" includeOutlines="true" isSelectable="false">
+                      <matrix>
+                        <Matrix a="1.00199890136719" tx="60" ty="330"/>
+                      </matrix>
+                      <textRuns>
+                        <DOMTextRun>
+                          <characters>User-Name-Here</characters>
+                          <textAttrs>
+                            <DOMTextAttrs aliasText="false" size="15" face="LiberationSans-Bold" fillColor="#FDA238"/>
+                          </textAttrs>
+                        </DOMTextRun>
+                      </textRuns>
+                    </DOMStaticText>
+                    <DOMStaticText left="-104.3" width="197.25" height="16.8" includeOutlines="true" isSelectable="false">
+                      <matrix>
+                        <Matrix a="1.00224304199219" tx="484.5" ty="330"/>
+                      </matrix>
+                      <textRuns>
+                        <DOMTextRun>
+                          <characters>123,456,789.00</characters>
+                          <textAttrs>
+                            <DOMTextAttrs alignment="right" aliasText="false" size="15" face="LiberationSans-Regular" fillColor="#FFFFFF"/>
+                          </textAttrs>
+                        </DOMTextRun>
+                      </textRuns>
+                    </DOMStaticText>
+                    <DOMStaticText width="31.9" height="16.8" includeOutlines="true" isSelectable="false">
+                      <matrix>
+                        <Matrix a="1.00199890136719" tx="20" ty="362"/>
+                      </matrix>
+                      <textRuns>
+                        <DOMTextRun>
+                          <characters>X.</characters>
+                          <textAttrs>
+                            <DOMTextAttrs aliasText="false" size="15" face="LiberationSans-Regular" fillColor="#FFFFFF"/>
+                          </textAttrs>
+                        </DOMTextRun>
+                      </textRuns>
+                    </DOMStaticText>
+                    <DOMStaticText width="316.45" height="16.8" includeOutlines="true" isSelectable="false">
+                      <matrix>
+                        <Matrix a="1.00199890136719" tx="60" ty="362"/>
+                      </matrix>
+                      <textRuns>
+                        <DOMTextRun>
+                          <characters>User-Name-Here</characters>
+                          <textAttrs>
+                            <DOMTextAttrs aliasText="false" size="15" face="LiberationSans-Bold" fillColor="#FDA238"/>
+                          </textAttrs>
+                        </DOMTextRun>
+                      </textRuns>
+                    </DOMStaticText>
+                    <DOMStaticText left="-104.3" width="197.25" height="16.8" includeOutlines="true" isSelectable="false">
+                      <matrix>
+                        <Matrix a="1.00224304199219" tx="484.5" ty="362"/>
+                      </matrix>
+                      <textRuns>
+                        <DOMTextRun>
+                          <characters>123,456,789.00</characters>
+                          <textAttrs>
+                            <DOMTextAttrs alignment="right" aliasText="false" size="15" face="LiberationSans-Regular" fillColor="#FFFFFF"/>
+                          </textAttrs>
+                        </DOMTextRun>
+                      </textRuns>
+                    </DOMStaticText>
+                    <DOMStaticText width="31.9" height="16.8" includeOutlines="true" isSelectable="false">
+                      <matrix>
+                        <Matrix a="1.00199890136719" tx="20" ty="394"/>
+                      </matrix>
+                      <textRuns>
+                        <DOMTextRun>
+                          <characters>X.</characters>
+                          <textAttrs>
+                            <DOMTextAttrs aliasText="false" size="15" face="LiberationSans-Regular" fillColor="#FFFFFF"/>
+                          </textAttrs>
+                        </DOMTextRun>
+                      </textRuns>
+                    </DOMStaticText>
+                    <DOMStaticText width="316.45" height="16.8" includeOutlines="true" isSelectable="false">
+                      <matrix>
+                        <Matrix a="1.00199890136719" tx="60" ty="394"/>
+                      </matrix>
+                      <textRuns>
+                        <DOMTextRun>
+                          <characters>User-Name-Here</characters>
+                          <textAttrs>
+                            <DOMTextAttrs aliasText="false" size="15" face="LiberationSans-Bold" fillColor="#FDA238"/>
+                          </textAttrs>
+                        </DOMTextRun>
+                      </textRuns>
+                    </DOMStaticText>
+                    <DOMStaticText left="-104.3" width="197.25" height="16.8" includeOutlines="true" isSelectable="false">
+                      <matrix>
+                        <Matrix a="1.00224304199219" tx="484.5" ty="394"/>
+                      </matrix>
+                      <textRuns>
+                        <DOMTextRun>
+                          <characters>123,456,789.00</characters>
+                          <textAttrs>
+                            <DOMTextAttrs alignment="right" aliasText="false" size="15" face="LiberationSans-Regular" fillColor="#FFFFFF"/>
+                          </textAttrs>
+                        </DOMTextRun>
+                      </textRuns>
+                    </DOMStaticText>
+                  </members>
+                </DOMGroup>
+              </elements>
+            </DOMFrame>
+            <DOMFrame index="1" duration="6" keyMode="9728">
+              <elements/>
+            </DOMFrame>
+            <DOMFrame index="7" duration="34" keyMode="9728">
+              <elements>
+                <DOMSymbolInstance libraryItemName="Newgrounds.IO/assets/scoreBoards/_ngio_scoreboard_list" name="score_list" centerPoint3DX="300" centerPoint3DY="258.6">
+                  <matrix>
+                    <Matrix tx="18" ty="104"/>
+                  </matrix>
+                  <transformationPoint>
+                    <Point x="280.8" y="154.4"/>
+                  </transformationPoint>
+                </DOMSymbolInstance>
+              </elements>
+            </DOMFrame>
+            <DOMFrame index="41" duration="11" keyMode="9728">
+              <elements/>
+            </DOMFrame>
+          </frames>
+        </DOMLayer>
+        <DOMLayer name="Bg" color="#9933CC" autoNamed="false">
+          <frames>
+            <DOMFrame index="0" duration="52" keyMode="9728">
+              <elements>
+                <DOMGroup>
+                  <members>
+                    <DOMGroup>
+                      <members>
+                        <DOMShape>
+                          <fills>
+                            <FillStyle index="1">
+                              <SolidColor alpha="0.752941176470588"/>
+                            </FillStyle>
+                          </fills>
+                          <edges>
+                            <Edge fillStyle1="1" edges="!12080 340|12080 8540!12080 8540[12080 8548 12074 8554!12074 8554[12068 8560 12060 8560!12060 8560|100 8560!100 8560[92 8560 86 8554!86 8554[80 8548 80 8540!80 8540|80 340!80 340[80 80 340 80!340 80|11820 80!11820 80[12080 80 12080 340"/>
+                            <Edge cubics="!12022 -940(;12532,-940 12375,-330 12382,-165q12022 -940Q12343 -940q12391 -614Q12406 -512q12395 -356Q12382 -175q12382 -165)12382,-165;"/>
+                            <Edge cubics="!12382 -165(;14430,-265 14502,222 14502,357q12382 -165Q13695 -229q14210 8Q14502 142q14502 357);"/>
+                            <Edge cubics="!14502 357(;14502,900 13687,585 12422,955q14502 357Q14502 547q14355 627Q14238 691q13936 721Q13535 751q13281 782Q12824 838q12422 955)12422,955;"/>
+                            <Edge cubics="!12422 955(;14805,962 13372,1227 14012,1250q12422 955Q13832 959q13871 1097Q13880 1132q13829 1195Q13817 1243q14012 1250);"/>
+                            <Edge cubics="!14012 1250(14012,1250;14427,1265 14462,1515 14462,1562q14012 1250Q14277 1260q14393 1394Q14462 1474q14462 1562)14462,1562;"/>
+                            <Edge cubics="!14462 1562(;14462,1692 14460,1957 13152,1895q14462 1562Q14462 1635q14441 1678Q14405 1751q14298 1801Q14002 1935q13152 1895);"/>
+                            <Edge cubics="!13152 1895(;13162,2115 13162,2355 13142,2590q13152 1895Q13169 2271q13142 2590);"/>
+                            <Edge cubics="!13142 2590(;13352,2635 14922,2715 14922,3200q13142 2590Q13160 2594q13509 2636Q13864 2679q14111 2730Q14922 2897q14922 3200);"/>
+                            <Edge cubics="!14922 3200(;14922,3242 14980,3607 13912,3505q14922 3200Q14922 3601q13912 3505);"/>
+                            <Edge cubics="!13912 3505(;14407,3642 14637,3647 15402,3920q13912 3505Q14160 3574q14556 3662Q14942 3756q15402 3920)15402,3920;"/>
+                            <Edge cubics="!15402 3920(;16535,4327 17465,4380 17465,4827q15402 3920Q15732 4039q16202 4171Q16764 4328q16858 4359Q17164 4457q17302 4554Q17465 4669q17465 4827);"/>
+                            <Edge cubics="!17465 4827(;17465,5057 17685,5240 15602,5240q17465 4827Q17465 4836q17470 4911Q17474 4959q17467 4989Q17447 5072q17315 5120Q16983 5240q15602 5240);"/>
+                            <Edge cubics="!15602 5240(;13417,5240 12690,5127 12442,5100q15602 5240Q14215 5240q13296 5180Q13003 5161q12442 5100)12442,5100;"/>
+                            <Edge cubics="!12442 5100(;12442,5130 12442,5175 12442,5215q12442 5100 12442 5215);"/>
+                            <Edge cubics="!12442 5215(12442,5215;12822,5232 12862,5465 12862,5537q12442 5215Q12687 5226q12795 5355Q12862 5437q12862 5537)12862,5537;"/>
+                            <Edge cubics="!12862 5537(;12862,5710 12737,5815 12367,5880q12862 5537Q12862 5670q12753 5749Q12638 5832q12367 5880);"/>
+                            <Edge cubics="!12367 5880(;12185,5910 12215,6177 11847,6260q12367 5880Q12308 5890q12261 5940Q12257 5945q12177 6050Q12053 6214q11847 6260);"/>
+                            <Edge cubics="!11847 6260(;11867,6305 11892,6365 11897,6395q11847 6260Q11891 6359q11897 6395);"/>
+                            <Edge cubics="!11897 6395(;11897,6395 1610,6395 1610,6395q11897 6395 1610 6395)1610,6395;"/>
+                            <Edge cubics="!1610 6395(;1240,6310 847,6202 480,6120q1610 6395Q1438 6355q1044 6256Q674 6163q480 6120);"/>
+                            <Edge cubics="!480 6120(;480,6210 480,6300 480,6390q480 6120 480 6390);"/>
+                            <Edge cubics="!480 6390(;480,6390 -680,6390 -680,6390q480 6390 -680 6390);"/>
+                            <Edge cubics="!-680 6390(;-675,6240 -660,6075 -645,5925q-680 6390Q-674 6218q-645 5925);"/>
+                            <Edge cubics="!-645 5925(;-757,5892 -1397,5770 -1445,5770q-645 5925Q-726 5901q-1069 5835Q-1408 5770q-1445 5770)-1445,5770;"/>
+                            <Edge cubics="!-1445 5770(;-1560,5770 -1807,5920 -2350,5920q-1445 5770Q-1479 5770q-1559 5793Q-1710 5838q-1737 5845Q-2025 5920q-2350 5920);"/>
+                            <Edge cubics="!-2350 5920(-2350,5920;-2962,5920 -2840,5585 -2840,5555q-2350 5920Q-2734 5920q-2824 5749Q-2853 5694q-2849 5625Q-2840 5563q-2840 5555);"/>
+                            <Edge cubics="!-2840 5555(;-3112,5510 -4320,5462 -4755,5145q-2840 5555Q-2890 5547q-3193 5517Q-3515 5484q-3736 5452Q-4484 5342q-4755 5145)-4755,5145;"/>
+                            <Edge cubics="!-4755 5145(;-4985,4977 -5452,4930 -5910,4750q-4755 5145Q-4884 5051q-5247 4952Q-5733 4820q-5910 4750);"/>
+                            <Edge cubics="!-5910 4750(;-6240,4622 -6360,4450 -6360,4300q-5910 4750Q-6143 4660q-6259 4533Q-6360 4423q-6360 4300);"/>
+                            <Edge cubics="!-6360 4300(;-6360,4222 -6305,4000 -6050,4000q-6360 4300Q-6360 4206q-6301 4121Q-6216 4000q-6050 4000);"/>
+                            <Edge cubics="!-6050 4000(;-5775,4000 -3112,4375 -2967,4375q-6050 4000Q-5896 4000q-4460 4188Q-3023 4375q-2967 4375);"/>
+                            <Edge cubics="!-2967 4375(;-2717,4375 -2642,3962 -1795,4165q-2967 4375Q-2893 4375q-2798 4314Q-2632 4207q-2605 4194Q-2303 4043q-1795 4165);"/>
+                            <Edge cubics="!-1795 4165(;-1732,4110 -1730,3957 -1565,3890q-1795 4165Q-1776 4148q-1756 4108Q-1733 4059q-1718 4032Q-1663 3930q-1565 3890);"/>
+                            <Edge cubics="!-1565 3890(;-1677,3832 -1700,3712 -1700,3642q-1565 3890Q-1640 3851q-1674 3771Q-1700 3711q-1700 3642);"/>
+                            <Edge cubics="!-1700 3642(;-1700,3555 -1655,3362 -1430,3345q-1700 3642Q-1700 3546q-1649 3467Q-1578 3356q-1430 3345);"/>
+                            <Edge cubics="!-1430 3345(;-1637,3295 -3300,3507 -3300,2942q-1430 3345Q-1479 3333q-1810 3340Q-2212 3349q-2443 3337Q-3300 3290q-3300 2942);"/>
+                            <Edge cubics="!-3300 2942(;-3300,2537 -3005,2710 -1700,2525q-3300 2942Q-3300 2792q-3234 2732Q-3170 2674q-2989 2651Q-2943 2645q-2501 2611Q-2084 2579q-1700 2525);"/>
+                            <Edge cubics="!-1700 2525(;-2050,2470 -2720,2125 -3085,2020q-1700 2525Q-1896 2494q-2387 2291Q-2946 2060q-3085 2020);"/>
+                            <Edge cubics="!-3085 2020(;-3737,1830 -4112,2322 -4540,1775q-3085 2020Q-3293 1959q-3527 1978Q-3661 1989q-3896 2031Q-4096 2058q-4224 2017Q-4393 1963q-4540 1775);"/>
+                            <Edge cubics="!-4540 1775(;-4775,1477 -4900,1537 -4900,1302q-4540 1775Q-4614 1681q-4695 1608Q-4740 1568q-4808 1515Q-4858 1472q-4877 1433Q-4900 1385q-4900 1302);"/>
+                            <Edge cubics="!-4900 1302(;-4900,1252 -4880,1190 -4860,1145q-4900 1302Q-4900 1235q-4860 1145);"/>
+                            <Edge cubics="!-4860 1145(;-4860,1145 -4850,1135 -4850,1135q-4860 1145 -4850 1135);"/>
+                            <Edge cubics="!-4850 1135(;-5832,977 -7600,957 -7600,457q-4850 1135Q-5094 1096q-5694 1033Q-6309 968q-6593 924Q-7067 851q-7308 752Q-7600 631q-7600 457);"/>
+                            <Edge cubics="!-7600 457(;-7600,355 -7517,160 -7290,160q-7600 457Q-7600 358q-7530 270Q-7442 160q-7290 160);"/>
+                            <Edge cubics="!-7290 160(;-7282,160 -6380,250 -6187,250q-7290 160Q-6380 250q-6187 250);"/>
+                            <Edge cubics="!-6187 250(;-6102,250 -6057,130 -5990,90q-6187 250Q-6138 250q-6082 185Q-6010 102q-5990 90);"/>
+                            <Edge cubics="!-5990 90(;-6612,177 -6620,-195 -6620,-222q-5990 90Q-6381 145q-6538 -23Q-6620 -111q-6620 -222);"/>
+                            <Edge cubics="!-6620 -222(;-6620,-407 -6800,-580 -5000,-580q-6620 -222Q-6620 -224q-6624 -290Q-6627 -331q-6620 -356Q-6601 -428q-6485 -470Q-6188 -580q-5000 -580);"/>
+                            <Edge cubics="!-5000 -580(;-2325,-580 -1070,-285 -80,-285q-5000 -580Q-3452 -580q-1908 -432Q-1189 -359q-890 -331Q-393 -285q-80 -285);"/>
+                            <Edge cubics="!-80 -285(;772,-285 395,-360 610,-360q-80 -285Q426 -285q504 -322Q523 -332q531 -348Q545 -360q610 -360);"/>
+                            <Edge cubics="!610 -360(;800,-360 792,-240 1140,-240q610 -360Q685 -360q816 -300Q946 -240q1140 -240);"/>
+                            <Edge cubics="!1140 -240(;1217,-240 1262,-460 1490,-460q1140 -240Q1164 -240q1195 -274Q1214 -295q1258 -350Q1357 -460q1490 -460);"/>
+                            <Edge cubics="!1490 -460(;1662,-460 1987,-185 2000,-185q1490 -460Q1596 -460q1805 -322Q1909 -254q2000 -185);"/>
+                            <Edge cubics="!2000 -185(;2000,-185 3600,-190 3600,-190q2000 -185 3600 -190);"/>
+                            <Edge cubics="!3600 -190(;3605,-285 3400,-500 4190,-500q3600 -190Q3601 -214q3583 -279Q3572 -341q3601 -381Q3688 -500q4190 -500);"/>
+                            <Edge cubics="!4190 -500(;4667,-500 6820,-382 7915,-350q4190 -500Q4439 -500q5821 -437Q7397 -365q7915 -350);"/>
+                            <Edge cubics="!7915 -350(;8697,-327 10737,-205 10747,-205q7915 -350Q8401 -336q9621 -269Q10230 -235q10747 -205);"/>
+                            <Edge cubics="!10747 -205(;10755,-205 11612,-332 11677,-325q10747 -205Q10751 -205q11191 -268Q11637 -329q11677 -325);"/>
+                            <Edge cubics="!11677 -325(;11692,-397 11592,-940 12022,-940q11677 -325Q11678 -329q11677 -451Q11676 -573q11694 -659Q11753 -940q12022 -940);"/>
+                            <Edge cubics="!13547 4025(;13497,4025 13462,4040 13062,4050q13547 4025Q13501 4029q13436 4034Q13303 4044q13062 4050);"/>
+                            <Edge cubics="!13062 4050(;13062,4050 13062,4135 13062,4135q13062 4050 13062 4135);"/>
+                            <Edge cubics="!13062 4135(;13397,4125 13977,4252 13932,4605q13062 4135Q13377 4126q13640 4234Q13962 4367q13932 4605);"/>
+                            <Edge cubics="!13932 4605(;14107,4615 14407,4635 14457,4635q13932 4605Q13932 4605q14241 4624Q14427 4635q14457 4635);"/>
+                            <Edge cubics="!14457 4635(;14457,4635 15667,4630 15667,4630q14457 4635 15667 4630);"/>
+                            <Edge cubics="!15667 4630(;15597,4607 13587,4025 13547,4025q15667 4630Q15588 4604q14596 4319Q13573 4025q13547 4025);"/>
+                            <Edge cubics="!480 6400(;480,6400 -680,6400 -680,6400q480 6400 -680 6400);"/>
+                            <Edge cubics="!-680 6400(;-680,6400 480,6400 480,6400q-680 6400 480 6400);"/>
+                            <Edge cubics="!11897 6400(;11897,6400 1635,6400 1635,6400q11897 6400 1635 6400);"/>
+                            <Edge cubics="!1635 6400(;1635,6400 11897,6400 11897,6400q1635 6400 11897 6400);"/>
+                          </edges>
+                        </DOMShape>
+                      </members>
+                    </DOMGroup>
+                    <DOMGroup>
+                      <members>
+                        <DOMShape>
+                          <fills>
+                            <FillStyle index="1">
+                              <SolidColor alpha="0.752941176470588"/>
+                            </FillStyle>
+                          </fills>
+                          <edges>
+                            <Edge fillStyle1="1" edges="!12000 320|12000 5800!12000 5800[12000 5808 11989 5814!11989 5814[11979 5820 11964 5820!11964 5820|143 5820!143 5820[129 5820 118 5814!118 5814[107 5808 107 5800!107 5800|107 320!107 320[107 60 573 60!573 60|11534 60!11534 60[12000 60
+ 12000 320"/>
+                          </edges>
+                        </DOMShape>
+                      </members>
+                    </DOMGroup>
+                    <DOMGroup>
+                      <members>
+                        <DOMShape>
+                          <fills>
+                            <FillStyle index="1">
+                              <SolidColor/>
+                            </FillStyle>
+                            <FillStyle index="2">
+                              <LinearGradient>
+                                <matrix>
+                                  <Matrix a="0" b="-0.02685546875" c="0.0244140625" d="0" tx="434.5" ty="21"/>
+                                </matrix>
+                                <GradientEntry color="#32383D" ratio="0"/>
+                                <GradientEntry color="#212529" ratio="0.447058823529412"/>
+                                <GradientEntry color="#3F4649" ratio="0.572549019607843"/>
+                                <GradientEntry color="#434B4E" ratio="0.83921568627451"/>
+                                <GradientEntry color="#626F73" ratio="1"/>
+                              </LinearGradient>
+                            </FillStyle>
+                            <FillStyle index="3">
+                              <SolidColor color="#171314"/>
+                            </FillStyle>
+                            <FillStyle index="4">
+                              <SolidColor color="#0F0B0C"/>
+                            </FillStyle>
+                          </fills>
+                          <edges>
+                            <Edge fillStyle1="1" edges="
+!12000 260|12000 8460!12000 8460[12000 8468 11994 8474!11994 8474[11988 8480 11980 8480!11980 8480|20 8480!20 8480[12 8480 6 8474!6 8474[0 8468 0 8460!0 8460|0 260!0 260[0 0 260 0!260 0|11740 0!11740 0[12000 0 12000 260"/>
+                            <Edge fillStyle0="1" fillStyle1="2" edges="
+!11960 800|40 800!40 800|40 260!40 260[40 40 260 40!260 40|11740 40!11740 40[11960 40 11960 260!11960 260|11960 800"/>
+                            <Edge fillStyle0="1" fillStyle1="3" edges="
+!40 8440|40 840!40 840|11960 840!11960 840|11960 8440!11960 8440|40 8440"/>
+                            <Edge fillStyle0="3" fillStyle1="4" edges="
+!80 8400|80 880!80 880|11920 880!11920 880|11920 8400!11920 8400|80 8400"/>
+                            <Edge cubics="!12022 -940(;12532,-940 12375,-330 12382,-165q12022 -940Q12343 -940q12391 -614Q12406 -512q12395 -356Q12382 -175q12382 -165);"/>
+                            <Edge cubics="!12382 -165(;14430,-265 14502,222 14502,357q12382 -165Q13695 -229q14210 8Q14502 142q14502 357);"/>
+                            <Edge cubics="!14502 357(;14502,900 13687,585 12422,955q14502 357Q14502 547q14355 627Q14238 691q13936 721Q13535 751q13281 782Q12824 838q12422 955);"/>
+                            <Edge cubics="!12422 955(;14805,962 13372,1227 14012,1250q12422 955Q13832 959q13871 1097Q13880 1132q13829 1195Q13817 1243q14012 1250);"/>
+                            <Edge cubics="!14012 1250(;14427,1265 14462,1515 14462,1562q14012 1250Q14277 1260q14393 1394Q14462 1474q14462 1562);"/>
+                            <Edge cubics="!14462 1562(;14462,1692 14460,1957 13152,1895q14462 1562Q14462 1635q14441 1678Q14405 1751q14298 1801Q14002 1935q13152 1895);"/>
+                            <Edge cubics="!13152 1895(;13162,2115 13162,2355 13142,2590q13152 1895Q13169 2271q13142 2590);"/>
+                            <Edge cubics="!13142 2590(;13352,2635 14922,2715 14922,3200q13142 2590Q13160 2594q13509 2636Q13864 2679q14111 2730Q14922 2897q14922 3200);"/>
+                            <Edge cubics="!14922 3200(;14922,3242 14980,3607 13912,3505q14922 3200Q14922 3601q13912 3505);"/>
+                            <Edge cubics="!13912 3505(;14407,3642 14637,3647 15402,3920q13912 3505Q14160 3574q14556 3662Q14942 3756q15402 3920);"/>
+                            <Edge cubics="!15402 3920(;16535,4327 17465,4380 17465,4827q15402 3920Q15732 4039q16202 4171Q16764 4328q16858 4359Q17164 4457q17302 4554Q17465 4669q17465 4827);"/>
+                            <Edge cubics="!17465 4827(;17465,5057 17685,5240 15602,5240q17465 4827Q17465 4836q17470 4911Q17474 4959q17467 4989Q17447 5072q17315 5120Q16983 5240q15602 5240);"/>
+                            <Edge cubics="!15602 5240(;13417,5240 12690,5127 12442,5100q15602 5240Q14215 5240q13296 5180Q13003 5161q12442 5100);"/>
+                            <Edge cubics="!12442 5100(;12442,5130 12442,5175 12442,5215q12442 5100 12442 5215);"/>
+                            <Edge cubics="!12442 5215(;12822,5232 12862,5465 12862,5537q12442 5215Q12687 5226q12795 5355Q12862 5437q12862 5537);"/>
+                            <Edge cubics="!12862 5537(;12862,5710 12737,5815 12367,5880q12862 5537Q12862 5670q12753 5749Q12638 5832q12367 5880);"/>
+                            <Edge cubics="!12367 5880(;12185,5910 12215,6177 11847,6260q12367 5880Q12308 5890q12261 5940Q12257 5945q12177 6050Q12053 6214q11847 6260);"/>
+                            <Edge cubics="!11847 6260(;11867,6305 11892,6365 11897,6395q11847 6260Q11891 6359q11897 6395);"/>
+                            <Edge cubics="!11897 6395(;11897,6395 1610,6395 1610,6395q11897 6395 1610 6395);"/>
+                            <Edge cubics="!1610 6395(;1240,6310 847,6202 480,6120q1610 6395Q1438 6355q1044 6256Q674 6163q480 6120);"/>
+                            <Edge cubics="!480 6120(;480,6210 480,6300 480,6390q480 6120 480 6390);"/>
+                            <Edge cubics="!480 6390(;480,6390 -680,6390 -680,6390q480 6390 -680 6390);"/>
+                            <Edge cubics="!-680 6390(;-675,6240 -660,6075 -645,5925q-680 6390Q-674 6218q-645 5925);"/>
+                            <Edge cubics="!-645 5925(;-757,5892 -1397,5770 -1445,5770q-645 5925Q-726 5901q-1069 5835Q-1408 5770q-1445 5770);"/>
+                            <Edge cubics="!-1445 5770(;-1560,5770 -1807,5920 -2350,5920q-1445 5770Q-1479 5770q-1559 5793Q-1710 5838q-1737 5845Q-2025 5920q-2350 5920);"/>
+                            <Edge cubics="!-2350 5920(;-2962,5920 -2840,5585 -2840,5555q-2350 5920Q-2734 5920q-2824 5749Q-2853 5694q-2849 5625Q-2840 5563q-2840 5555);"/>
+                            <Edge cubics="!-2840 5555(;-3112,5510 -4320,5462 -4755,5145q-2840 5555Q-2890 5547q-3193 5517Q-3515 5484q-3736 5452Q-4484 5342q-4755 5145);"/>
+                            <Edge cubics="!-4755 5145(;-4985,4977 -5452,4930 -5910,4750q-4755 5145Q-4884 5051q-5247 4952Q-5733 4820q-5910 4750);"/>
+                            <Edge cubics="!-5910 4750(;-6240,4622 -6360,4450 -6360,4300q-5910 4750Q-6143 4660q-6259 4533Q-6360 4423q-6360 4300);"/>
+                            <Edge cubics="!-6360 4300(;-6360,4222 -6305,4000 -6050,4000q-6360 4300Q-6360 4206q-6301 4121Q-6216 4000q-6050 4000);"/>
+                            <Edge cubics="!-6050 4000(;-5775,4000 -3112,4375 -2967,4375q-6050 4000Q-5896 4000q-4460 4188Q-3023 4375q-2967 4375);"/>
+                            <Edge cubics="!-2967 4375(;-2717,4375 -2642,3962 -1795,4165q-2967 4375Q-2893 4375q-2798 4314Q-2632 4207q-2605 4194Q-2303 4043q-1795 4165);"/>
+                            <Edge cubics="!-1795 4165(;-1732,4110 -1730,3957 -1565,3890q-1795 4165Q-1776 4148q-1756 4108Q-1733 4059q-1718 4032Q-1663 3930q-1565 3890);"/>
+                            <Edge cubics="!-1565 3890(;-1677,3832 -1700,3712 -1700,3642q-1565 3890Q-1640 3851q-1674 3771Q-1700 3711q-1700 3642);"/>
+                            <Edge cubics="!-1700 3642(;-1700,3555 -1655,3362 -1430,3345q-1700 3642Q-1700 3546q-1649 3467Q-1578 3356q-1430 3345);"/>
+                            <Edge cubics="!-1430 3345(;-1637,3295 -3300,3507 -3300,2942q-1430 3345Q-1479 3333q-1810 3340Q-2212 3349q-2443 3337Q-3300 3290q-3300 2942);"/>
+                            <Edge cubics="!-3300 2942(;-3300,2537 -3005,2710 -1700,2525q-3300 2942Q-3300 2792q-3234 2732Q-3170 2674q-2989 2651Q-2943 2645q-2501 2611Q-2084 2579q-1700 2525);"/>
+                            <Edge cubics="!-1700 2525(;-2050,2470 -2720,2125 -3085,2020q-1700 2525Q-1896 2494q-2387 2291Q-2946 2060q-3085 2020);"/>
+                            <Edge cubics="!-3085 2020(;-3737,1830 -4112,2322 -4540,1775q-3085 2020Q-3293 1959q-3527 1978Q-3661 1989q-3896 2031Q-4096 2058q-4224 2017Q-4393 1963q-4540 1775);"/>
+                            <Edge cubics="!-4540 1775(;-4775,1477 -4900,1537 -4900,1302q-4540 1775Q-4614 1681q-4695 1608Q-4740 1568q-4808 1515Q-4858 1472q-4877 1433Q-4900 1385q-4900 1302);"/>
+                            <Edge cubics="!-4900 1302(;-4900,1252 -4880,1190 -4860,1145q-4900 1302Q-4900 1235q-4860 1145);"/>
+                            <Edge cubics="!-4860 1145(;-4860,1145 -4850,1135 -4850,1135q-4860 1145 -4850 1135);"/>
+                            <Edge cubics="!-4850 1135(;-5832,977 -7600,957 -7600,457q-4850 1135Q-5094 1096q-5694 1033Q-6309 968q-6593 924Q-7067 851q-7308 752Q-7600 631q-7600 457);"/>
+                            <Edge cubics="!-7600 457(;-7600,355 -7517,160 -7290,160q-7600 457Q-7600 358q-7530 270Q-7442 160q-7290 160);"/>
+                            <Edge cubics="!-7290 160(;-7282,160 -6380,250 -6187,250q-7290 160Q-6380 250q-6187 250);"/>
+                            <Edge cubics="!-6187 250(;-6102,250 -6057,130 -5990,90q-6187 250Q-6138 250q-6082 185Q-6010 102q-5990 90);"/>
+                            <Edge cubics="!-5990 90(;-6612,177 -6620,-195 -6620,-222q-5990 90Q-6381 145q-6538 -23Q-6620 -111q-6620 -222);"/>
+                            <Edge cubics="!-6620 -222(;-6620,-407 -6800,-580 -5000,-580q-6620 -222Q-6620 -224q-6624 -290Q-6627 -331q-6620 -356Q-6601 -428q-6485 -470Q-6188 -580q-5000 -580);"/>
+                            <Edge cubics="!-5000 -580(;-2325,-580 -1070,-285 -80,-285q-5000 -580Q-3452 -580q-1908 -432Q-1189 -359q-890 -331Q-393 -285q-80 -285);"/>
+                            <Edge cubics="!-80 -285(;772,-285 395,-360 610,-360q-80 -285Q426 -285q504 -322Q523 -332q531 -348Q545 -360q610 -360);"/>
+                            <Edge cubics="!610 -360(;800,-360 792,-240 1140,-240q610 -360Q685 -360q816 -300Q946 -240q1140 -240);"/>
+                            <Edge cubics="!1140 -240(;1217,-240 1262,-460 1490,-460q1140 -240Q1164 -240q1195 -274Q1214 -295q1258 -350Q1357 -460q1490 -460);"/>
+                            <Edge cubics="!1490 -460(;1662,-460 1987,-185 2000,-185q1490 -460Q1596 -460q1805 -322Q1909 -254q2000 -185);"/>
+                            <Edge cubics="!2000 -185(;2000,-185 3600,-190 3600,-190q2000 -185 3600 -190);"/>
+                            <Edge cubics="!3600 -190(;3605,-285 3400,-500 4190,-500q3600 -190Q3601 -214q3583 -279Q3572 -341q3601 -381Q3688 -500q4190 -500);"/>
+                            <Edge cubics="!4190 -500(;4667,-500 6820,-382 7915,-350q4190 -500Q4439 -500q5821 -437Q7397 -365q7915 -350);"/>
+                            <Edge cubics="!7915 -350(;8697,-327 10737,-205 10747,-205q7915 -350Q8401 -336q9621 -269Q10230 -235q10747 -205);"/>
+                            <Edge cubics="!10747 -205(;10755,-205 11612,-332 11677,-325q10747 -205Q10751 -205q11191 -268Q11637 -329q11677 -325);"/>
+                            <Edge cubics="!11677 -325(;11692,-397 11592,-940 12022,-940q11677 -325Q11678 -329q11677 -451Q11676 -573q11694 -659Q11753 -940q12022 -940);"/>
+                            <Edge cubics="!13547 4025(;13497,4025 13462,4040 13062,4050q13547 4025Q13501 4029q13436 4034Q13303 4044q13062 4050);"/>
+                            <Edge cubics="!13062 4050(;13062,4050 13062,4135 13062,4135q13062 4050 13062 4135);"/>
+                            <Edge cubics="!13062 4135(;13397,4125 13977,4252 13932,4605q13062 4135Q13377 4126q13640 4234Q13962 4367q13932 4605);"/>
+                            <Edge cubics="!13932 4605(;14107,4615 14407,4635 14457,4635q13932 4605Q13932 4605q14241 4624Q14427 4635q14457 4635);"/>
+                            <Edge cubics="!14457 4635(;14457,4635 15667,4630 15667,4630q14457 4635 15667 4630);"/>
+                            <Edge cubics="!15667 4630(;15597,4607 13587,4025 13547,4025q15667 4630Q15588 4604q14596 4319Q13573 4025q13547 4025);"/>
+                            <Edge cubics="!480 6400(;480,6400 -680,6400 -680,6400q480 6400 -680 6400);"/>
+                            <Edge cubics="!-680 6400(;-680,6400 480,6400 480,6400q-680 6400 480 6400);"/>
+                            <Edge cubics="!11897 6400(;11897,6400 1635,6400 1635,6400q11897 6400 1635 6400);"/>
+                            <Edge cubics="!1635 6400(;1635,6400 11897,6400 11897,6400q1635 6400 11897 6400);"/>
+                          </edges>
+                        </DOMShape>
+                      </members>
+                    </DOMGroup>
+                    <DOMGroup>
+                      <members>
+                        <DOMGroup>
+                          <transformationPoint>
+                            <Point x="300.1" y="88"/>
+                          </transformationPoint>
+                          <members>
+                            <DOMShape>
+                              <transformationPoint>
+                                <Point x="300.1" y="88"/>
+                              </transformationPoint>
+                              <fills>
+                                <FillStyle index="1">
+                                  <SolidColor/>
+                                </FillStyle>
+                              </fills>
+                              <edges>
+                                <Edge fillStyle0="1" edges="
+!11999 1740|0 1740!0 1740|0 1780!0 1780|11999 1780!11999 1780|11999 1740"/>
+                              </edges>
+                            </DOMShape>
+                          </members>
+                        </DOMGroup>
+                        <DOMGroup>
+                          <members>
+                            <DOMShape>
+                              <fills>
+                                <FillStyle index="1">
+                                  <SolidColor color="#171314"/>
+                                </FillStyle>
+                              </fills>
+                              <edges>
+                                <Edge fillStyle0="1" edges="
+!11960 1700|40 1700!40 1700|40 1740!40 1740|11960 1740!11960 1740|11960 1700!11960 1780|40 1780!40 1780|40 1820!40 1820|11960 1820!11960 1820|11960 1780"/>
+                              </edges>
+                            </DOMShape>
+                          </members>
+                        </DOMGroup>
+                      </members>
+                    </DOMGroup>
+                  </members>
+                </DOMGroup>
+              </elements>
+            </DOMFrame>
+          </frames>
+        </DOMLayer>
+      </layers>
+    </DOMTimeline>
+  </timeline>
+  <parametersAsXML><![CDATA[   <property id="board_id">
+      <Inspectable name="ScoreBoard ID" variable="board_id" category="" verbose="0" defaultValue="0" type="Number"/>
+   </property>
+   <property id="period">
+      <Inspectable name="Period" variable="period" category="" verbose="0" defaultValue="Today" enumeration="Today,Week,Month,Year,All" type="List"/>
+   </property>
+   <property id="show">
+      <Inspectable name="Show" variable="show" category="" verbose="0" defaultValue="Everybody" enumeration="My Best,Friends,Everybody" type="List"/>
+   </property>
+   <property id="tag">
+      <Inspectable name="Tag (optional)" variable="tag" category="" verbose="0" defaultValue="" type="String"/>
+   </property>
+]]></parametersAsXML>
+</DOMComponentItem>

@@ -1,0 +1,65 @@
+<DOMSymbolItem xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://ns.adobe.com/xfl/2008/" name="Newgrounds.IO/assets/connector/_ngio_loader_bar" itemID="67be2cff-00001a33" sourceFlashFilepath="..\..\..\NewgroundsIO-AS3\build\test-f8.fla" sourceLibraryItemHRef="_ngio_loader_bar" sourceLastModified="1740516743" lastModified="1740516743" lastUniqueIdentifier="1">
+  <timeline>
+    <DOMTimeline name="_ngio_loader_bar">
+      <layers>
+        <DOMLayer name="mask" color="#9933CC" locked="true" autoNamed="false" visible="false" layerType="mask">
+          <frames>
+            <DOMFrame index="0" keyMode="9728">
+              <elements>
+                <DOMShape>
+                  <fills>
+                    <FillStyle index="1">
+                      <SolidColor color="#33FFFF"/>
+                    </FillStyle>
+                  </fills>
+                  <edges>
+                    <Edge fillStyle1="1" edges="!3284 -85S2[3319 -50 3320 0!3320 0[3320 49 3285 84!3285 84|3284 85!3284 85[3249 120 3200 120!3200 120|-3200 120!-3200 120[-3250 119 -3285 84!-3285 84[-3320 49 -3319 0!-3319 0[-3319 -49 -3285 -84!-3285 -84[-3285 -85 -3284 -85!-3284 -85
+[-3249 -119 -3200 -119!-3200 -119|3200 -119!3200 -119[3249 -120 3284 -85"/>
+                  </edges>
+                </DOMShape>
+              </elements>
+            </DOMFrame>
+          </frames>
+        </DOMLayer>
+        <DOMLayer name="bar" color="#FF800A" parentLayerIndex="0" current="true" isSelected="true" autoNamed="false">
+          <frames>
+            <DOMFrame index="0" keyMode="9728">
+              <elements>
+                <DOMSymbolInstance libraryItemName="Newgrounds.IO/assets/connector/_ngio_loader_bar_inner" name="inner">
+                  <matrix>
+                    <Matrix tx="-165.95"/>
+                  </matrix>
+                  <transformationPoint>
+                    <Point x="165.95"/>
+                  </transformationPoint>
+                </DOMSymbolInstance>
+              </elements>
+            </DOMFrame>
+          </frames>
+        </DOMLayer>
+        <DOMLayer name="border" color="#4FFF4F" autoNamed="false">
+          <frames>
+            <DOMFrame index="0" keyMode="9728">
+              <elements>
+                <DOMShape>
+                  <fills>
+                    <FillStyle index="1">
+                      <SolidColor color="#FFFFFF"/>
+                    </FillStyle>
+                  </fills>
+                  <edges>
+                    <Edge fillStyle0="1" edges="
+!3370 -170[3441 -99 3441 0!3441 0[3440 94 3379 162!3379 162[3366 166 3362 179!3362 179[3294 240 3200 241!3200 241|-3200 241!-3200 241[-3299 241 -3370 170!-3370 170[-3440 100 -3440 0!-3440 0[-3441 -100 -3370 -169!-3370 -169[-3370 -170
+ -3369 -170!-3369 -170[-3300 -241 -3200 -240!-3200 -240|3200 -240!3200 -240[3300 -240 3370 -170!3200 -320|-3200 -320!-3200 -320[-3333 -321 -3426 -227!-3426 -227[-3427 -227 -3427 -226!-3427 -226[-3521 -133 -3520 0!-3520 0|-3520 1!-3520
+ 1[-3520 134 -3427 227!-3427 227[-3333 321 -3200 321!-3200 321|3201 321!3201 321[3333 320 3426 228!3426 228[3427 227 3428 226!3428 226[3520 133 3521 1!3521 1|3521 0!3521 0[3521 -133 3427 -227!3427 -227[3334 -320 3200 -320!-3438 -200|-3438
+ -199!-3438 -199|-3439 -198!-3439 -198|-3438 -200!-3358 -199|-3359 -196!-3359 -196[-3359 -197 -3359 -198!-3359 -198|-3358 -199"/>
+                  </edges>
+                </DOMShape>
+              </elements>
+            </DOMFrame>
+          </frames>
+        </DOMLayer>
+      </layers>
+    </DOMTimeline>
+  </timeline>
+</DOMSymbolItem>

@@ -1,0 +1,30 @@
+<DOMSymbolItem xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://ns.adobe.com/xfl/2008/" name="Newgrounds.IO/assets/saveSlots/_ngio_saveslot_item_mask" itemID="69976fa4-000003ec" lastModified="1771532196">
+  <timeline>
+    <DOMTimeline name="_ngio_saveslot_item_mask">
+      <layers>
+        <DOMLayer name="Layer 1" color="#4FFF4F" current="true" isSelected="true">
+          <frames>
+            <DOMFrame index="0" keyMode="9728">
+              <elements>
+                <DOMShape>
+                  <fills>
+                    <FillStyle index="1">
+                      <SolidColor color="#0F0B0C"/>
+                    </FillStyle>
+                  </fills>
+                  <edges>
+                    <Edge fillStyle1="1" edges="!8840 4440S2|0 4440!0 4440|0 0!0 0|8840 0!8840 0|8840 4440"/>
+                    <Edge cubics="!0 0(;0,0 8840,0 8840,0q0 0 8840 0);"/>
+                    <Edge cubics="!8840 4440(8840,4440;8840,4440 0,4440 0,4440q8840 4440 0 4440);"/>
+                    <Edge cubics="!8840 0(;8840,0 8840,4440 8840,4440q8840 0 8840 4440);"/>
+                    <Edge cubics="!0 4440(;0,4440 0,0 0,0q0 4440 0 0);"/>
+                  </edges>
+                </DOMShape>
+              </elements>
+            </DOMFrame>
+          </frames>
+        </DOMLayer>
+      </layers>
+    </DOMTimeline>
+  </timeline>
+</DOMSymbolItem>

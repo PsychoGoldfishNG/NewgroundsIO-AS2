@@ -1,0 +1,295 @@
+<DOMSymbolItem xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://ns.adobe.com/xfl/2008/" name="Newgrounds.IO/assets/saveSlots/_ngio_saveslot_bar" itemID="69950dfd-00000290" lastModified="1771900470" lastUniqueIdentifier="8">
+  <timeline>
+    <DOMTimeline name="_ngio_saveslot_bar">
+      <layers>
+        <DOMLayer name="trashBtn" color="#FF4FFF" autoNamed="false">
+          <frames>
+            <DOMFrame index="0" duration="13" keyMode="9728">
+              <elements>
+                <DOMSymbolInstance libraryItemName="Newgrounds.IO/assets/saveSlots/_ngio_saveslot_delete_btn" name="deleteBtn" symbolType="button">
+                  <matrix>
+                    <Matrix tx="416" ty="20.5"/>
+                  </matrix>
+                  <transformationPoint>
+                    <Point/>
+                  </transformationPoint>
+                </DOMSymbolInstance>
+              </elements>
+            </DOMFrame>
+            <DOMFrame index="13" duration="10" keyMode="9728">
+              <elements/>
+            </DOMFrame>
+            <DOMFrame index="23" duration="28" keyMode="9728">
+              <elements/>
+            </DOMFrame>
+          </frames>
+        </DOMLayer>
+        <DOMLayer name="selectBtn" color="#FF800A" locked="true" autoNamed="false" visible="false">
+          <frames>
+            <DOMFrame index="0" duration="13" keyMode="9728">
+              <elements>
+                <DOMSymbolInstance libraryItemName="Newgrounds.IO/assets/saveSlots/_ngio_saveslot_select_btn" name="selectBtn" symbolType="button">
+                  <transformationPoint>
+                    <Point x="218" y="33"/>
+                  </transformationPoint>
+                </DOMSymbolInstance>
+              </elements>
+            </DOMFrame>
+            <DOMFrame index="13" duration="10" name="locked" labelType="name" keyMode="9728">
+              <elements/>
+            </DOMFrame>
+            <DOMFrame index="23" duration="28" keyMode="9728">
+              <elements/>
+            </DOMFrame>
+          </frames>
+        </DOMLayer>
+        <DOMLayer name="Labels" color="#4FFF4F" autoNamed="false">
+          <frames>
+            <DOMFrame index="0" duration="23" name="has_data" labelType="name" keyMode="9728">
+              <Actionscript>
+                <script><![CDATA[
+var targetComponent = this._parent._parent;
+var _this = this;
+
+this.selectBtn.onRelease = function() {
+	targetComponent['onSlotSelected'].call(targetComponent, _this.slot_id, _this);
+};
+
+this.selectBtn.onRollOut = function() {
+	_this.selectBg.gotoAndStop(1);
+};
+
+this.selectBtn.onRollOver = function() {
+	_this.selectBg.gotoAndStop('hover');
+};
+
+this.deleteBtn.onRelease = function() {
+	targetComponent['onSlotDeleted'].call(targetComponent, _this.slot_id, _this);
+};
+
+stop();]]></script>
+              </Actionscript>
+              <elements>
+                <DOMDynamicText name="fileSize" left="-0.85" width="125.45" height="16.8" includeOutlines="true" isSelectable="false">
+                  <matrix>
+                    <Matrix tx="68.85" ty="36"/>
+                  </matrix>
+                  <textRuns>
+                    <DOMTextRun>
+                      <characters>932.6 kb</characters>
+                      <textAttrs>
+                        <DOMTextAttrs aliasText="false" size="15" bitmapSize="300" face="LiberationSans-Bold" fillColor="#FDA238"/>
+                      </textAttrs>
+                    </DOMTextRun>
+                  </textRuns>
+                </DOMDynamicText>
+                <DOMDynamicText name="slotId" width="32" height="38.1" includeOutlines="true" isSelectable="false" lineType="multiline">
+                  <matrix>
+                    <Matrix tx="18" ty="15"/>
+                  </matrix>
+                  <textRuns>
+                    <DOMTextRun>
+                      <characters>X</characters>
+                      <textAttrs>
+                        <DOMTextAttrs alignment="center" aliasText="false" size="28" bitmapSize="560" face="Helotypo-Regular" fillColor="#FFFFFF"/>
+                      </textAttrs>
+                    </DOMTextRun>
+                  </textRuns>
+                </DOMDynamicText>
+              </elements>
+            </DOMFrame>
+            <DOMFrame index="23" duration="7" name="loading" labelType="name" keyMode="9728">
+              <elements>
+                <DOMStaticText left="-0.85" width="125.45" height="16.8" includeOutlines="true" isSelectable="false">
+                  <matrix>
+                    <Matrix tx="68.85" ty="36"/>
+                  </matrix>
+                  <textRuns>
+                    <DOMTextRun>
+                      <characters>Loading...</characters>
+                      <textAttrs>
+                        <DOMTextAttrs aliasText="false" size="15" bitmapSize="300" face="LiberationSans-Bold" fillColor="#FDA238"/>
+                      </textAttrs>
+                    </DOMTextRun>
+                  </textRuns>
+                </DOMStaticText>
+                <DOMSymbolInstance libraryItemName="Newgrounds.IO/assets/shared/_ngio_loader_ring" centerPoint3DX="33.9" centerPoint3DY="32.25">
+                  <matrix>
+                    <Matrix a="0.74432373046875" d="0.744461059570313" tx="32.75" ty="33.35"/>
+                  </matrix>
+                  <transformationPoint>
+                    <Point x="1.55" y="-1.5"/>
+                  </transformationPoint>
+                </DOMSymbolInstance>
+              </elements>
+            </DOMFrame>
+            <DOMFrame index="30" duration="7" name="saving" labelType="name" keyMode="9728">
+              <elements>
+                <DOMStaticText left="-0.85" width="125.45" height="16.8" includeOutlines="true" isSelectable="false">
+                  <matrix>
+                    <Matrix tx="68.85" ty="36"/>
+                  </matrix>
+                  <textRuns>
+                    <DOMTextRun>
+                      <characters>Saving...</characters>
+                      <textAttrs>
+                        <DOMTextAttrs aliasText="false" size="15" face="LiberationSans-Bold" fillColor="#FDA238"/>
+                      </textAttrs>
+                    </DOMTextRun>
+                  </textRuns>
+                </DOMStaticText>
+                <DOMSymbolInstance libraryItemName="Newgrounds.IO/assets/shared/_ngio_loader_ring" centerPoint3DX="33.9" centerPoint3DY="32.25">
+                  <matrix>
+                    <Matrix a="0.74432373046875" d="0.744461059570313" tx="32.75" ty="33.35"/>
+                  </matrix>
+                  <transformationPoint>
+                    <Point x="1.55" y="-1.5"/>
+                  </transformationPoint>
+                </DOMSymbolInstance>
+              </elements>
+            </DOMFrame>
+            <DOMFrame index="37" duration="8" name="no_data" labelType="name" keyMode="9728">
+              <elements>
+                <DOMShape>
+                  <fills>
+                    <FillStyle index="1">
+                      <SolidColor color="#2C2527"/>
+                    </FillStyle>
+                  </fills>
+                  <edges>
+                    <Edge fillStyle0="1" edges="!8521 0|199 0!199 0[186 0 175 1!175 1[153 2 134 6!134 6|82 25!82 25[2 70 0 194!0 194|0 1135!0 1135[4 1320 199 1320!199 1320|8521 1320!8521 1320[8718 1320 8720 1130!8720 1130[8720 1128 8720 1126!8720 1126|8720 194!8720 194[8720 0 8521
+ 0"/>
+                  </edges>
+                </DOMShape>
+                <DOMGroup>
+                  <members>
+                    <DOMShape>
+                      <fills>
+                        <FillStyle index="1">
+                          <SolidColor color="#666666"/>
+                        </FillStyle>
+                      </fills>
+                      <edges>
+                        <Edge fillStyle1="1" edges="
+!1160 660[1160 859 1019 1000!1019 1000[879 1140 680 1140!680 1140[481 1140 340 1000!340 1000[200 859 200 660!200 660[200 461 340 321!340 321[481 180 680 180!680 180[879 180 1019 321!1019 321[1160 461 1160 660"/>
+                      </edges>
+                    </DOMShape>
+                  </members>
+                </DOMGroup>
+                <DOMDynamicText name="slotId" width="32" height="38.1" includeOutlines="true" isSelectable="false" lineType="multiline">
+                  <matrix>
+                    <Matrix tx="18" ty="15"/>
+                  </matrix>
+                  <textRuns>
+                    <DOMTextRun>
+                      <characters>X</characters>
+                      <textAttrs>
+                        <DOMTextAttrs alignment="center" aliasText="false" size="28" bitmapSize="560" face="Helotypo-Regular"/>
+                      </textAttrs>
+                    </DOMTextRun>
+                  </textRuns>
+                </DOMDynamicText>
+                <DOMStaticText left="-110.75" width="269.05" height="24.5" includeOutlines="true" isSelectable="false">
+                  <matrix>
+                    <Matrix c="-0.5614013671875" tx="185.65" ty="20.75"/>
+                  </matrix>
+                  <transformationPoint>
+                    <Point x="23.75" y="12.25"/>
+                  </transformationPoint>
+                  <textRuns>
+                    <DOMTextRun>
+                      <characters>-Empty-</characters>
+                      <textAttrs>
+                        <DOMTextAttrs aliasText="false" size="18" bitmapSize="360" face="Helotypo-Regular" fillColor="#999999"/>
+                      </textAttrs>
+                    </DOMTextRun>
+                  </textRuns>
+                </DOMStaticText>
+              </elements>
+            </DOMFrame>
+            <DOMFrame index="45" duration="6" name="reset" labelType="name" keyMode="9728">
+              <elements/>
+            </DOMFrame>
+          </frames>
+        </DOMLayer>
+        <DOMLayer name="message" color="#4F80FF" locked="true" autoNamed="false">
+          <frames>
+            <DOMFrame index="0" duration="37" keyMode="9728">
+              <elements>
+                <DOMDynamicText name="saveMsg" selected="true" left="-110.75" width="269.05" height="24.5" includeOutlines="true" isSelectable="false" lineType="multiline">
+                  <matrix>
+                    <Matrix tx="178.75" ty="20"/>
+                  </matrix>
+                  <textRuns>
+                    <DOMTextRun>
+                      <characters></characters>
+                      <textAttrs>
+                        <DOMTextAttrs aliasText="false" size="18" bitmapSize="360" face="Helotypo-Regular" fillColor="#FFFFFF"/>
+                      </textAttrs>
+                    </DOMTextRun>
+                  </textRuns>
+                </DOMDynamicText>
+              </elements>
+            </DOMFrame>
+            <DOMFrame index="37" duration="14" keyMode="9728">
+              <elements/>
+            </DOMFrame>
+          </frames>
+        </DOMLayer>
+        <DOMLayer name="Date" color="#4FFFFF" current="true" isSelected="true" autoNamed="false">
+          <frames>
+            <DOMFrame index="0" duration="37" keyMode="9728">
+              <elements>
+                <DOMDynamicText name="saveDate" left="-110.75" width="269.05" height="24.5" includeOutlines="true" isSelectable="false" lineType="multiline">
+                  <matrix>
+                    <Matrix tx="178.75" ty="11"/>
+                  </matrix>
+                  <textRuns>
+                    <DOMTextRun>
+                      <characters>Feb 24, 2026</characters>
+                      <textAttrs>
+                        <DOMTextAttrs aliasText="false" size="18" bitmapSize="360" face="Helotypo-Regular" fillColor="#FFFFFF"/>
+                      </textAttrs>
+                    </DOMTextRun>
+                  </textRuns>
+                </DOMDynamicText>
+              </elements>
+            </DOMFrame>
+            <DOMFrame index="37" duration="14" keyMode="9728">
+              <elements/>
+            </DOMFrame>
+          </frames>
+        </DOMLayer>
+        <DOMLayer name="selectBg" color="#9933CC" autoNamed="false">
+          <frames>
+            <DOMFrame index="0" duration="23" keyMode="9728">
+              <elements>
+                <DOMSymbolInstance libraryItemName="Newgrounds.IO/assets/saveSlots/_ngio_saveslot_select_bg" name="selectBg" centerPoint3DX="218" centerPoint3DY="33">
+                  <transformationPoint>
+                    <Point x="218" y="33"/>
+                  </transformationPoint>
+                </DOMSymbolInstance>
+              </elements>
+            </DOMFrame>
+            <DOMFrame index="23" duration="28" keyMode="9728">
+              <elements>
+                <DOMShape>
+                  <fills>
+                    <FillStyle index="1">
+                      <SolidColor color="#2C2527"/>
+                    </FillStyle>
+                  </fills>
+                  <edges>
+                    <Edge fillStyle0="1" edges="
+!8521 0|199 0!199 0[186 0 175 1!175 1[153 2 134 6!134 6|82 25!82 25[2 70 0 194!0 194|0 1135!0 1135[4 1320 199 1320!199 1320|8521 1320!8521 1320[8718 1320 8720 1130!8720 1130[8720 1128 8720 1126!8720 1126|8720 194!8720 194[8720 0 8521
+ 0"/>
+                  </edges>
+                </DOMShape>
+              </elements>
+            </DOMFrame>
+          </frames>
+        </DOMLayer>
+      </layers>
+    </DOMTimeline>
+  </timeline>
+</DOMSymbolItem>

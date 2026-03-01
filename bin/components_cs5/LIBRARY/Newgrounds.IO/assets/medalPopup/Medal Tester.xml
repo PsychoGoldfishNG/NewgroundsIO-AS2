@@ -1,0 +1,68 @@
+<DOMSymbolItem xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://ns.adobe.com/xfl/2008/" name="Newgrounds.IO/assets/medalPopup/Medal Tester" itemID="67cb5fd6-00000dce" lastModified="1771901288">
+  <timeline>
+    <DOMTimeline name="Medal Tester">
+      <layers>
+        <DOMLayer name="Layer 1" color="#4FFF4F" current="true" isSelected="true">
+          <frames>
+            <DOMFrame index="0" keyMode="9728">
+              <Actionscript>
+                <script><![CDATA[unlock_btn.onRelease = function() {
+	NGIO.medalPopup.unlock(Number(medal_id.text));
+};]]></script>
+              </Actionscript>
+              <elements>
+                <DOMSymbolInstance libraryItemName="Newgrounds.IO/assets/shared/_demo_btn" name="unlock_btn" symbolType="button">
+                  <matrix>
+                    <Matrix a="0.999832153320313" tx="249.45" ty="14.65"/>
+                  </matrix>
+                  <transformationPoint>
+                    <Point/>
+                  </transformationPoint>
+                </DOMSymbolInstance>
+                <DOMStaticText fontRenderingMode="standard" width="74.4" height="21.75" autoExpand="true" isSelectable="false">
+                  <matrix>
+                    <Matrix a="0.999832153320313" tx="2" ty="5.7"/>
+                  </matrix>
+                  <textRuns>
+                    <DOMTextRun>
+                      <characters>Medal ID:</characters>
+                      <textAttrs>
+                        <DOMTextAttrs aliasText="false" autoKern="false" bold="true" size="16" face="Helotypo-Regular"/>
+                      </textAttrs>
+                    </DOMTextRun>
+                  </textRuns>
+                </DOMStaticText>
+                <DOMInputText name="medal_id" width="107.05" height="22.35" border="true">
+                  <matrix>
+                    <Matrix a="0.999832153320313" tx="81" ty="3.5"/>
+                  </matrix>
+                  <textRuns>
+                    <DOMTextRun>
+                      <characters></characters>
+                      <textAttrs>
+                        <DOMTextAttrs aliasText="false" autoKern="false" size="20" bitmapSize="400" face="LiberationSans-Regular"/>
+                      </textAttrs>
+                    </DOMTextRun>
+                  </textRuns>
+                </DOMInputText>
+                <DOMStaticText fontRenderingMode="standard" width="63.5" height="21.25" autoExpand="true" isSelectable="false">
+                  <matrix>
+                    <Matrix a="0.999832153320313" tx="217.7" ty="4.05"/>
+                  </matrix>
+                  <textRuns>
+                    <DOMTextRun>
+                      <characters>Unlock</characters>
+                      <textAttrs>
+                        <DOMTextAttrs aliasText="false" autoKern="false" size="19" face="LiberationSans-BoldItalic" fillColor="#FFFFFF"/>
+                      </textAttrs>
+                    </DOMTextRun>
+                  </textRuns>
+                </DOMStaticText>
+              </elements>
+            </DOMFrame>
+          </frames>
+        </DOMLayer>
+      </layers>
+    </DOMTimeline>
+  </timeline>
+</DOMSymbolItem>

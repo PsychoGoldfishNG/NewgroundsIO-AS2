@@ -1,0 +1,65 @@
+<DOMSymbolItem xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://ns.adobe.com/xfl/2008/" name="Newgrounds.IO/assets/scoreBoards/_ngio_scoreboard_period_select" itemID="67c6009b-0000003c" lastModified="1771037356">
+  <timeline>
+    <DOMTimeline name="_ngio_scoreboard_period_select">
+      <layers>
+        <DOMLayer name="Layer 1" color="#4FFF4F" current="true" isSelected="true">
+          <frames>
+            <DOMFrame index="0" keyMode="9728">
+              <Actionscript>
+                <script><![CDATA[// extract the period value from the movieclip's identifier name
+this.period = this._name.split("_").pop();
+
+// if this is the currently selected button, go to the next frame.
+if (_parent['period'] === this.period) {
+	gotoAndStop(2);
+
+// otherwise set the button up
+} else {
+	var parentRef = _parent;
+	var selfRef = this;
+
+	btn.onRelease = function() {
+		parentRef.refreshBoard({period:selfRef.period});
+	};
+
+}
+
+stop();]]></script>
+              </Actionscript>
+              <elements>
+                <DOMSymbolInstance libraryItemName="Newgrounds.IO/assets/scoreBoards/_ngio_scoreboard_period_btn" name="btn" symbolType="button">
+                  <transformationPoint>
+                    <Point/>
+                  </transformationPoint>
+                </DOMSymbolInstance>
+              </elements>
+            </DOMFrame>
+            <DOMFrame index="1" keyMode="9728">
+              <elements>
+                <DOMShape>
+                  <fills>
+                    <FillStyle index="1">
+                      <SolidColor color="#FFFFFF" alpha="0.2"/>
+                    </FillStyle>
+                  </fills>
+                  <strokes>
+                    <StrokeStyle index="1">
+                      <SolidStroke scaleMode="normal" weight="0.05" solidStyle="hairline">
+                        <fill>
+                          <SolidColor color="#EEB211"/>
+                        </fill>
+                      </SolidStroke>
+                    </StrokeStyle>
+                  </strokes>
+                  <edges>
+                    <Edge fillStyle1="1" strokeStyle="1" edges="!760 260|-760 260!-760 260|-760 -260!-760 -260|760 -260!760 -260|760 260"/>
+                  </edges>
+                </DOMShape>
+              </elements>
+            </DOMFrame>
+          </frames>
+        </DOMLayer>
+      </layers>
+    </DOMTimeline>
+  </timeline>
+</DOMSymbolItem>
