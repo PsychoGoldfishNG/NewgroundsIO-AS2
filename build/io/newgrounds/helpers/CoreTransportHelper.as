@@ -61,14 +61,17 @@ class io.newgrounds.helpers.CoreTransportHelper {
 			trace("         Request Data: " + requestString);
 		}
 
-		receiveLV.onLoad = function(success:Boolean):Void {
-			if (success) {
-				var rawData:String = this._rawData;
+		// Use onData instead of onLoad to capture the raw response text.
+		// onData fires before LoadVars URL-decodes the body, giving us the
+		// raw string. _rawData is an AS3 URLLoader property that does not
+		// exist in AS2 LoadVars.
+		receiveLV.onData = function(src:String):Void {
+			if (src != undefined && src != null) {
 				if (coreRef.debugNetworkCalls) {
 					trace("NETWORK: Received response from server");
-					trace("         Response Data: " + rawData);
+					trace("         Response Data: " + src);
 				}
-				coreRef.forwardHTTPResponse(200, rawData, callback, thisArg);
+				coreRef.forwardHTTPResponse(200, src, callback, thisArg);
 			} else {
 				if (coreRef.debugNetworkCalls) {
 					trace("NETWORK: Load failed");
