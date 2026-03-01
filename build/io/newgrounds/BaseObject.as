@@ -19,6 +19,7 @@ class io.newgrounds.BaseObject {
 	 */
 	public function get objectName():String {
 		throw new Error("BaseObject.objectName must be overridden in subclass");
+		return null;
 	}
 
 	/**
@@ -26,6 +27,7 @@ class io.newgrounds.BaseObject {
 	 */
 	public function get objectType():String {
 		throw new Error("BaseObject.objectType must be overridden in subclass");
+		return null;
 	}
 
 	/**
@@ -33,6 +35,7 @@ class io.newgrounds.BaseObject {
 	 */
 	public function get propertyNames():Array {
 		throw new Error("BaseObject.propertyNames must be overridden in subclass");
+		return null;
 	}
 
 	/**
@@ -40,6 +43,7 @@ class io.newgrounds.BaseObject {
 	 */
 	public function get requiredProperties():Array {
 		throw new Error("BaseObject.requiredProperties must be overridden in subclass");
+		return null;
 	}
 
 	/**
@@ -47,6 +51,7 @@ class io.newgrounds.BaseObject {
 	 */
 	public function get castTypes():Object {
 		throw new Error("BaseObject.castTypes must be overridden in subclass");
+		return null;
 	}
 
 	//==================== PUBLIC PROPERTIES ====================
@@ -61,7 +66,7 @@ class io.newgrounds.BaseObject {
 	public var parentPropertyName:String;
 
 	/** Error details if something went wrong (can be set on any object) */
-	public var error:io.newgrounds.models.objects.NgioError = null;
+	public var error = null;
 
 	/** Static counter for tracking object IDs (for debugging) */
 	private static var objectIDTracking:Number = 0;

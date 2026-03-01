@@ -104,7 +104,7 @@ class io.newgrounds.Errors {
 		if (errorMessage == undefined) errorMessage = null;
 		if (appendMessage == undefined) appendMessage = false;
 
-		var errorModel:io.newgrounds.models.objects.NgioError = io.newgrounds.models.objects.ObjectFactory.CreateObject("Error");
+		var errorModel = io.newgrounds.models.objects.ObjectFactory.CreateObject("Error");
 
 		errorModel.code = errorCode;
 

@@ -56,7 +56,7 @@ class io.newgrounds.helpers.AppStateBootstrapHelper {
 	public static function resolveHost():String {
 		try {
 			var lc:LocalConnection = new LocalConnection();
-			return lc.domain;
+			return lc.domain();
 		} catch (e) {
 		}
 		return "localhost";

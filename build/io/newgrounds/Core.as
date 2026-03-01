@@ -157,7 +157,7 @@ class io.newgrounds.Core {
 	 */
 	public function queueComponent(componentModel:io.newgrounds.BaseComponent):Void {
 		if (componentQueue.length < io.newgrounds.Core.MAX_QUEUE_SIZE) {
-			var executeModel:io.newgrounds.models.objects.Execute = io.newgrounds.models.objects.ObjectFactory.CreateObject("Execute", null, this);
+			var executeModel = io.newgrounds.models.objects.ObjectFactory.CreateObject("Execute", null, this);
 			executeModel.setComponent(componentModel);
 			componentQueue.push(executeModel);
 		} else {
@@ -210,7 +210,7 @@ class io.newgrounds.Core {
 			componentModel.core = this;
 		}
 
-		var executeModel:io.newgrounds.models.objects.Execute = io.newgrounds.models.objects.ObjectFactory.CreateObject("Execute", null, this);
+		var executeModel = io.newgrounds.models.objects.ObjectFactory.CreateObject("Execute", null, this);
 		executeModel.core = this;
 		executeModel.setComponent(componentModel);
 
@@ -265,7 +265,7 @@ class io.newgrounds.Core {
 	 * The core network communication method
 	 */
 	private function sendRequest(toExecute, openInBrowser:Boolean, callback:Function, thisArg):Void {
-		var requestModel:io.newgrounds.models.objects.Request = io.newgrounds.models.objects.ObjectFactory.CreateObject("Request", null, this);
+		var requestModel = io.newgrounds.models.objects.ObjectFactory.CreateObject("Request", null, this);
 
 		requestModel.core = this;
 		requestModel.app_id = this.appId;
@@ -307,7 +307,7 @@ class io.newgrounds.Core {
 	 * Handle HTTP response from the server
 	 */
 	private function onHTTPResponse(statusCode:Number, responseText:String, callback:Function, thisArg):Void {
-		var responseModel:io.newgrounds.models.objects.Response = io.newgrounds.models.objects.ObjectFactory.CreateObject("Response", null, this);
+		var responseModel = io.newgrounds.models.objects.ObjectFactory.CreateObject("Response", null, this);
 
 		if (statusCode < 200 || statusCode > 299) {
 			responseModel.error = io.newgrounds.Errors.getError(statusCode);
