@@ -151,6 +151,17 @@ module.exports = {
     },
 
     /**
+     * Returns ":TypeName" for strictly typed properties, or "" for mixed/untyped ones.
+     * Use this in place of ":<%- helpers.getDataType(...) %>" for var declarations
+     * so that mixed types produce no type annotation instead of the invalid ":*".
+     */
+    appendStrictType(obj) {
+        const type = this.getDataType(obj);
+        if (!type || type === "*") return "";
+        return `:${type}`;
+    },
+
+    /**
      * Gets the appropriate default value for a property
      */
     getDefaultValue(property) {

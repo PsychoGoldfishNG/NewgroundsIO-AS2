@@ -28,7 +28,7 @@ class io.newgrounds.models.objects.<%- className %> extends io.newgrounds.BaseOb
 	/**
 	 * <%- model.properties[propertyName].description %>
 	 */
-	public var <%- propertyName %>:<%- helpers.getDataType(model.properties[propertyName]) %> = <%- helpers.getDefaultValue(model.properties[propertyName]) %>;
+	public var <%- propertyName %><%- helpers.appendStrictType(model.properties[propertyName]) %> = <%- helpers.getDefaultValue(model.properties[propertyName]) %>;
 
 <%   } -%>
 <% } -%>
