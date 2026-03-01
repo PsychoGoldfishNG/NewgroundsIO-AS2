@@ -1,0 +1,22 @@
+
+	/**
+	 * Clears session-specific data to return the session to an unauthenticated state.
+	 * Called by AppState when a session expires or is cancelled.
+	 */
+	public function clearSessionData():Void {
+		this.id = null;
+		this.user = null;
+		this.passport_url = null;
+		this.expired = false;
+		this.remember = false;
+		this.verified = false;
+		this.preauthenticatedId = "";
+	}
+
+	/**
+	 * Compares session id against a pre-authenticated id.
+	 * Used in SessionState to determine if we can skip user verification.
+	 */
+	public function isPreauthenticated():Boolean {
+		return this.preauthenticatedId.length > 0 && this.id === this.preauthenticatedId;
+	}

@@ -1,0 +1,60 @@
+
+	// ===================== OVERRIDE METHODS =========================
+
+	/**
+	 * Unlocks this medal for the current user.
+	 * @param callback Function to call when the unlock completes
+	 * @param thisArg Context to use when calling the callback
+	 */
+	public function unlock(callback:Function, thisArg):Void {
+		if (callback == undefined) callback = null;
+		if (thisArg == undefined) thisArg = null;
+		var callbackParams:Object = {
+			callback: callback,
+			thisArg: thisArg
+		};
+
+		// Call Medal.unlock component via core
+		if (this.core) this.core.callComponent("Medal.unlock", {id: this.id}, this.onUnlock, this, callbackParams);
+	}
+
+	/**
+	 * Callback handler for when the medal unlock completes.
+	 * @param response The result from the Medal.unlock component call
+	 * @param callbackParams The callback parameters stored during unlock()
+	 */
+	public function onUnlock(response:io.newgrounds.models.objects.Response, callbackParams:Object):Void {
+
+		var result:io.newgrounds.models.results.Medal.unlockResult = null;
+
+		if (response && response.success) {
+			result = response.getResult();
+		}
+
+		if (response && response.success) {
+			this.unlocked = true;
+		}
+
+		if (callbackParams.callback != null) {
+			callbackParams.callback.call(callbackParams.thisArg, this, result.medal_score);
+		}
+	}
+
+	/**
+	 * Returns a string representation of this medal.
+	 */
+	public function toString():String {
+		var description:String = "Medal #";
+		description += (this.id != 0) ? this.id : "0";
+		description += " - ";
+		description += (this.name != null && this.name.length > 0) ? this.name : "null";
+		return description;
+	}
+
+	/**
+	 * Clears session-specific data to return the medal to its unauthenticated state.
+	 * Called by AppState when the user's session expires or is cleared.
+	 */
+	public function clearSessionData():Void {
+		this.unlocked = false;
+	}

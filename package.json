@@ -1,0 +1,11 @@
+{
+  "name": "@psychogoldfish/newgroundsio-as2-library",
+  "version": "1.0.0",
+  "description": "AS2 library for Newgrounds.io API",
+  "scripts": {
+    "build": "npx ngio-build ./src/modelgen/config.js"
+  },
+  "dependencies": {
+    "@psychogoldfish/ngio-object-model-generator": "github:PsychoGoldfishNG/ngio-object-model-generator"
+  }
+}
