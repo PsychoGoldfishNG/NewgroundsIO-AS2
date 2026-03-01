@@ -18,7 +18,7 @@ class io.newgrounds.models.objects.NgioError extends io.newgrounds.BaseObject {
 	/**
 	 * A code indicating the error type.
 	 */
-	public var code:Number = NaN;
+	public var code:Number = 0;
 
 
 	//==================== CONSTRUCTOR ====================

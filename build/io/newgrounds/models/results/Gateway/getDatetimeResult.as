@@ -18,7 +18,7 @@ class io.newgrounds.models.results.Gateway.getDatetimeResult extends io.newgroun
 	/**
 	 * The current UNIX timestamp on the server.
 	 */
-	public var timestamp:Number = NaN;
+	public var timestamp:Number = 0;
 
 
 	//==================== CONSTRUCTOR ====================

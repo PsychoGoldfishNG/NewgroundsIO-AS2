@@ -16,12 +16,12 @@ class io.newgrounds.models.objects.SaveSlot extends io.newgrounds.BaseObject {
 	/**
 	 * The slot number.
 	 */
-	public var id:Number = NaN;
+	public var id:Number = 0;
 
 	/**
 	 * The size of the save data in bytes.
 	 */
-	public var size:Number = NaN;
+	public var size:Number = 0;
 
 	/**
 	 * A date and time (in ISO 8601 format) representing when this slot was last saved.
@@ -31,7 +31,7 @@ class io.newgrounds.models.objects.SaveSlot extends io.newgrounds.BaseObject {
 	/**
 	 * A unix timestamp representing when this slot was last saved.
 	 */
-	public var timestamp:Number = NaN;
+	public var timestamp:Number = 0;
 
 	/**
 	 * The URL containing the actual save data for this slot, or null if this slot has no data.

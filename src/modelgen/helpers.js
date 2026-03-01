@@ -172,7 +172,7 @@ module.exports = {
         const dataType = this.getDataType(property);
 
         if (dataType === "Number") {
-            return "NaN";
+            return "0";
         }
 
         if (dataType === "Boolean") {

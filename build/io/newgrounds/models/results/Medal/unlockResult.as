@@ -19,7 +19,7 @@ class io.newgrounds.models.results.Medal.unlockResult extends io.newgrounds.Base
 	/**
 	 * The user's new medal score.
 	 */
-	public var medal_score:Number = NaN;
+	public var medal_score:Number = 0;
 
 
 	//==================== CONSTRUCTOR ====================

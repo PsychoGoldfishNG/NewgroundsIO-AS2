@@ -13,7 +13,7 @@ class io.newgrounds.models.components.ScoreBoard.getScores extends io.newgrounds
 	/**
 	 * The numeric ID of the scoreboard.
 	 */
-	public var id:Number = NaN;
+	public var id:Number = 0;
 
 	/**
 	 * The time-frame to pull scores from (see notes for acceptable values).

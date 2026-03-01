@@ -13,7 +13,7 @@ class io.newgrounds.models.components.CloudSave.loadSlot extends io.newgrounds.B
 	/**
 	 * The slot number.
 	 */
-	public var id:Number = NaN;
+	public var id:Number = 0;
 
 	/**
 	 * The App ID of another, approved app to load slot data from.

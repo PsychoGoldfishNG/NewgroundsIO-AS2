@@ -13,7 +13,7 @@ class io.newgrounds.models.components.CloudSave.clearSlot extends io.newgrounds.
 	/**
 	 * The slot number.
 	 */
-	public var id:Number = NaN;
+	public var id:Number = 0;
 
 
 	//==================== CONSTRUCTOR ====================

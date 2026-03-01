@@ -13,7 +13,7 @@ class io.newgrounds.models.components.CloudSave.setData extends io.newgrounds.Ba
 	/**
 	 * The slot number.
 	 */
-	public var id:Number = NaN;
+	public var id:Number = 0;
 
 	/**
 	 * The data you want to save.

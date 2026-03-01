@@ -13,7 +13,7 @@ class io.newgrounds.models.results.Medal.getMedalScoreResult extends io.newgroun
 	/**
 	 * The user's medal score.
 	 */
-	public var medal_score:Number = NaN;
+	public var medal_score:Number = 0;
 
 
 	//==================== CONSTRUCTOR ====================

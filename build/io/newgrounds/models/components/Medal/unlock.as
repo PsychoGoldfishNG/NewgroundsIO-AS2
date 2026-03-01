@@ -13,7 +13,7 @@ class io.newgrounds.models.components.Medal.unlock extends io.newgrounds.BaseCom
 	/**
 	 * The numeric ID of the medal to unlock.
 	 */
-	public var id:Number = NaN;
+	public var id:Number = 0;
 
 
 	//==================== CONSTRUCTOR ====================

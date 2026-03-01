@@ -13,7 +13,7 @@ class io.newgrounds.models.objects.User extends io.newgrounds.BaseObject {
 	/**
 	 * The user's numeric ID.
 	 */
-	public var id:Number = NaN;
+	public var id:Number = 0;
 
 	/**
 	 * The user's textual name.

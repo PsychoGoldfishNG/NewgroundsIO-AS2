@@ -114,7 +114,7 @@ class io.newgrounds.BaseObject {
 			var propertyName:String = propNames[i];
 
 			// Check if property exists in the import object
-			if (!(propertyName in importObject)) {
+			if (importObject[propertyName] == undefined) {
 				continue;
 			}
 
@@ -126,7 +126,7 @@ class io.newgrounds.BaseObject {
 		}
 
 		// Check for error property
-		if ("error" in importObject && importObject.error != null) {
+		if (importObject["error"] != undefined && importObject.error != null) {
 			this.error = io.newgrounds.models.objects.ObjectFactory.CreateObject("Error", importObject.error, this.core);
 		}
 	}
@@ -144,7 +144,7 @@ class io.newgrounds.BaseObject {
 		}
 
 		var castTypesObj:Object = castTypes;
-		if (!(propertyName in castTypesObj)) {
+		if (castTypesObj[propertyName] == undefined) {
 			return value;
 		}
 

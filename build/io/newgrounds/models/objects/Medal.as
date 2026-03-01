@@ -15,7 +15,7 @@ class io.newgrounds.models.objects.Medal extends io.newgrounds.BaseObject {
 	/**
 	 * The numeric ID of the medal.
 	 */
-	public var id:Number = NaN;
+	public var id:Number = 0;
 
 	/**
 	 * The name of the medal.
@@ -35,12 +35,12 @@ class io.newgrounds.models.objects.Medal extends io.newgrounds.BaseObject {
 	/**
 	 * The medal's point value.
 	 */
-	public var value:Number = NaN;
+	public var value:Number = 0;
 
 	/**
 	 * The difficulty id of the medal: 1 = easy, 2 = moderate, 3 = challenging, 4 = difficult, 5 = brutal.
 	 */
-	public var difficulty:Number = NaN;
+	public var difficulty:Number = 0;
 
 	/**
 	 * 

@@ -25,12 +25,12 @@ class io.newgrounds.models.results.ScoreBoard.getScoresResult extends io.newgrou
 	/**
 	 * The query limit that was used.
 	 */
-	public var limit:Number = NaN;
+	public var limit:Number = 0;
 
 	/**
 	 * The query skip that was used.
 	 */
-	public var skip:Number = NaN;
+	public var skip:Number = 0;
 
 	/**
 	 * The #ScoreBoard being queried.

@@ -18,7 +18,7 @@ class io.newgrounds.models.objects.ScoreBoard extends io.newgrounds.BaseObject {
 	/**
 	 * The numeric ID of the scoreboard.
 	 */
-	public var id:Number = NaN;
+	public var id:Number = 0;
 
 	/**
 	 * The name of the scoreboard.

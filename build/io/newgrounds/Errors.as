@@ -46,34 +46,40 @@ class io.newgrounds.Errors {
 	//==================== ERROR MESSAGES ====================
 
 	/**
-	 * Maps error codes to human-readable error messages
+	 * Maps error codes to human-readable error messages.
+	 * Lazily initialized because AS2 object literals do not support numeric keys.
 	 */
-	private static var errorMessages:Object = {
-		0: "An unknown error has occurred.",
-		100: "Missing/empty request.",
-		101: "Invalid request.",
-		102: "Missing required parameter.",
-		103: "Invalid parameter.",
-		104: "Your session has expired.",
-		107: "Maximum number of components, for a single request, has been exceeded. (Maximum is 10)",
-		108: "Your request has exceeded the maximum allowed memory use on the server.",
-		109: "Your request took too long to complete and timed out.",
-		110: "You must be logged in to do that.",
-		111: "Your session was cancelled on the server.",
-		200: "Invalid App ID.",
-		201: "An encrypted object failed to decrypt on the server. Make sure you are using the correct key, cypher, and encoding format.",
-		202: "Requested Medal does not exist, or is not associated with this App ID.",
-		203: "Requested ScoreBoard does not exist, or is not associated with this App ID.",
-		204: "Requested SaveSlot does not exist, or is not associated with this App ID.",
-		400: "There was a problem sending your request.",
-		403: "Forbidden.",
-		404: "Page not found.",
-		429: "You are making too many requests.",
-		500: "An unexpected error has occurred on the server. If error persists, contact support.",
-		503: "The server is currently down, try again later.",
-		504: "Unable to reach the server, try again later.",
-		505: "Invalid response received from server."
-	};
+	private static var _errorMessages:Object;
+
+	private static function getErrorMessages():Object {
+		if (_errorMessages != null) return _errorMessages;
+		_errorMessages = new Object();
+		_errorMessages[0]   = "An unknown error has occurred.";
+		_errorMessages[100] = "Missing/empty request.";
+		_errorMessages[101] = "Invalid request.";
+		_errorMessages[102] = "Missing required parameter.";
+		_errorMessages[103] = "Invalid parameter.";
+		_errorMessages[104] = "Your session has expired.";
+		_errorMessages[107] = "Maximum number of components, for a single request, has been exceeded. (Maximum is 10)";
+		_errorMessages[108] = "Your request has exceeded the maximum allowed memory use on the server.";
+		_errorMessages[109] = "Your request took too long to complete and timed out.";
+		_errorMessages[110] = "You must be logged in to do that.";
+		_errorMessages[111] = "Your session was cancelled on the server.";
+		_errorMessages[200] = "Invalid App ID.";
+		_errorMessages[201] = "An encrypted object failed to decrypt on the server. Make sure you are using the correct key, cypher, and encoding format.";
+		_errorMessages[202] = "Requested Medal does not exist, or is not associated with this App ID.";
+		_errorMessages[203] = "Requested ScoreBoard does not exist, or is not associated with this App ID.";
+		_errorMessages[204] = "Requested SaveSlot does not exist, or is not associated with this App ID.";
+		_errorMessages[400] = "There was a problem sending your request.";
+		_errorMessages[403] = "Forbidden.";
+		_errorMessages[404] = "Page not found.";
+		_errorMessages[429] = "You are making too many requests.";
+		_errorMessages[500] = "An unexpected error has occurred on the server. If error persists, contact support.";
+		_errorMessages[503] = "The server is currently down, try again later.";
+		_errorMessages[504] = "Unable to reach the server, try again later.";
+		_errorMessages[505] = "Invalid response received from server.";
+		return _errorMessages;
+	}
 
 	//==================== PUBLIC STATIC METHODS ====================
 
@@ -82,10 +88,11 @@ class io.newgrounds.Errors {
 	 */
 	public static function getDefaultMessage(errorCode:Number):String {
 		if (errorCode == undefined) errorCode = 0;
-		if (errorMessages.hasOwnProperty(errorCode)) {
-			return errorMessages[errorCode];
+		var msgs:Object = getErrorMessages();
+		if (msgs[errorCode] != undefined) {
+			return msgs[errorCode];
 		} else {
-			return errorMessages[0];
+			return msgs[0];
 		}
 	}
 
