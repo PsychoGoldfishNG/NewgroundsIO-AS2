@@ -186,39 +186,41 @@ class io.newgrounds.encoders.JSON {
 	}
 
 	static function decode(text:String):Object {
-        var at = 0;
-        var ch = ' ';
+		// AS2 closures do not reliably share mutations of primitive local variables
+		// (ch, at) across sibling closures. Wrapping them in an object ensures all
+		// closures reference the same slot via the shared object reference.
+		var _s:Object = { at: 0, ch: ' ' };
 		var _value:Function;
 
         var _error:Function = function (m) {
             throw {
                 name: 'JSONError',
                 message: m,
-                at: at - 1,
+                at: _s.at - 1,
                 text: text
             };
         }
 
         var _next:Function = function() {
-            ch = text.charAt(at);
-            at += 1;
-            return ch;
+            _s.ch = text.charAt(_s.at);
+            _s.at += 1;
+            return _s.ch;
         }
 
         var _white:Function = function() {
-            while (ch) {
-                if (ch <= ' ') {
+            while (_s.ch) {
+                if (_s.ch <= ' ') {
                     _next();
-                } else if (ch == '/') {
+                } else if (_s.ch == '/') {
                     switch (_next()) {
                         case '/':
-                            while (_next() && ch != '\n' && ch != '\r') {}
+                            while (_next() && _s.ch != '\n' && _s.ch != '\r') {}
                             break;
                         case '*':
                             _next();
                             for (;;) {
-                                if (ch) {
-                                    if (ch == '*') {
+                                if (_s.ch) {
+                                    if (_s.ch == '*') {
                                         if (_next() == '/') {
                                             _next();
                                             break;
@@ -244,12 +246,12 @@ class io.newgrounds.encoders.JSON {
             var i, s = '', t, u;
 			var outer:Boolean = false;
 
-            if (ch == '"') {
+            if (_s.ch == '"') {
 				while (_next()) {
-                    if (ch == '"') {
+                    if (_s.ch == '"') {
                         _next();
                         return s;
-                    } else if (ch == '\\') {
+                    } else if (_s.ch == '\\') {
                         switch (_next()) {
 						case '"':
 							s += '"';
@@ -286,10 +288,10 @@ class io.newgrounds.encoders.JSON {
                             s += String.fromCharCode(u);
                             break;
                         default:
-                            s += ch;
+                            s += _s.ch;
                         }
                     } else {
-                        s += ch;
+                        s += _s.ch;
                     }
                 }
             }
@@ -299,20 +301,20 @@ class io.newgrounds.encoders.JSON {
         var _array:Function = function() {
             var a = [];
 
-            if (ch == '[') {
+            if (_s.ch == '[') {
                 _next();
                 _white();
-                if (ch == ']') {
+                if (_s.ch == ']') {
                     _next();
                     return a;
                 }
-                while (ch) {
+                while (_s.ch) {
                     a.push(_value());
                     _white();
-                    if (ch == ']') {
+                    if (_s.ch == ']') {
                         _next();
                         return a;
-                    } else if (ch != ',') {
+                    } else if (_s.ch != ',') {
                         break;
                     }
                     _next();
@@ -325,26 +327,26 @@ class io.newgrounds.encoders.JSON {
         var _object:Function = function() {
             var k, o = {};
 
-            if (ch == '{') {
+            if (_s.ch == '{') {
                 _next();
                 _white();
-                if (ch == '}') {
+                if (_s.ch == '}') {
                     _next();
                     return o;
                 }
-                while (ch) {
+                while (_s.ch) {
                     k = _string();
                     _white();
-                    if (ch != ':') {
+                    if (_s.ch != ':') {
                         break;
                     }
                     _next();
                     o[k] = _value();
                     _white();
-                    if (ch == '}') {
+                    if (_s.ch == '}') {
                         _next();
                         return o;
-                    } else if (ch != ',') {
+                    } else if (_s.ch != ',') {
                         break;
                     }
                     _next();
@@ -357,21 +359,20 @@ class io.newgrounds.encoders.JSON {
         var _number:Function = function() {
             var n = '', v;
 
-            if (ch == '-') {
+            if (_s.ch == '-') {
                 n = '-';
                 _next();
             }
-            while (ch >= '0' && ch <= '9') {
-                n += ch;
+            while (_s.ch >= '0' && _s.ch <= '9') {
+                n += _s.ch;
                 _next();
             }
-            if (ch == '.') {
+            if (_s.ch == '.') {
                 n += '.';
-                while (_next() && ch >= '0' && ch <= '9') {
-                    n += ch;
+                while (_next() && _s.ch >= '0' && _s.ch <= '9') {
+                    n += _s.ch;
                 }
             }
-            //v = +n;
 			v = 1 * n;
             if (!isFinite(v)) {
                 _error("Bad number");
@@ -381,7 +382,7 @@ class io.newgrounds.encoders.JSON {
         }
 
         var _word:Function = function() {
-            switch (ch) {
+            switch (_s.ch) {
                 case 't':
                     if (_next() == 'r' && _next() == 'u' && _next() == 'e') {
                         _next();
@@ -407,7 +408,7 @@ class io.newgrounds.encoders.JSON {
 
         _value = function() {
             _white();
-            switch (ch) {
+            switch (_s.ch) {
                 case '{':
                     return _object();
                 case '[':
@@ -417,7 +418,7 @@ class io.newgrounds.encoders.JSON {
                 case '-':
                     return _number();
                 default:
-                    return ch >= '0' && ch <= '9' ? _number() : _word();
+                    return _s.ch >= '0' && _s.ch <= '9' ? _number() : _word();
             }
         }
 
