@@ -27,7 +27,7 @@ class io.newgrounds.BaseResult extends io.newgrounds.BaseObject {
 	 */
 	public function importFromObject(importObject):Void {
 		super.importFromObject(importObject);
-		if (importObject.hasOwnProperty("success")) {
+		if (importObject.success != undefined) {
 			this.success = Boolean(importObject.success);
 		}
 	}

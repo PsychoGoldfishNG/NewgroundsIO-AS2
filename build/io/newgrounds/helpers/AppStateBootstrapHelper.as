@@ -87,7 +87,7 @@ class io.newgrounds.helpers.AppStateBootstrapHelper {
 	private static function getFromLocalStorage(key:String):String {
 		try {
 			var so:SharedObject = SharedObject.getLocal("ngio");
-			if (so.data.hasOwnProperty(key)) {
+			if (so.data[key] != undefined) {
 				return so.data[key];
 			}
 		} catch (e) {

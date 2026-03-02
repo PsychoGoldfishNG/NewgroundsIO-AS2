@@ -16,7 +16,7 @@ import io.newgrounds.encoders.JSON;
 class io.newgrounds.helpers.HttpResponseHelper {
 
 	public static function importResponseObject(responseModel:io.newgrounds.models.objects.Response, jsonObject:Object):Void {
-		var hasResultProperty:Boolean = (jsonObject != null && jsonObject.hasOwnProperty("result"));
+		var hasResultProperty:Boolean = (jsonObject != null && jsonObject.result != undefined);
 		var typedResults = null;
 
 		var importObject:Object = cloneWithoutResult(jsonObject);
@@ -72,7 +72,7 @@ class io.newgrounds.helpers.HttpResponseHelper {
 	}
 
 	private static function createSingleTypedResult(rawResult, core) {
-		if (rawResult == null || !rawResult.hasOwnProperty("component") || !rawResult.hasOwnProperty("data")) {
+		if (rawResult == null || rawResult.component == undefined || rawResult.data == undefined) {
 			return null;
 		}
 

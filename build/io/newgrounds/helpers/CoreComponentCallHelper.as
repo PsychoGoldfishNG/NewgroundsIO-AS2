@@ -33,11 +33,11 @@ class io.newgrounds.helpers.CoreComponentCallHelper {
 			}
 
 			if (componentParams != null) {
-				if (component.hasOwnProperty("importFromObject")) {
+				if (typeof(component.importFromObject) == "function") {
 					component.importFromObject(componentParams);
 				} else {
 					for (var key:String in componentParams) {
-						if (component.hasOwnProperty(key)) {
+						if (component[key] != undefined) {
 							component[key] = componentParams[key];
 						}
 					}

@@ -141,7 +141,7 @@ class io.newgrounds.models.objects.ScoreBoard extends io.newgrounds.BaseObject {
 		} else if (filters.user !== undefined && filters.user !== null) {
 			if (filters.user instanceof io.newgrounds.models.objects.User) {
 				componentParams.user = filters.user.id;
-			} else if (typeof filters.user === 'object' && filters.user.hasOwnProperty('id')) {
+			} else if (typeof filters.user === 'object' && filters.user.id != undefined) {
 				componentParams.user = filters.user.id;
 			} else {
 				throw new Error('ScoreBoard filter user must be a User object with an id property.');

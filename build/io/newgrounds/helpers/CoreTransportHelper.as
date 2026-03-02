@@ -92,13 +92,13 @@ class io.newgrounds.helpers.CoreTransportHelper {
 		if (toExecute != null && !(toExecute instanceof Array)) {
 			var component:io.newgrounds.BaseComponent = null;
 
-			if (toExecute.hasOwnProperty("componentModel")) {
+			if (toExecute.componentModel != undefined) {
 				component = toExecute.componentModel;
-			} else if (toExecute.hasOwnProperty("component")) {
+			} else if (toExecute.component != undefined) {
 				component = toExecute.component;
 			}
 
-			if (component != null && component.hasOwnProperty("browserTarget") && component.browserTarget != null) {
+			if (component != null && component.browserTarget != undefined && component.browserTarget != null) {
 				browserTarget = component.browserTarget;
 			}
 		}

@@ -8,9 +8,9 @@
 		// Store reference to the component
 		this.componentModel = componentModel;
 		this.component = componentModel.objectName;
-		if (componentModel.hasOwnProperty("prepareForJson")) {
+		if (typeof(componentModel.prepareForJson) == "function") {
 			this.parameters = componentModel.prepareForJson();
-		} else if (componentModel.hasOwnProperty("toObject")) {
+		} else if (typeof(componentModel.toObject) == "function") {
 			this.parameters = componentModel.toObject();
 		} else {
 			this.parameters = null;

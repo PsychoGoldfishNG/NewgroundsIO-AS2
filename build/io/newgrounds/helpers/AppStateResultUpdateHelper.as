@@ -40,7 +40,7 @@ class io.newgrounds.helpers.AppStateResultUpdateHelper {
 			appState.session = resultObject.session;
 			appState.markLoaded("session");
 		} else {
-			if (appState.session.hasOwnProperty("importFromObject")) {
+			if (typeof(appState.session.importFromObject) == "function") {
 				appState.session.importFromObject(resultObject.session);
 			} else {
 				for (var key:String in resultObject.session) {
@@ -135,7 +135,7 @@ class io.newgrounds.helpers.AppStateResultUpdateHelper {
 		for (var i:Number = 0; i < existingCollection.length; i++) {
 			var existing = existingCollection[i];
 			if (existing.id == incoming.id) {
-				if (existing.hasOwnProperty("importFromObject")) {
+				if (typeof(existing.importFromObject) == "function") {
 					existing.importFromObject(incoming);
 				}
 			}

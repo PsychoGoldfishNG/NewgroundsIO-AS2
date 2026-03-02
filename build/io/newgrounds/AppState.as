@@ -213,7 +213,7 @@ class io.newgrounds.AppState {
 	 * Completely clear the current session (used when logging out)
 	 */
 	public function clearSession():Void {
-		if (session != null && session.hasOwnProperty("clearSessionData")) {
+		if (session != null && typeof(session.clearSessionData) == "function") {
 			session.clearSessionData();
 		}
 

@@ -11,14 +11,14 @@ class io.newgrounds.helpers.AppStateSessionResetHelper {
 	 * Clears session-specific fields from session/save slot/medal state.
 	 */
 	public static function clearSessionScopedData(appState:io.newgrounds.AppState):Void {
-		if (appState.session != null && appState.session.hasOwnProperty("clearSessionData")) {
+		if (appState.session != null && typeof(appState.session.clearSessionData) == "function") {
 			appState.session.clearSessionData();
 		}
 
 		if (appState.saveSlots != null) {
 			for (var i:Number = 0; i < appState.saveSlots.length; i++) {
 				var saveSlot = appState.saveSlots[i];
-				if (saveSlot.hasOwnProperty("clearSessionData")) {
+				if (typeof(saveSlot.clearSessionData) == "function") {
 					saveSlot.clearSessionData();
 				}
 			}
@@ -27,7 +27,7 @@ class io.newgrounds.helpers.AppStateSessionResetHelper {
 		if (appState.medals != null) {
 			for (var j:Number = 0; j < appState.medals.length; j++) {
 				var medal = appState.medals[j];
-				if (medal.hasOwnProperty("clearSessionData")) {
+				if (typeof(medal.clearSessionData) == "function") {
 					medal.clearSessionData();
 				}
 			}
