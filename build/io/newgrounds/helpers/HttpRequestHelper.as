@@ -57,7 +57,9 @@ class io.newgrounds.helpers.HttpRequestHelper {
 			return serializeExecute(executeItem);
 		}
 
-		if (executeItem != null && executeItem.hasOwnProperty("toObject")) {
+		// hasOwnProperty returns false for inherited methods in AS2;
+		// use typeof to duck-type check instead
+		if (executeItem != null && typeof(executeItem.toObject) == "function") {
 			return executeItem.toObject();
 		}
 

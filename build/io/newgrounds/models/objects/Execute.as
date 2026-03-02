@@ -94,13 +94,9 @@ class io.newgrounds.models.objects.Execute extends io.newgrounds.BaseObject {
 		// Store reference to the component
 		this.componentModel = componentModel;
 		this.component = componentModel.objectName;
-		if (componentModel.hasOwnProperty("prepareForJson")) {
-			this.parameters = componentModel.prepareForJson();
-		} else if (componentModel.hasOwnProperty("toObject")) {
-			this.parameters = componentModel.toObject();
-		} else {
-			this.parameters = null;
-		}
+		// In AS2, hasOwnProperty returns false for inherited class methods,
+		// so call prepareForJson() directly — all BaseObject subclasses have it.
+		this.parameters = componentModel.prepareForJson();
 		// Note: Encryption for secure components is handled by HttpRequestHelper
 		// This Execute object just stores the component name and parameters
 	}
