@@ -307,6 +307,7 @@ class io.newgrounds.Core {
 	 * Handle HTTP response from the server
 	 */
 	private function onHTTPResponse(statusCode:Number, responseText:String, callback:Function, thisArg):Void {
+		
 		var responseModel = io.newgrounds.models.objects.ObjectFactory.CreateObject("Response", null, this);
 
 		if (statusCode < 200 || statusCode > 299) {

@@ -1,4 +1,4 @@
-/*
+﻿/*
 Copyright (c) 2005 JSON.org
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -33,13 +33,21 @@ USAGE:
 
 class io.newgrounds.encoders.JSON {
 	
-	// This method will encode an object and return it instantly.
+	// This method will encode an object and return it instantly. 
+	// this method is preferred when working form sserver and other high speed applications.
 	static function encode(arg,noquotes):String {
 
         var c, i, l, s = '', v;
-		var typemodel = typeof arg;
+		if (arg.isSServerVar()) {
+			var typemodel = 'sservervariable';
+		} else {
+			var typemodel = typeof arg;
+		}
 		
         switch (typemodel) {
+        case 'sservervariable':
+			return ("?"+arg.getEncodedValue());
+			break;
 		case 'object':
 
             if (arg) {
@@ -124,7 +132,7 @@ class io.newgrounds.encoders.JSON {
 	private static var interval:Number;
 	private static var busy:Boolean = false;
 	
-	// this method will take an object aprt and encode it in chunks.
+	// this method will take an object aprt and encode it in chunks. 
 	// This method is preferable when dealing with extremely large objects that would crash the encode() method.
 	public static function background_encode(arg,callback:Function) {
 		if (busy) {
@@ -186,41 +194,39 @@ class io.newgrounds.encoders.JSON {
 	}
 
 	static function decode(text:String):Object {
-		// AS2 closures do not reliably share mutations of primitive local variables
-		// (ch, at) across sibling closures. Wrapping them in an object ensures all
-		// closures reference the same slot via the shared object reference.
-		var _s:Object = { at: 0, ch: ' ' };
+        var at = 0;
+        var ch = ' ';
 		var _value:Function;
 
         var _error:Function = function (m) {
             throw {
                 name: 'JSONError',
                 message: m,
-                at: _s.at - 1,
+                at: at - 1,
                 text: text
             };
         }
 
         var _next:Function = function() {
-            _s.ch = text.charAt(_s.at);
-            _s.at += 1;
-            return _s.ch;
+            ch = text.charAt(at);
+            at += 1;
+            return ch;
         }
 
         var _white:Function = function() {
-            while (_s.ch) {
-                if (_s.ch <= ' ') {
+            while (ch) {
+                if (ch <= ' ') {
                     _next();
-                } else if (_s.ch == '/') {
+                } else if (ch == '/') {
                     switch (_next()) {
                         case '/':
-                            while (_next() && _s.ch != '\n' && _s.ch != '\r') {}
+                            while (_next() && ch != '\n' && ch != '\r') {}
                             break;
                         case '*':
                             _next();
                             for (;;) {
-                                if (_s.ch) {
-                                    if (_s.ch == '*') {
+                                if (ch) {
+                                    if (ch == '*') {
                                         if (_next() == '/') {
                                             _next();
                                             break;
@@ -246,16 +252,13 @@ class io.newgrounds.encoders.JSON {
             var i, s = '', t, u;
 			var outer:Boolean = false;
 
-            if (_s.ch == '"') {
+            if (ch == '"') {
 				while (_next()) {
-                    if (_s.ch == '"') {
+                    if (ch == '"') {
                         _next();
                         return s;
-                    } else if (_s.ch == '\\') {
+                    } else if (ch == '\\') {
                         switch (_next()) {
-						case '"':
-							s += '"';
-							break;
                         case 'b':
                             s += '\b';
                             break;
@@ -288,10 +291,10 @@ class io.newgrounds.encoders.JSON {
                             s += String.fromCharCode(u);
                             break;
                         default:
-                            s += _s.ch;
+                            s += ch;
                         }
                     } else {
-                        s += _s.ch;
+                        s += ch;
                     }
                 }
             }
@@ -301,20 +304,20 @@ class io.newgrounds.encoders.JSON {
         var _array:Function = function() {
             var a = [];
 
-            if (_s.ch == '[') {
+            if (ch == '[') {
                 _next();
                 _white();
-                if (_s.ch == ']') {
+                if (ch == ']') {
                     _next();
                     return a;
                 }
-                while (_s.ch) {
+                while (ch) {
                     a.push(_value());
                     _white();
-                    if (_s.ch == ']') {
+                    if (ch == ']') {
                         _next();
                         return a;
-                    } else if (_s.ch != ',') {
+                    } else if (ch != ',') {
                         break;
                     }
                     _next();
@@ -327,26 +330,26 @@ class io.newgrounds.encoders.JSON {
         var _object:Function = function() {
             var k, o = {};
 
-            if (_s.ch == '{') {
+            if (ch == '{') {
                 _next();
                 _white();
-                if (_s.ch == '}') {
+                if (ch == '}') {
                     _next();
                     return o;
                 }
-                while (_s.ch) {
+                while (ch) {
                     k = _string();
                     _white();
-                    if (_s.ch != ':') {
+                    if (ch != ':') {
                         break;
                     }
                     _next();
                     o[k] = _value();
                     _white();
-                    if (_s.ch == '}') {
+                    if (ch == '}') {
                         _next();
                         return o;
-                    } else if (_s.ch != ',') {
+                    } else if (ch != ',') {
                         break;
                     }
                     _next();
@@ -359,20 +362,21 @@ class io.newgrounds.encoders.JSON {
         var _number:Function = function() {
             var n = '', v;
 
-            if (_s.ch == '-') {
+            if (ch == '-') {
                 n = '-';
                 _next();
             }
-            while (_s.ch >= '0' && _s.ch <= '9') {
-                n += _s.ch;
+            while (ch >= '0' && ch <= '9') {
+                n += ch;
                 _next();
             }
-            if (_s.ch == '.') {
+            if (ch == '.') {
                 n += '.';
-                while (_next() && _s.ch >= '0' && _s.ch <= '9') {
-                    n += _s.ch;
+                while (_next() && ch >= '0' && ch <= '9') {
+                    n += ch;
                 }
             }
+            //v = +n;
 			v = 1 * n;
             if (!isFinite(v)) {
                 _error("Bad number");
@@ -382,7 +386,7 @@ class io.newgrounds.encoders.JSON {
         }
 
         var _word:Function = function() {
-            switch (_s.ch) {
+            switch (ch) {
                 case 't':
                     if (_next() == 'r' && _next() == 'u' && _next() == 'e') {
                         _next();
@@ -408,7 +412,7 @@ class io.newgrounds.encoders.JSON {
 
         _value = function() {
             _white();
-            switch (_s.ch) {
+            switch (ch) {
                 case '{':
                     return _object();
                 case '[':
@@ -418,7 +422,7 @@ class io.newgrounds.encoders.JSON {
                 case '-':
                     return _number();
                 default:
-                    return _s.ch >= '0' && _s.ch <= '9' ? _number() : _word();
+                    return ch >= '0' && ch <= '9' ? _number() : _word();
             }
         }
 
@@ -438,7 +442,7 @@ class io.newgrounds.encoders.JSON {
 			cache.busy = true;
 			for(var i=0; i<decode_chunks; i++) {
 				chunk_decoder();
-				if (cache.complete) {
+				if (cache.complete) { 
 					break;
 				}
 			}
