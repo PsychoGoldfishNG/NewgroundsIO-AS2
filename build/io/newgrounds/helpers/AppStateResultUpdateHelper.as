@@ -40,13 +40,7 @@ class io.newgrounds.helpers.AppStateResultUpdateHelper {
 			appState.session = resultObject.session;
 			appState.markLoaded("session");
 		} else {
-			if (typeof(appState.session.importFromObject) == "function") {
-				appState.session.importFromObject(resultObject.session);
-			} else {
-				for (var key:String in resultObject.session) {
-					appState.session[key] = resultObject.session[key];
-				}
-			}
+			appState.session.importFromObject(resultObject.session);
 		}
 
 		appState.session.error = resultObject.error;

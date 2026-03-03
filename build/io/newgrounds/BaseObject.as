@@ -115,18 +115,24 @@ class io.newgrounds.BaseObject {
 		var propNames:Array = propertyNames;
 		var castTypesObj:Object = castTypes;
 
+		// create a new object of this type to get default values from
+		// if the property isn't povided in the import object
+		var defaultObject = io.newgrounds.models.objects.ObjectFactory.CreateObject(objectName, null, core);
+
 		for (var i:Number = 0; i < propNames.length; i++) {
 			var propertyName:String = propNames[i];
 
 			// Check if property exists in the import object
-			if (importObject[propertyName] == undefined) {
-				continue;
+			// Use === to distinguish explicit null from missing/undefined
+			if (importObject[propertyName] === undefined) {
+				importObject[propertyName] = defaultObject[propertyName];
 			}
 
 			var propertyValue = importObject[propertyName];
 
 			// Cast and assign
 			var castValue = castToExpectedType(propertyName, propertyValue);
+
 			this[propertyName] = castValue;
 		}
 
