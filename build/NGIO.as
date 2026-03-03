@@ -57,7 +57,7 @@ class NGIO {
 	 * Adjust the volume value if you want NGIO components to be quieter
 	 */
 	public static var audio:Object = {
-		volume: 1,
+		volume: 100,
 		muted: false
 	};
 
