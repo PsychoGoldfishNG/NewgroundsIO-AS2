@@ -41,7 +41,7 @@ class io.newgrounds.helpers.AppStateBootstrapHelper {
 	 */
 	public static function getSessionIdFromUrl():String {
 		try {
-			var sessionId:String = _root.ngio_session;
+			var sessionId:String = _root.ngio_session_id;
 			if (sessionId != undefined && sessionId != null && sessionId.length > 0) {
 				return sessionId;
 			}
