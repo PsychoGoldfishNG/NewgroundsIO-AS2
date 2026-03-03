@@ -44,7 +44,7 @@ Extract the files to a location on your computer, then follow one of the install
 
 This is the recommended approach. The Connector Component has the entire NewgroundsIO library pre-compiled inside it.
 
-1. Open `bin/components.fla` in Flash CS5 or later
+1. Open `bin/components.fla` in Flash 8 or later
 2. Go to the **connector** frame in the timeline
 3. On the stage, select the Connector Component and copy it (Ctrl+C)
 4. Open your game's FLA file
@@ -82,7 +82,7 @@ if (NGIO.hasUser()) {
 
 If you don't want to use the full Connector Component, you can just use the pre-compiled library component.
 
-1. Open `bin/components.fla` in Flash CS5 or later
+1. Open `bin/components.fla` in Flash 8 or later
 2. Go to the **library** frame in the timeline
 3. On the stage, select the NgioLibraryComponent and copy it (Ctrl+C)
 4. Open your game's FLA file
@@ -126,7 +126,7 @@ MyGame/
     └── newgrounds/
 ```
 
-2. In Flash CS5, when you compile your SWF, ActionScript will automatically find these files in the same directory as your FLA.
+2. In Flash 8 or later, when you compile your SWF, ActionScript will automatically find these files in the same directory as your FLA.
 
 3. You can now use NGIO directly in your timeline code.
 
@@ -175,7 +175,7 @@ The easiest way is to use **Method 1** or **Method 2** from the Installation sec
 
 Alternatively, you can:
 
-1. Open **bin/components.fla** in Flash CS5 or later
+1. Open **bin/components.fla** in Flash 8 or later
 2. In the Library panel, find the component you want
 3. Right-click the component symbol → **Copy** (or drag it directly to another FLA)
 4. In your game's FLA, right-click on your stage where you want the component → **Paste** (or use Ctrl+V)
