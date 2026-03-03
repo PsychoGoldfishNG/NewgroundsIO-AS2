@@ -214,11 +214,11 @@ Once the component has completed its tasks, it will automatically play the movie
 
 #### Advanced Use ####
 
-Give the Connector Component an **instance name** (e.g., `myConnector`) in the Properties panel, then override the `onComplete` handler in your code:
+Give the Connector Component an **instance name** (e.g., `ngioConnector`) in the Properties panel, then override the `onComplete` handler in your code:
 
 ```actionscript
-// Give the connector component the instance name "myConnector"
-myConnector.onComplete = function() {
+// Give the connector component the instance name "ngioConnector"
+ngioConnector.onComplete = function() {
 	// start your game!
 };
 ```
@@ -271,11 +271,11 @@ All 3 versions use the same setup. Simply paste them wherever you want to show t
 
 Each scoreboard has a close (X) button in the top right. You can edit the clip and remove it if you want to handle exiting the scoreboard screen yourself.
 
-Otherwise, give the component an **instance name** (e.g., `myScoreboard`) and override the `onClose` handler:
+Otherwise, give the component an **instance name** (e.g., `ngioScoreBoard`) and override the `onClose` handler:
 
 ```actionscript
-// Give the scoreboard component the instance name "myScoreboard"
-myScoreboard.onClose = function() {
+// Give the scoreboard component the instance name "ngioScoreBoard"
+ngioScoreBoard.onClose = function() {
 	// handle closing the board
 };
 ```
@@ -315,13 +315,13 @@ Copy the component wherever you have a save or load dialogue and set the followi
 
 #### Basic Use ####
 
-Give the component an **instance name** (e.g., `mySaveManager`) and override the handler functions:
+Give the component an **instance name** (e.g., `saveSlotManager`) and override the handler functions:
 
 For loading data, use the following code:
 
 ```actionscript
-// Give the save manager component the instance name "mySaveManager"
-mySaveManager.onSlotLoaded = function(data, error) {
+// Give the save manager component the instance name "saveSlotManager"
+saveSlotManager.onSlotLoaded = function(data, error) {
 	if (error == null) {
 		// you have your data now!
 		var loaded_data = data;
@@ -332,12 +332,12 @@ mySaveManager.onSlotLoaded = function(data, error) {
 For saving data, use the following code:
 
 ```actionscript
-// Give the save manager component the instance name "mySaveManager"
+// Give the save manager component the instance name "saveSlotManager"
 // first, attach the data you want to save
-mySaveManager.setData(data_to_save);
+saveSlotManager.setData(data_to_save);
 
 // listen for when the slot has been selected and saved on the server
-mySaveManager.onSlotSaved = function(error) {
+saveSlotManager.onSlotSaved = function(error) {
 	if (error == null) {
 		// your data saved successfully!
 	}
@@ -347,7 +347,7 @@ mySaveManager.onSlotSaved = function(error) {
 Each saveslot manager has a close (X) button in the top right. You can edit the clip and remove it if you want to handle exiting the save/load screen yourself. Otherwise, override the `onClose` handler:
 
 ```actionscript
-mySaveManager.onClose = function() {
+saveSlotManager.onClose = function() {
 	// handle closing the save manager
 };
 ```
