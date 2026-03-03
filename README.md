@@ -412,6 +412,26 @@ NGIO.init(
 NGIO.init("12345:abcdef1234", "uXp/7Q9V4vG5L6R2W9zB8A==", "1.0.0");
 ```
 
+### Audio Settings
+
+NGIO components that play sounds (such as the Medal Popup) respect the `NGIO.audio` object. You can adjust these values at any time to integrate with your game's sound settings:
+
+```actionscript
+// Volume range is 0-100 (default 100)
+NGIO.audio.volume = 50;
+
+// Mute all NGIO component sounds
+NGIO.audio.muted = true;
+```
+
+A typical integration with a game's sound toggle:
+
+```actionscript
+function setSoundEnabled(enabled) {
+	NGIO.audio.muted = !enabled;
+}
+```
+
 ### Understanding the Callback Model
 
 Most NGIO methods that perform server operations use callbacks. When the operation completes, your callback function is called with the result.
