@@ -31,7 +31,7 @@ Then follow one of the installation methods below.
 
 If you don't use Git, download the [latest release](https://github.com/PsychoGoldfishNG/NewgroundsIO-AS2/releases). The release includes:
 
-- **components_cs5.fla** - Pre-compiled components (for Methods 1 & 2)
+- **components.fla** - Pre-compiled components (for Methods 1 & 2)
 - **Source files** - ActionScript source code (for Method 3)
 
 Extract the files to a location on your computer, then follow one of the installation methods below.
@@ -44,7 +44,7 @@ Extract the files to a location on your computer, then follow one of the install
 
 This is the recommended approach. The Connector Component has the entire NewgroundsIO library pre-compiled inside it.
 
-1. Open `bin/components_cs5.fla` in Flash CS5 or later
+1. Open `bin/components.fla` in Flash CS5 or later
 2. Go to the **connector** frame in the timeline
 3. On the stage, select the Connector Component and copy it (Ctrl+C)
 4. Open your game's FLA file
@@ -82,7 +82,7 @@ if (NGIO.hasUser()) {
 
 If you don't want to use the full Connector Component, you can just use the pre-compiled library component.
 
-1. Open `bin/components_cs5.fla` in Flash CS5 or later
+1. Open `bin/components.fla` in Flash CS5 or later
 2. Go to the **library** frame in the timeline
 3. On the stage, select the NgioLibraryComponent and copy it (Ctrl+C)
 4. Open your game's FLA file
@@ -161,7 +161,7 @@ NGIO components use fonts that are available in the `fonts/` directory. To match
 
 ## Using the Component Clips
 
-The library includes **bin/components_cs5.fla** with pre-built Flash components for common Newgrounds.io features. These components have the NewgroundsIO library pre-compiled inside them:
+The library includes **bin/components.fla** with pre-built Flash components for common Newgrounds.io features. These components have the NewgroundsIO library pre-compiled inside them:
 
 - **Connector Component** - Initializes your app, loads all metadata, and handles logging in users (includes full library)
 - **Medal Popup Component** - Display unlocked medals to the user
@@ -175,7 +175,7 @@ The easiest way is to use **Method 1** or **Method 2** from the Installation sec
 
 Alternatively, you can:
 
-1. Open **bin/components_cs5.fla** in Flash CS5 or later
+1. Open **bin/components.fla** in Flash CS5 or later
 2. In the Library panel, find the component you want
 3. Right-click the component symbol → **Copy** (or drag it directly to another FLA)
 4. In your game's FLA, right-click on your stage where you want the component → **Paste** (or use Ctrl+V)
