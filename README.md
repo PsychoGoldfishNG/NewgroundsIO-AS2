@@ -164,33 +164,21 @@ NGIO components use fonts that are available in the `fonts/` directory. To match
 
 When a new version is released, follow these steps to update an existing project.
 
-### Step 1: Remove the old compiled library
+### Step 1: Remove the old NewgroundsIO folder
 
-Open your game's FLA and look in the **Library panel** for the old compiled library clip. Depending on which version you installed, it may be named **NgioClassLib SWF** (older) or **NgioClassLibCompiled** (newer). Right-click it and choose **Delete**.
+Open your game's FLA and look in the **Library panel** for the **NewgroundsIO** folder. Right-click it and choose **Delete**. This removes all old components and the compiled library in one step and ensures you start with a clean slate.
 
-### Step 2: Bring in the new compiled library
+### Step 2: Re-add all components you were using
 
-How you do this depends on which method you used originally:
+Open `bin/components.fla` and copy each component you were using back into your FLA:
 
-**If you use the Connector Component:**
+1. Find the component in the **components.fla** library
+2. Copy it (or drag it directly onto your game's stage)
+3. Restore any **instance names** and **Component Parameters** you had set previously
 
-1. Open `bin/components.fla`
-2. Copy the new Connector Component from the **connector** frame
-3. Paste it into your game's FLA
-4. Flash will ask whether to replace the existing symbol in the library or keep the old one — choose **Replace**
+Repeat this for every NewgroundsIO component in your project — Connector, Medal Popup, Scoreboard, Cloud Save, etc.
 
-The Connector Component has the full compiled library baked in, so replacing it is all you need.
-
-**If you are not using the Connector Component:**
-
-1. Open `bin/components.fla`
-2. Drag the **NgioLibraryComponent** from the library panel directly onto your game's stage
-3. This imports the compiled library into your project
-4. You can immediately delete the NgioLibraryComponent from the stage — it only needs to touch the stage long enough to register in your library
-
-### Step 3: Check your other components
-
-Most components that had no bugs in the new release will continue working without changes. Any that are behaving unexpectedly should be replaced the same way as the Connector Component above — copy from `components.fla`, paste into your FLA, and choose **Replace** when prompted.
+> **Tip:** Make a note of your component settings (instance names, App ID, parameters) before deleting the old folder so you can restore them quickly.
 
 ---
 
