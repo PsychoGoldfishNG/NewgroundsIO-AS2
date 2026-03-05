@@ -42,7 +42,7 @@ class io.newgrounds.Core {
 	/**
 	 * The version of the library - used for debugging and error reporting
 	 */
-	public static var LIBRARY_VERSION:String = "1.0.3a";
+	public static var LIBRARY_VERSION:String = "1.0.3b";
 
 	//==================== PUBLIC PROPERTIES ====================
 
