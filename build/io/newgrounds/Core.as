@@ -18,6 +18,7 @@ import io.newgrounds.helpers.CoreQueueExecutionHelper;
 import io.newgrounds.helpers.HttpRequestHelper;
 import io.newgrounds.helpers.HttpResponseHelper;
 import io.newgrounds.helpers.CoreTransportHelper;
+import io.newgrounds.BrowserConsole;
 
 class io.newgrounds.Core {
 
@@ -37,6 +38,11 @@ class io.newgrounds.Core {
 	 * Maximum number of components that can be bundled in a single request
 	 */
 	public static var MAX_QUEUE_SIZE:Number = 10;
+
+	/**
+	 * The version of the library - used for debugging and error reporting
+	 */
+	public static var LIBRARY_VERSION:String = "1.0.3a";
 
 	//==================== PUBLIC PROPERTIES ====================
 
@@ -108,6 +114,8 @@ class io.newgrounds.Core {
 
 		// Load the crossdomain policy file to allow HTTPS connections
 		System.security.loadPolicyFile(io.newgrounds.Core.POLICY_FILE_URL);
+
+		BrowserConsole.log("Newgrounds.io Core initialized with appId: " + appId + ", buildVersion: " + buildVersion + ", useDebugMode: " + useDebugMode + ", libraryVersion: " + LIBRARY_VERSION + " (AS2), hasEncryptionKey: " + (encryptionKey != null && encryptionKey.length > 0), false);
 	}
 
 	//==================== PUBLIC METHODS ====================
