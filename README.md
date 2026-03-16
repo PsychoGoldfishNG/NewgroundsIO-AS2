@@ -17,9 +17,9 @@ A comprehensive ActionScript 2.0 library for integrating Newgrounds.io API funct
 
 ## Project Settings
 
-The default encryption method for Newgrounds.io projects is 128-bit AES.  Unfortunately, ActionScript 2.0 does not support this cypher.
+The default encryption method for Newgrounds.io projects is 128-bit AES. Unfortunately, ActionScript 2.0 does not support this cipher.
 
-You will need to access the **Advanced options** from your **Newgrounds.io App credentials** page, and switch your **Encryption Cypher** to ```RC4```.
+You will need to access the **Advanced options** from your **Newgrounds.io App credentials** page and switch your **Encryption Cipher** to ```RC4```.
 
 ![Advanced Settings](./docs/projectSettings.png "Advanced Settings")
 
