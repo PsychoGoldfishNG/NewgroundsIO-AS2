@@ -6,6 +6,7 @@ A comprehensive ActionScript 2.0 library for integrating Newgrounds.io API funct
 
 ## Table of Contents
 
+- [Project Settings](#project-settings)
 - [Installing the Library](#installing-the-library)
 - [Updating the Library](#updating-the-library)
 - [Using the Component Clips](#using-the-component-clips)
@@ -13,6 +14,14 @@ A comprehensive ActionScript 2.0 library for integrating Newgrounds.io API funct
 - [Advanced Use](#advanced-use)
 
 ---
+
+## Project Settings
+
+The default encryption method for Newgrounds.io projects is 128-bit AES.  Unfortunately, ActionScript 2.0 does not support this cypher.
+
+You will need to access the **Advanced options** from your **Newgrounds.io App credentials** page, and switch your **Encryption Cypher** to ```RC4```.
+
+![Advanced Settings](./docs/projectSettings.png "Advanced Settings")
 
 ## Installing the Library
 
@@ -55,7 +64,7 @@ This is the recommended approach. The Connector Component has the entire Newgrou
    - `Encryption Key` - The encryption key from your Newgrounds Project
    - `App Version` - Your game's version (optional)
 
-![The Connector Component](./docs/connectorComponent.png "The Connector Component")
+![The Connector Component](./docs/connectorComponent.png "The Connector Component")  
 
 **That's it!** The component will automatically handle app initialization and loading. Once it's done, your movie will play.
 
