@@ -1,3 +1,4 @@
 node_modules/
 .claude/
 bin/components.swf
+bin/components/
