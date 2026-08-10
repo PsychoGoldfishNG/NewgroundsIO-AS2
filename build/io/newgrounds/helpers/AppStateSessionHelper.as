@@ -29,7 +29,15 @@ class io.newgrounds.helpers.AppStateSessionHelper {
 		}
 
 		if (appState.session.error != null) {
-			if (appState.session.error.code == io.newgrounds.Errors.CANCELLED_SESSION) {
+			if (appState.session.error.code == io.newgrounds.Errors.EXPIRED_SESSION) {
+				// The server rejected this session id. Report EXPIRED rather than a
+				// generic ERROR so callers can tell "start over" apart from "something
+				// broke", and clear the session-scoped data that is no longer valid.
+				if (onSessionCleared != null) {
+					onSessionCleared.call();
+				}
+				sessionStatus.status = io.newgrounds.SessionStatus.EXPIRED;
+			} else if (appState.session.error.code == io.newgrounds.Errors.CANCELLED_SESSION) {
 				if (onSessionCleared != null) {
 					onSessionCleared.call();
 				}

@@ -210,6 +210,30 @@ class io.newgrounds.AppState {
 	}
 
 	/**
+	 * Discard a session the server has rejected (expired or cancelled)
+	 *
+	 * Stronger than clearSession(): as well as forgetting the saved session id, this
+	 * resets the session-scoped caches (medals, save slots, medal score) and lowers
+	 * passportIsOpen, because none of that data is valid once the session is gone.
+	 *
+	 * Without this, a rejected session id stays in memory and in storage, so every
+	 * later checkSession() re-sends the same dead id and fails the same way.
+	 */
+	public function invalidateSession():Void {
+		// Reset session-scoped state and the session object itself
+		io.newgrounds.helpers.AppStateSessionResetHelper.clearSessionScopedData(this);
+
+		// Drop any error left over from the rejected session, so a freshly started
+		// session isn't immediately judged by the old session's failure
+		if (this.session != null) {
+			this.session.error = null;
+		}
+
+		// Forget the saved id so a page reload doesn't restore the dead session
+		io.newgrounds.helpers.AppStateBootstrapHelper.clearSavedSessionId(this.sessionStorageKey);
+	}
+
+	/**
 	 * Completely clear the current session (used when logging out)
 	 */
 	public function clearSession():Void {
