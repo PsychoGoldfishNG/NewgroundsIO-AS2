@@ -3,7 +3,9 @@
 
 	/**
 	 * Unlocks this medal for the current user.
-	 * @param callback Function to call when the unlock completes
+	 * @param callback Function to call when the unlock completes, as callback(medal, error)
+	 *                 where error is null on success. Read the updated point total from
+	 *                 NGIO.getMedalScore() - AppState updates it from the same result.
 	 * @param thisArg Context to use when calling the callback
 	 */
 	public function unlock(callback:Function, thisArg):Void {
@@ -26,19 +28,33 @@
 	public function onUnlock(response:io.newgrounds.models.objects.Response, callbackParams:Object):Void {
 
 		var result:io.newgrounds.models.results.Medal.unlockResult = null;
+		var error = null;
 
-		if (response && response.success) {
+		// A rejected unlock can surface at either level: the request itself may fail, or
+		// it may succeed while the component result reports failure (unknown medal ID,
+		// no session, etc). Check both, so the caller gets one clear answer.
+		if (response == null || response.success !== true) {
+			error = (response != null && response.error != null)
+				? response.error
+				: io.newgrounds.Errors.getError();
+		} else {
 			result = response.getResult();
+
+			if (result == null) {
+				error = io.newgrounds.Errors.getError(io.newgrounds.Errors.INVALID_RESPONSE);
+			} else if (result.success !== true) {
+				error = (result.error != null) ? result.error : io.newgrounds.Errors.getError();
+			}
 		}
 
-		if (response && response.success) {
+		// Only mark this unlocked if the server actually accepted it. Setting it on any
+		// response would leave the medal permanently showing as earned after a failure.
+		if (error == null) {
 			this.unlocked = true;
 		}
 
 		if (callbackParams.callback != null) {
-			// result stays null when the request failed, so guard the dereference
-			var medalScore = (result != null) ? result.medal_score : null;
-			callbackParams.callback.call(callbackParams.thisArg, this, medalScore);
+			callbackParams.callback.call(callbackParams.thisArg, this, error);
 		}
 	}
 
