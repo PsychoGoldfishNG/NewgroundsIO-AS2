@@ -37,8 +37,10 @@ class io.newgrounds.helpers.AppStateResultUpdateHelper {
 		}
 
 		if (appState.session == null) {
+			// Note: no markLoaded("session") here - 'session' is not one of
+			// AppState.dataProperties (it isn't loadable via loadData), and
+			// markLoaded throws on names outside that list.
 			appState.session = resultObject.session;
-			appState.markLoaded("session");
 		} else {
 			appState.session.importFromObject(resultObject.session);
 		}
