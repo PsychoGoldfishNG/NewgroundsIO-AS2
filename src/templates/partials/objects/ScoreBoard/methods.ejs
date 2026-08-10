@@ -92,9 +92,31 @@
 	 * @param callbackParams The callback parameters stored during getScores()
 	 */
 	public function onScoresLoaded(response:io.newgrounds.models.objects.Response, callbackParams:Object):Void {
+
+		var result:io.newgrounds.models.results.ScoreBoard.getScoresResult = null;
+		var scores:Array = null;
+		var error = null;
+
+		// A failed load can surface at either level: the request itself may fail, or
+		// it may succeed while the component result reports failure. Check both, so
+		// the caller gets one clear answer.
+		if (response == null || response.success !== true) {
+			error = (response != null && response.error != null)
+				? response.error : io.newgrounds.Errors.getError();
+		} else {
+			result = response.getResult();
+
+			if (result == null) {
+				error = io.newgrounds.Errors.getError(io.newgrounds.Errors.INVALID_RESPONSE);
+			} else if (result.success !== true) {
+				error = (result.error != null) ? result.error : io.newgrounds.Errors.getError();
+			} else {
+				scores = result.scores;
+			}
+		}
+
 		if (callbackParams.callback != null) {
-			var result:io.newgrounds.models.results.ScoreBoard.getScoresResult = response.getResult();
-			callbackParams.callback.call(callbackParams.thisArg, result.scores);
+			callbackParams.callback.call(callbackParams.thisArg, scores, error);
 		}
 	}
 
@@ -132,21 +154,28 @@
 	 * @param callbackParams The callback parameters stored during postScore()
 	 */
 	public function onPostScore(response:io.newgrounds.models.objects.Response, callbackParams:Object):Void {
-		if (callbackParams.callback != null) {
-			var error:io.newgrounds.models.objects.NgioError = null;
-			var score:io.newgrounds.models.objects.Score = null;
 
-			if (response && response.success) {
-				var result:io.newgrounds.models.results.ScoreBoard.postScoreResult = response.getResult();
-				if (result.success) {
-					score = result.score;
-				} else {
-					error = result.error;
-				}
+		var result:io.newgrounds.models.results.ScoreBoard.postScoreResult = null;
+		var score:io.newgrounds.models.objects.Score = null;
+		var error = null;
+
+		// Same two-level check as onScoresLoaded - see the note there.
+		if (response == null || response.success !== true) {
+			error = (response != null && response.error != null)
+				? response.error : io.newgrounds.Errors.getError();
+		} else {
+			result = response.getResult();
+
+			if (result == null) {
+				error = io.newgrounds.Errors.getError(io.newgrounds.Errors.INVALID_RESPONSE);
+			} else if (result.success !== true) {
+				error = (result.error != null) ? result.error : io.newgrounds.Errors.getError();
 			} else {
-				error = response.error;
+				score = result.score;
 			}
+		}
 
+		if (callbackParams.callback != null) {
 			callbackParams.callback.call(callbackParams.thisArg, score, error);
 		}
 	}
