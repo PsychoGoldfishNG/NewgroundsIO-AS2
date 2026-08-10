@@ -1113,6 +1113,12 @@ NGIO.core.executeQueue(function(responses) {
 - Newgrounds.io API Documentation: https://www.newgrounds.io/
 - ActionScript 2.0 Reference: https://help.adobe.com/en_US/AS2LCR/Flash_10.0/
 
+### Working on the library itself?
+
+If you're modifying this library rather than using it, see **[CONTRIBUTING.md](CONTRIBUTING.md)** —
+it covers regenerating the model classes and rebuilding the pre-compiled component that the
+Connector and Library install methods depend on.
+
 ---
 
 ## License
