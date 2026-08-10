@@ -137,7 +137,12 @@ class io.newgrounds.models.objects.ObjectFactory {
 
 		}
 
-		if (coreReference) obj.core = coreReference;
+		// An unrecognised name falls through the switch leaving obj null, and
+		// BaseObject.importFromObject() calls this with a dotted objectName
+		// ("App.checkSession") that deliberately has no case here. AS2 ignores assignment
+		// to a null reference, so the guard is behaviour-neutral here - but the same line
+		// throws TypeError #1009 in AS3, so keep the two libraries consistent.
+		if (obj != null && coreReference) obj.core = coreReference;
 
 		// If object was created and data provided, import the data
 		if (obj != null && objectData != null) {
@@ -266,7 +271,8 @@ class io.newgrounds.models.objects.ObjectFactory {
 
 		}
 
-		if (coreReference) comp.core = coreReference;
+		// Guard for parity with AS3, where assigning .core to a null comp throws #1009
+		if (comp != null && coreReference) comp.core = coreReference;
 
 		// If component was created and data provided, import the data
 		if (comp != null && props != null) {
@@ -395,7 +401,8 @@ class io.newgrounds.models.objects.ObjectFactory {
 
 		}
 
-		if (coreReference) result.core = coreReference;
+		// Guard for parity with AS3, where assigning .core to a null result throws #1009
+		if (result != null && coreReference) result.core = coreReference;
 
 		// If result was created and data provided, import the data
 		if (result != null && props != null) {

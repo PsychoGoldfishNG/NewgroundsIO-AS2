@@ -1,0 +1,7 @@
+		// 'component' and 'secure' are mutually exclusive. A plain Execute carries
+		// 'component' + 'parameters'; an encrypted one carries only 'secure'. The schema
+		// expresses this with not_required_if, which the generator doesn't model yet, so
+		// listing both here would make hasValidProperties() impossible to satisfy.
+		// Neither is listed, and the hasValidProperties() override in methods.ejs
+		// enforces the real rule instead.
+		return [];

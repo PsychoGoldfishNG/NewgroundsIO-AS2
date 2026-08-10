@@ -136,7 +136,9 @@ class io.newgrounds.models.objects.Medal extends io.newgrounds.BaseObject {
 		}
 
 		if (callbackParams.callback != null) {
-			callbackParams.callback.call(callbackParams.thisArg, this, result.medal_score);
+			// result stays null when the request failed, so guard the dereference
+			var medalScore = (result != null) ? result.medal_score : null;
+			callbackParams.callback.call(callbackParams.thisArg, this, medalScore);
 		}
 	}
 

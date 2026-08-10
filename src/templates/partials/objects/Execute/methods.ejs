@@ -19,3 +19,21 @@
 		// This Execute object just stores the component name and parameters
 	}
 
+	/**
+	 * Validates that exactly one of component / secure is set.
+	 *
+	 * Pairs with required_properties.ejs, which returns an empty list. The schema marks
+	 * both properties required, but they are mutually exclusive - a plain "all present"
+	 * check can never pass. This enforces the actual rule instead.
+	 */
+	public function hasValidProperties():Boolean {
+		if (!super.hasValidProperties()) {
+			return false;
+		}
+
+		var hasComponent:Boolean = (this.component != null && this.component.length > 0);
+		var hasSecure:Boolean = (this.secure != null && this.secure.length > 0);
+
+		return (hasComponent || hasSecure) && !(hasComponent && hasSecure);
+	}
+

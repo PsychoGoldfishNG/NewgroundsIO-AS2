@@ -71,7 +71,13 @@ class io.newgrounds.models.objects.Execute extends io.newgrounds.BaseObject {
 	 * Required properties for validation
 	 */
 	public function get requiredProperties():Array {
-		return ["component","secure"];
+		// 'component' and 'secure' are mutually exclusive. A plain Execute carries
+		// 'component' + 'parameters'; an encrypted one carries only 'secure'. The schema
+		// expresses this with not_required_if, which the generator doesn't model yet, so
+		// listing both here would make hasValidProperties() impossible to satisfy.
+		// Neither is listed, and the hasValidProperties() override in methods.ejs
+		// enforces the real rule instead.
+		return [];
 	}
 
 	/**
@@ -103,6 +109,24 @@ class io.newgrounds.models.objects.Execute extends io.newgrounds.BaseObject {
 		}
 		// Note: Encryption for secure components is handled by HttpRequestHelper
 		// This Execute object just stores the component name and parameters
+	}
+
+	/**
+	 * Validates that exactly one of component / secure is set.
+	 *
+	 * Pairs with required_properties.ejs, which returns an empty list. The schema marks
+	 * both properties required, but they are mutually exclusive - a plain "all present"
+	 * check can never pass. This enforces the actual rule instead.
+	 */
+	public function hasValidProperties():Boolean {
+		if (!super.hasValidProperties()) {
+			return false;
+		}
+
+		var hasComponent:Boolean = (this.component != null && this.component.length > 0);
+		var hasSecure:Boolean = (this.secure != null && this.secure.length > 0);
+
+		return (hasComponent || hasSecure) && !(hasComponent && hasSecure);
 	}
 
 }

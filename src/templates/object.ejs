@@ -9,6 +9,14 @@ const propertyNames = Object.keys(model.properties).filter(prop => prop !== 'err
 const requiredParams = [];
 const hasProperties = propertyNames.length > 0;
 const className = helpers.getClassName(model.name);
+
+// A model may replace the schema-derived requiredProperties body with its own.
+// requiredProperties can only express "all of these must be present". Models whose schema
+// marks properties required under conditions the generator can't see (mutually exclusive
+// fields, for example) need to opt out and enforce the real rule in hasValidProperties()
+// instead. See partials/objects/Execute/ for the worked example.
+const requiredOverride = partial.getIfExists(`objects/${model.name}/required_properties`);
+const hasRequiredOverride = requiredOverride && requiredOverride.trim().length > 0;
 %>
 /**
  * <%- className %>
@@ -67,7 +75,11 @@ class io.newgrounds.models.objects.<%- className %> extends io.newgrounds.BaseOb
 	 * Required properties for validation
 	 */
 	public function get requiredProperties():Array {
+<% if (hasRequiredOverride) { -%>
+<%- requiredOverride -%>
+<% } else { -%>
 		return <%- JSON.stringify(requiredParams) %>;
+<% } -%>
 	}
 
 	/**
