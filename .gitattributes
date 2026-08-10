@@ -1,0 +1,28 @@
+# Let Git decide what is text and normalise it to LF inside the repository.
+* text=auto
+
+# Source and config keep LF in the working copy too.
+#
+# The model generator writes LF. Without this, a Windows checkout gets CRLF and
+# every `npm run build` rewrites those files back to LF, so regenerating shows
+# line-ending-only diffs that look like real changes. Pinning eol=lf keeps the
+# working copy matching what the generator emits, so a rebuild is a true no-op.
+*.as    text eol=lf
+*.ejs   text eol=lf
+*.js    text eol=lf
+*.json  text eol=lf
+*.md    text eol=lf
+*.yml   text eol=lf
+
+# Binaries: never apply EOL conversion. Git normally auto-detects these, but the
+# Flash sources especially are not worth leaving to detection - a .fla treated as
+# text would be corrupted, and the damage would not be obvious until it failed to
+# open in the IDE.
+*.fla   binary
+*.swf   binary
+*.swc   binary
+*.png   binary
+*.ttf   binary
+*.TTF   binary
+*.otf   binary
+*.OTF   binary
