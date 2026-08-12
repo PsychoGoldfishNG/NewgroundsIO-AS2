@@ -88,7 +88,32 @@ class io.newgrounds.encoders.JSON {
 			s = quotes;
             for (i = 0; i < l; i += 1) {
                 c = arg.charAt(i);
-                if (c >= ' ') {
+                // Left untyped on purpose. AS2's intrinsic Number declares
+                // toString() with no parameters, so calling .toString(16) on a
+                // strictly-typed Number can fail to compile. The original code in
+                // this branch called it on an untyped value for the same reason -
+                // keep it that way.
+                var cc = arg.charCodeAt(i);
+                // Emit printable ASCII as-is. EVERYTHING else - control characters
+                // and all non-ASCII alike - becomes a \uXXXX escape.
+                //
+                // Escaping non-ASCII is what keeps RC4 correct. Core.encryptObject()
+                // runs this encoder's output straight into RC4.encrypt(), whose
+                // strToChars() reads the plaintext with charCodeAt - i.e. UTF-16 code
+                // units, not UTF-8 bytes. Left raw, 'e-acute' (U+00E9) would be XORed
+                // as the single value 233 where UTF-8 needs two bytes, and anything
+                // above U+00FF would produce a value over 255 fed into a byte-oriented
+                // Base64 encoder, corrupting the stream outright.
+                //
+                // Escaping here means RC4 only ever sees printable ASCII, where
+                // charCodeAt and UTF-8 bytes are identical by definition - so the
+                // cipher is correct without being modified. \uXXXX is plain JSON and
+                // the gateway's json_decode resolves it identically; PHP's own
+                // json_encode escapes non-ASCII this way by default.
+                //
+                // Characters above U+FFFF arrive as two UTF-16 surrogates and each is
+                // escaped separately, which is exactly how JSON represents them.
+                if (cc >= 0x20 && cc <= 0x7E) {
                     if (c == '\\' || c == '"') {
                         s += '\\';
                     }
@@ -111,9 +136,14 @@ class io.newgrounds.encoders.JSON {
                             s += '\\t';
                             break;
                         default:
-                            c = c.charCodeAt();
-                            s += '\\u00' + Math.floor(c / 16).toString(16) +
-                                (c % 16).toString(16);
+                            // Four hex digits, zero padded. The previous form
+                            // hardcoded '\u00' plus two digits, which is only correct
+                            // below U+0100 and silently truncated everything above it.
+                            var hex = cc.toString(16);
+                            while (hex.length < 4) {
+                                hex = '0' + hex;
+                            }
+                            s += '\\u' + hex;
                     }
                 }
             }
