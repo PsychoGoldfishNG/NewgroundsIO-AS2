@@ -77,7 +77,13 @@ class io.newgrounds.helpers.AppStateResultUpdateHelper {
 			return;
 		}
 
-		if (objectName == "CloudSave.setData" || objectName == "CloudSave.clearSlot") {
+		// All three return the same single 'slot' payload and want identical
+		// handling. Leaving one out leaves the cached SaveSlot the UI is holding
+		// reporting a stale size, timestamp and url - and hasData() answering
+		// from it. loadSlot was the one missing.
+		if (objectName == "CloudSave.loadSlot"
+		    || objectName == "CloudSave.setData"
+		    || objectName == "CloudSave.clearSlot") {
 			if (appState.saveSlots != null) {
 				updateSingleById(appState.saveSlots, resultObject.slot);
 			}
