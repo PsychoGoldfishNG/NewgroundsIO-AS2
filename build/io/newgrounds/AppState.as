@@ -173,13 +173,16 @@ class io.newgrounds.AppState {
 		}
 
 		if (this.passportIsOpen === true) {
+			// Chained, not three independent checks: the first branch is
+			// reached precisely when there is no session to interrogate, so
+			// falling through to this.session.expired read a property off null -
+			// fatal in AS3, silently undefined here. Same shape in both so the
+			// libraries stay comparable.
 			if (this.session == null || this.session.id == null || this.session.id.length == 0) {
 				this.passportIsOpen = false;
-			}
-			if (this.session.expired === true) {
+			} else if (this.session.expired === true) {
 				this.passportIsOpen = false;
-			}
-			if (this.session.user != null) {
+			} else if (this.session.user != null) {
 				this.passportIsOpen = false;
 			}
 		}

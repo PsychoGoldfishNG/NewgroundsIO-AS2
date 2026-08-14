@@ -68,6 +68,23 @@ class io.newgrounds.BaseObject {
 	/** Error details if something went wrong (can be set on any object) */
 	public var error = null;
 
+	/**
+	 * The App ID this object's data was loaded from, when it came from a
+	 * DIFFERENT app than the one this client is running as. Null for ordinary
+	 * local data, which is the overwhelmingly common case.
+	 *
+	 * Set by NGIO's loadExternal* methods, on the returned model and everything
+	 * nested inside it.
+	 *
+	 * It exists because a model returned by a cross-app read is otherwise
+	 * indistinguishable from a local one, while behaving very differently.
+	 * Cross-app access is READ-ONLY: no component that writes accepts an app_id,
+	 * so calling one on a foreign object sends that object's id against YOUR app.
+	 * Every write method checks this via assertNotForeign() - see the note there
+	 * for why that check is not merely cosmetic.
+	 */
+	public var foreignAppId:String = null;
+
 	/** Static counter for tracking object IDs (for debugging) */
 	private static var objectIDTracking:Number = 0;
 
@@ -75,6 +92,55 @@ class io.newgrounds.BaseObject {
 	public var objectId:Number = -1;
 
 	//==================== PUBLIC METHODS ====================
+
+	/**
+	 * True if this object's data was loaded from another app.
+	 *
+	 * Prefer this to testing foreignAppId directly - it treats an empty string
+	 * the same as null, so a stamp that never took cannot read as a foreign
+	 * object.
+	 */
+	public function isForeign():Boolean {
+		return this.foreignAppId != null && this.foreignAppId.length > 0;
+	}
+
+	/**
+	 * Refuses a write on an object that was loaded from another app.
+	 *
+	 * Called at the top of every method that writes - before any work is done
+	 * and before anything is sent - so a mistake surfaces at the call site
+	 * rather than as a puzzling gateway error later.
+	 *
+	 * WHY THIS THROWS RATHER THAN REPORTING VIA CALLBACK: calling a write on a
+	 * foreign object is a programming error, not a runtime condition the caller
+	 * can recover from. Every write method takes an OPTIONAL callback, so an
+	 * error delivered that way would be silently discarded by the callers most
+	 * likely to make the mistake.
+	 *
+	 * WHY IT MATTERS MOST FOR CloudSave: medal and scoreboard ids are globally
+	 * unique, so a misdirected write is rejected by the gateway - confusing, but
+	 * harmless. SaveSlot.id is a per-app SLOT NUMBER, and every app has a slot 1.
+	 * Writing through a foreign slot therefore succeeds, silently overwriting the
+	 * caller's OWN save data. This check is the only thing standing between a
+	 * cross-app read and real data loss.
+	 *
+	 * PUBLIC, unlike the AS3 version, only because ActionScript 2 has no
+	 * protected attribute. Treat it as internal to the library.
+	 *
+	 * @param action Name of the refused method, e.g. "unlock()"
+	 * @param consequence One sentence on what would have happened
+	 */
+	public function assertNotForeign(action:String, consequence:String):Void {
+		if (!this.isForeign()) {
+			return;
+		}
+
+		throw new Error(
+			this.toString() + " was loaded from app " + this.foreignAppId + ", not this one, " +
+			"and " + action + " writes through this app's session. " + consequence + " " +
+			"Cross-app access is read-only - see the NGIO.loadExternal* methods."
+		);
+	}
 
 	/**
 	 * Constructor for BaseObject

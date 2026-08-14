@@ -2,3 +2,6 @@ node_modules/
 .claude/
 bin/components.swf
 bin/components/
+
+# Test build output, published from test/NgioUnitTest.fla by the Flash IDE.
+test/NgioUnitTest.swf
