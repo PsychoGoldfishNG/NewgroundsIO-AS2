@@ -40,13 +40,28 @@ class io.newgrounds.helpers.NgioLoaderHelper {
 				var url:String = null;
 				var error = null;
 
-				if (response !== null) {
+				// A failed load surfaces at either of two levels, and both have to
+				// be checked - the same pattern Medal.unlock and ScoreBoard.getScores
+				// use.
+				//
+				// Only the component level was checked here. When the REQUEST fails
+				// there is no result to read an error from, so the block was skipped
+				// entirely and the caller got (null, null): no url and no reason. Any
+				// transport failure - server down, no network, a stream error - looked
+				// identical to success with an empty url.
+				if (response === null || response.success !== true) {
+					error = (response !== null && response.error !== null)
+						? response.error
+						: io.newgrounds.Errors.getError(0, null, false);
+				} else {
 					var result = response.getResult();
-					if (result !== null) {
+
+					if (result === null) {
+						error = io.newgrounds.Errors.getError(io.newgrounds.Errors.INVALID_RESPONSE, null, false);
+					} else if (result.error !== null) {
+						error = result.error;
+					} else {
 						url = result.url;
-						if (result.error !== null) {
-							error = result.error;
-						}
 					}
 				}
 
