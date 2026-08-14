@@ -117,10 +117,11 @@ class io.newgrounds.models.objects.ScoreBoard extends io.newgrounds.BaseObject {
 
 		// Handle social filter (friends only)
 		//
-		// Skipped entirely for a foreign board: 'social' filters to the current
-		// user's friends who have played THIS app, which says nothing about who has
-		// played the app the board belongs to.
-		if (this.core && this.core.hasSession() && filters.social === true && !this.isForeign()) {
+		// Applies to foreign boards too. The friends list is a site-wide relation,
+		// not a per-app one, so "me and my friends" is just as meaningful on another
+		// app's board as on ours. The session gate stays because 'social' needs to
+		// know who "you" are.
+		if (this.core && this.core.hasSession() && filters.social === true) {
 			componentParams.social = true;
 		}
 
@@ -158,7 +159,8 @@ class io.newgrounds.models.objects.ScoreBoard extends io.newgrounds.BaseObject {
 		// A board loaded from another app keeps reading from that app. Without
 		// forwarding the app_id the board came with, the gateway would look this id
 		// up against THIS app and reject it - and reading is the one thing cross-app
-		// access does allow, so make it work rather than refusing it.
+		// access does allow, so make it work rather than refusing it. Every filter
+		// above still applies, including 'social'.
 		if (this.isForeign()) {
 			componentParams.app_id = this.foreignAppId;
 		}
