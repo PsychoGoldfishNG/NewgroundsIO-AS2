@@ -406,6 +406,31 @@ class io.newgrounds.encoders.JSON {
                     n += ch;
                 }
             }
+
+            // Exponent: 1e3, 1E3, 1e+3, 1e-3. This was missing entirely, and it
+            // is not a theoretical gap - encode() renders numbers with
+            // String(arg), and AVM1 switches to exponent form below 1e-6 and at
+            // or above 1e21. So this decoder could not read back what the
+            // encoder in this same file produced: a cloud save holding 0.0000001
+            // was written as 1e-7 and then failed to load.
+            //
+            // Where it surfaced depended on position, which made it look like
+            // three different bugs: inside an object the leftover 'e' was
+            // reported as "Bad object", inside an array as "Bad array", and at
+            // the top level it was silently discarded, so `1e3` decoded as 1.
+            if (ch == 'e' || ch == 'E') {
+                n += ch;
+                _next();
+                if (ch == '+' || ch == '-') {
+                    n += ch;
+                    _next();
+                }
+                while (ch >= '0' && ch <= '9') {
+                    n += ch;
+                    _next();
+                }
+            }
+
             //v = +n;
 			v = 1 * n;
             if (!isFinite(v)) {
@@ -456,7 +481,26 @@ class io.newgrounds.encoders.JSON {
             }
         }
 
-        return _value();
+        var result = _value();
+
+        // Anything left over means this was not a JSON document, however well
+        // the leading part parsed.
+        //
+        // Crockford's original does exactly this and the 2005 port dropped it,
+        // so `{"a":1}<html>...` returned {a:1} and threw the rest away. That is
+        // the shape of a proxy interstitial or a PHP notice appended after a
+        // real response - precisely the case where silently trusting the first
+        // half is worst.
+        //
+        // _white() first, so trailing newlines and spaces are still fine, and
+        // `if (ch)` rather than a comparison because _next() yields "" at the
+        // end of the input.
+        _white();
+        if (ch) {
+            _error("Unexpected trailing content after a complete JSON value");
+        }
+
+        return result;
     }
 
 	private static function getType(v) {
@@ -483,8 +527,27 @@ class io.newgrounds.encoders.JSON {
 			var d = new Date();
 			busy = false;
 			clearInterval(interval);
-			cache.callback(cache.root, d.getTime()-start);
+
+			// cache.arg IS CLEARED BEFORE THE CALLBACK, NOT AFTER. Do not move it
+			// back down.
+			//
+			// `busy` is already false by this point, so a callback is free to
+			// start another background_decode() - and that replaces the static
+			// `cache` wholesale. Clearing arg afterwards therefore wiped the INPUT
+			// OF THE NEW JOB, not the finished one. The new decode then saw
+			// pos (0) >= arg.length (0), declared itself complete before reading a
+			// character, traced "NaN% decoded" from the 0/0, and handed its
+			// callback an undefined root.
+			//
+			// Two consecutive background_decode() calls is all it takes, and the
+			// second one has to be started from the first one's callback - which
+			// is exactly what a test suite, or any queue of saves, does.
+			//
+			// Reading cache.callback and cache.root below is safe: both are
+			// resolved before the call is made, so they still belong to this job.
 			cache.arg = "";
+
+			cache.callback(cache.root, d.getTime()-start);
 		}
 	}
 	
@@ -506,9 +569,19 @@ class io.newgrounds.encoders.JSON {
 			var e = d.getTime();
 			busy = false;
 			clearInterval(interval);
-			cache.callback(cache.encoded, e-start);
+
+			// Same hazard as decode_chunk, same fix: a callback that starts
+			// another background_encode() replaces the static `cache`, so
+			// releasing this job's buffer afterwards would empty the NEW job's.
+			//
+			// The result has to be captured first, because unlike arg it is the
+			// value being handed to the callback rather than spent input.
+			var finishedEncoded:String = cache.encoded;
+
 			// clear the encoded cache to free up memory
 			cache.encoded = "";
+
+			cache.callback(finishedEncoded, e-start);
 		}
 	}
 	
@@ -652,7 +725,26 @@ class io.newgrounds.encoders.JSON {
 		
 		function _number() {
 			var char = cache.arg.charAt(cache.pos);
-			var valid = "01234567890.-";
+
+			// background_decode() has its own scanner, entirely separate from
+			// decode()'s _number(), and it had the same exponent gap. Fixing only
+			// decode() would have left the chunked path unable to read numbers
+			// the chunked ENCODER wrote - the two are used as a pair on large
+			// cloud saves, which is exactly where a tiny float is most likely.
+			//
+			// Character-set based rather than a grammar, matching how the rest of
+			// this scanner works: it accumulates while the character is valid and
+			// stops at the first one that is not. That accepts some malformed
+			// input (1e2e3 becomes NaN), but this path has no error reporting at
+			// all and already behaved that way for "1.2.3".
+			//
+			// HISTORY, because it cost a run to learn: this change was made once,
+			// reverted, and then made again unaltered. The revert was wrong. The
+			// symptom blamed on it - "NaN% decoded" and a null result - was a
+			// pre-existing lifecycle bug in decode_chunk that only shows up when
+			// one background_decode starts another from its callback, which is
+			// what adding a second chunked test did. See the comment there.
+			var valid = "01234567890.-eE+";
 			if (!cache.mode) {
 				cache.mode = "number";
 				cache.scratch = "";
