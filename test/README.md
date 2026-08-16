@@ -947,21 +947,23 @@ on-stage field. The one test that needs a non-ASCII character builds it with
 
 ## Status
 
-**Fully green.** Run twice on 2026-08-16 at 750ms pacing, from a machine with a
-remembered login — once down each branch of the sign-out prompt, so both paths
+**Fully green.** Run on 2026-08-16 at 750ms pacing, from a machine with a
+remembered login — down each branch of the sign-out prompt, so both paths
 through the suite are verified rather than one:
 
 | Sign-out prompt | Passed | Failed | Skipped | Assertions | Requests | Duration |
 |---|---|---|---|---|---|---|
-| **Sign out and test it** | 223 | 0 | 2 | 1076 | 78 | 99.5s + 13.9s human |
+| **Sign out and test it** | 223 | 0 | 2 | 1076 | 78 | 99.8s + 16.8s human |
 | **Keep my login** | 221 | 0 | 4 | 1075 | 75 | 100.6s + 8.2s human |
-
-The keep-login branch has been run more than once and reproduces its counts
-exactly — same passes, skips, assertions and request total each time. Only the
-human-wait figure moves, which is the point of splitting it out.
 
 Both reconcile to the same 225 cases (135 offline + 90 live; `LiveGateSuite`
 registers two mutually exclusive cases and runs one).
+
+Both branches have been run more than once and reproduce their counts **exactly**
+— same passes, skips, assertions and request total every time. Only the durations
+move, and only within about a second of suite time. That reproducibility is worth
+more than any single figure here: it is what makes a changed count meaningful
+rather than noise.
 
 **Signing out is the more thorough run**, which is worth knowing before you
 answer the prompt. It costs a Passport sign-in and 3 extra gateway calls, and in
