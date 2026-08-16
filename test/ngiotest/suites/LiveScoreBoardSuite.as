@@ -259,8 +259,6 @@ class ngiotest.suites.LiveScoreBoardSuite extends ngiotest.LiveSuite {
 			}
 
 			var value:Number = 1000 + Math.floor(Math.random() * 9000);
-			t.status("Posting a score of " + value + " to " + board.name + "...");
-
 			board.postScore(value, null, function(score:io.newgrounds.models.objects.Score, error):Void {
 				if (!self.assertNoError(t, error, "postScore accepted")) {
 					t.done();

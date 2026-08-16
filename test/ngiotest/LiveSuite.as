@@ -37,6 +37,12 @@ class ngiotest.LiveSuite extends ngiotest.TestSuite {
 	public function LiveSuite() {
 		super();
 		isLive = true;
+
+		// Initialised here, not at the declarations below: an AS2 declaration
+		// initialiser lives on the PROTOTYPE until the property is first
+		// written, so every suite would otherwise share one stash.
+		this.stashedSessionId = null;
+		this.didStash = false;
 	}
 
 	public function setUp(done:Function):Void {
@@ -83,6 +89,118 @@ class ngiotest.LiveSuite extends ngiotest.TestSuite {
 	/** The signed-in user, or null */
 	public function getUser():io.newgrounds.models.objects.User {
 		return isSignedIn() ? io.newgrounds.models.objects.User(NGIO.getUser()) : null;
+	}
+
+	//==================== SESSION STASHING ====================
+	//
+	// Two suites need the client to be in a session state it is not currently
+	// in, and neither can wait for the tester to be in the right one - the whole
+	// point is that a single run covers every state.
+	//
+	// Stashing is purely LOCAL. The gateway request envelope is built from
+	// appState.session.id (see Core.sendRequest), so clearing that id reproduces
+	// exactly the wire condition of a client with no session, without ending
+	// anything server-side and without disturbing the tester's login. Putting
+	// the id back restores it completely.
+	//
+	// What stashing CANNOT do is fake a guest session: "this session has no
+	// user" is a judgement the SERVER makes, so LiveGuestSuite stashes and then
+	// asks the gateway for a real guest session instead.
+	//
+	// Instance fields, not static - AS2 does not inherit statics, and each suite
+	// stashes and restores entirely within itself. Initialised in the
+	// constructor because an AS2 declaration initialiser lives on the prototype
+	// until first written.
+
+	/** Session id parked by stashSession() */
+	private var stashedSessionId:String;
+
+	/** Whether anything was actually parked, so restore knows to act */
+	private var didStash:Boolean;
+
+	/**
+	 * Locally forget the current session, remembering it for restoreSession().
+	 *
+	 * @return true if a session was parked; false when there was none to park
+	 */
+	public function stashSession():Boolean {
+		if (didStash) {
+			return true;
+		}
+
+		var activeCore:io.newgrounds.Core = getCore();
+		if (activeCore == null || activeCore.appState == null || activeCore.appState.session == null) {
+			return false;
+		}
+
+		var currentId:String = activeCore.appState.session.id;
+		if (currentId == null || currentId == undefined || currentId.length == 0) {
+			return false;
+		}
+
+		stashedSessionId = currentId;
+		didStash = true;
+
+		// Clearing the whole session object rather than just the id, so
+		// hasUser() goes false too. keepAlive returns early unless hasUser(),
+		// which stops the interval firing a ping into the window we just opened.
+		activeCore.appState.session.clearSessionData();
+
+		return true;
+	}
+
+	/**
+	 * Put back whatever stashSession() parked. Safe to call when nothing was.
+	 *
+	 * Restores the id only - the user is re-attached by the server on the next
+	 * checkSession, which is also what re-verifies the session is still alive.
+	 */
+	public function restoreSession():Void {
+		if (!didStash) {
+			return;
+		}
+
+		var activeCore:io.newgrounds.Core = getCore();
+		if (activeCore != null && activeCore.appState != null && activeCore.appState.session != null) {
+			activeCore.appState.session.id = stashedSessionId;
+		}
+
+		didStash = false;
+		stashedSessionId = null;
+	}
+
+	/** The id parked by stashSession(), or null */
+	public function getStashedId():String {
+		return stashedSessionId;
+	}
+
+	/** True while a session is parked */
+	public function hasStashedSession():Boolean {
+		return didStash;
+	}
+
+	//==================== THROTTLE WAIT ====================
+
+	/**
+	 * Run something once the checkSession throttle has expired.
+	 *
+	 * NgioAuthHelper throttles checkSession to one server call every
+	 * CHECKSESSION_THROTTLE_TIME (3) seconds. Inside that window it answers from
+	 * local state and does NOT start a new session, so any test that needs a
+	 * genuine round trip has to wait the throttle out first. That wait is never
+	 * padding.
+	 *
+	 * setInterval rather than a Timer because AS2 has neither Timer nor a
+	 * one-shot setTimeout worth relying on; the handler clears its own id first
+	 * so it behaves as a one-shot. The id is not stored on the instance because
+	 * this is fire-and-forget and self-cancelling.
+	 */
+	public function afterThrottle(action:Function):Void {
+		var waitId:Number = 0;
+		waitId = setInterval(function():Void {
+			clearInterval(waitId);
+			action.call(null);
+		}, ngiotest.TestConfig.SESSION_THROTTLE_WAIT_MS);
 	}
 
 	/**

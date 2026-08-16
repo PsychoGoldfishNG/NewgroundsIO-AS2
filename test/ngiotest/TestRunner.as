@@ -239,6 +239,7 @@ class ngiotest.TestRunner {
 		}
 
 		ngiotest.Reporter.suite(activeSuite.getSuiteName());
+		showSuiteBanner();
 
 		// Say so when a suite runs at its own pace. Otherwise a run that takes
 		// 14 seconds longer than the last one looks like the gateway got
@@ -413,9 +414,41 @@ class ngiotest.TestRunner {
 
 		if (ui != null) {
 			ui.hideButton();
+			// Put the banner back. Without this, whatever a prompt or a status()
+			// call left on screen stays there for the rest of the run - which is
+			// how the stage ended up describing something that had finished
+			// several suites ago.
+			showSuiteBanner();
 		}
 
 		pump();
+	}
+
+	//==================== ON-STAGE TEXT ====================
+
+	/**
+	 * Name the suite in progress, and nothing else.
+	 *
+	 * The on-stage field deliberately does NOT track individual tests. It used
+	 * to, and the result was a line that was almost always describing work that
+	 * had already finished - a test completes in milliseconds, while a person
+	 * reads at human speed. The Output panel is the report; this is a sign
+	 * saying which part of the run you are in.
+	 *
+	 * So it changes exactly twice per suite: when the suite starts, and when a
+	 * test needs an answer from you.
+	 *
+	 * Public because advanceSuite reaches it directly and AS2 has no protected.
+	 */
+	public function showSuiteBanner():Void {
+		if (ui == null || activeSuite == null) {
+			return;
+		}
+
+		ui.setInfo(
+			activeSuite.getSuiteName() + "   (" + (suiteIndex + 1) + " of " + queuedSuites.length + ")" +
+			"\n\nRunning - results appear in the Output panel."
+		);
 	}
 
 	//==================== TIMERS ====================

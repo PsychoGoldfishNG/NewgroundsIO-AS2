@@ -37,8 +37,6 @@ class ngiotest.suites.LiveAppDataSuite extends ngiotest.LiveSuite {
 		add("batch-loads medals, scoreboards and save slots", function(t:ngiotest.TestContext):Void {
 			// One loadData() call for three properties should produce one
 			// request carrying three components, not three requests.
-			t.status("Loading app data...");
-
 			NGIO.loadAppData(["medals", "scoreBoards", "saveSlots"], function(error):Void {
 				if (!self.assertNoError(t, error, "batch load completed")) {
 					t.done();

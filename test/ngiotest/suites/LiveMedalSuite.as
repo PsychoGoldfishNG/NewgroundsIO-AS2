@@ -49,8 +49,6 @@ class ngiotest.suites.LiveMedalSuite extends ngiotest.LiveSuite {
 
 			var scoreBefore:Number = NGIO.getMedalScore();
 			t.note("unlocking " + medal.toString() + " (was unlocked=" + medal.unlocked + ")");
-			t.status("Unlocking " + medal.name + "...");
-
 			medal.unlock(function(unlockedMedal:io.newgrounds.models.objects.Medal, error):Void {
 				if (!self.assertNoError(t, error, "unlock accepted by the server")) {
 					t.done();

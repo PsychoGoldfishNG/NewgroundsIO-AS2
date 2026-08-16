@@ -263,7 +263,11 @@ class ngiotest.TestConfig {
 	 *
 	 *   100ms   ~60 requests in ~25s   REFUSED on request 60   (2026-08-15)
 	 *   1200ms  71 requests, no refusal                        (2026-08-16)
-	 *   750ms   untested when set
+	 *   750ms   73 requests, no refusal, ~93s running          (2026-08-16)
+	 *
+	 * The 750ms row is a real result, not a projection: a full AS2 run made 73
+	 * gateway calls without a refusal, and the AS3 suite did the same on the
+	 * same day. That is the current setting.
 	 *
 	 * Lowering it is low-risk to try: since the run now stops itself at the
 	 * first dead request, guessing too low costs a short burst of honest skips
@@ -290,7 +294,7 @@ class ngiotest.TestConfig {
 	 * Offline suites are never paced - they make no requests, and slowing them
 	 * would only make the suite feel broken.
 	 */
-	public static var LIVE_TEST_PACING_MS:Number = 1200;
+	public static var LIVE_TEST_PACING_MS:Number = 750;
 
 	/**
 	 * Pause before each Loader.* case specifically. -1 uses the value above.

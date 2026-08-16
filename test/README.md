@@ -1,6 +1,7 @@
 # NewgroundsIO-AS2 test suite
 
-201 tests across 16 suites, covering the class library in `../build`. It does
+224 tests across 19 suites — 226 across 20 when a remembered login is found and
+`LiveSignOutSuite` joins the run. Covers the class library in `../build`. It does
 **not** test the drag-and-drop components in `../src` — only the code a
 developer talks to directly (`NGIO`, `Core`, the models, the helpers).
 
@@ -9,10 +10,11 @@ of its tests pass against the live gateway. Where the two suites disagree, the
 disagreement is deliberate and the AS2 test says why in a comment — see
 [Where AS2 differs](#where-as2-differs-from-as3).
 
-> **Runs; two known failures remain, both deliberate.** There is no ActionScript
-> 2 compiler on this machine, so the Flash IDE is the only way to check this. The
-> first compile and the first run each turned up one defect — both in the
-> library, not the tests. See [Status](#status).
+> **Runs green.** There is no ActionScript 2 compiler on this machine, so the
+> Flash IDE is the only way to check this. The first compile and the first run
+> each turned up one defect — both in the library, not the tests — and the two
+> JSON failures that were red by design are now fixed. See [Status](#status) for
+> the last recorded run and for what has changed since it.
 
 ## Running it
 
@@ -40,14 +42,18 @@ else.
 
 ### What you'll be asked to do
 
-The run is unattended until the live tests start. Then the on-stage button
-appears twice:
+The run is unattended until the live tests start. Then the on-stage buttons
+appear up to three times:
 
 1. **"Run live tests"** — a confirmation, so you can read the offline results
    first. Ignore it for 90 seconds and the live suites are skipped cleanly.
-2. **"Open Newgrounds sign-in"** — opens Passport in your browser. Approve the
+2. **"Keep my login" / "Sign out and test it"** — shown **only if a remembered
+   login was found**. Keeping it is the default and an unanswered prompt lands
+   there, so you can ignore this one safely. See
+   [The one state that cannot be manufactured](#the-one-state-that-cannot-be-manufactured).
+3. **"Open Newgrounds sign-in"** — opens Passport in your browser. Approve the
    app and come back; the suite polls until it sees the session and carries on
-   by itself.
+   by itself. Already signed in, this one passes without asking.
 
 You do **not** need to re-lock the medal between runs. `TestConfig.USE_DEBUG_MODE`
 is on by default, so the gateway validates unlocks and score posts normally
@@ -62,12 +68,13 @@ test/
   ngiotest/
     TestConfig.as             every knob: credentials, toggles, timeouts
     TestRunner.as             sequential async runner + watchdog
-    TestContext.as            assertions, done(), prompt()
+    TestContext.as            assertions, done(), prompt(), promptChoice()
     TestSuite.as / TestCase.as
-    TestUI.as                 drives infoText / inputButton / inputButtonLabel
+    TestUI.as                 drives infoText and both button/label pairs
     Reporter.as               output formatting
     NetworkLog.as             per-test packet buffer, printed under [FAIL]
-    LiveSuite.as              base for gateway suites; shared NGIO.init()
+    LiveSuite.as              base for gateway suites; shared NGIO.init(),
+                              session parking, checkSession throttle wait
     suites/                   the tests themselves
 ```
 
@@ -93,9 +100,9 @@ everything that depends on a session.
 | `OfflineModelSuite` | Hand-written model behaviour: `toString`, session clearing, `ScoreBoard.getScores` argument validation, `Errors` codes, `AppState` status derivation, and `HttpStatusHelper` |
 | `OfflineForeignGuardSuite` | The write guards on objects loaded from another app. Confirms `unlock`, `postScore`, `saveData`, `saveDataRaw` and `clearData` all throw on a foreign object — and that the reads (`loadDataRaw`, `getScores`, including `social`) and every local object are left alone |
 
-### Live — real gateway (85 tests)
+### Live — real gateway (89 tests, 91 with the sign-out suite)
 
-The first six suites walk the **session states in order**, and the order is the
+The first suites walk the **session states in order**, and the order is the
 whole point — each tests something only reachable before the next has run. See
 [Session states](#session-states).
 
@@ -103,10 +110,11 @@ whole point — each tests something only reachable before the next has run. See
 |---|---|---|
 | `LiveGateSuite` | no | The confirmation prompt. Registers two cases, runs exactly one |
 | `LiveGatewaySuite` | no | ping, version, server time, host license, custom event. **Read this first when a live run goes wrong** — if ping fails, nothing below matters |
-| `LiveNoSessionSuite` | no | What works with **no session at all**, in the window between `init()` and the first `checkSession()`. Also loads the medal and scoreboard lists that later suites reuse |
-| `LiveSessionSuite` | — | Gets a session, and offers to end an existing one (see [Ending a session](#ending-a-session)) |
-| `LiveGuestSuite` | no | What a **guest session** — session id, no user — is allowed to do. Runs only if the previous suite ended a session |
-| `LiveSignInSuite` | — | The Passport flow. Split out of `LiveSessionSuite` so the guest suite can sit between them |
+| `LiveSignOutSuite` | — | **Only present when a remembered login exists.** Asks whether to sign out; if you do, ends your real login, checks the stored id is gone, and proves the server rejects the ended session. Keeping it is the default |
+| `LiveNoSessionSuite` | no | No session at all. Proves the sixteen components that never touch a session work that way — a medal list on a title screen — and that the session-gated ones are refused with `[102] Missing required session_id`. Also loads the medal and scoreboard lists later suites reuse |
+| `LiveSessionSuite` | — | Proves a session can be obtained at all, before anything depends on one |
+| `LiveGuestSuite` | no | A real session id with no user attached. Reads stay open; writes and per-user queries are refused with `[110] User is not logged in` — a *different* code from the no-session case, which is why these are two suites. Also where `App.endSession` is covered without a prompt |
+| `LiveSignInSuite` | — | The Passport flow. Split out of `LiveSessionSuite` so the guest suite can sit between them. Also checks the session id reaches local storage when — and only when — the server sets `remember` |
 | `LiveAppDataSuite` | partly | Batch-loads medals/scoreboards/save slots, checks counts against `TestConfig`, verifies lookup-by-id returns cached instances |
 | `LiveMedalSuite` | yes | The encrypted `Medal.unlock` path, repeat unlocks, unknown-id rejection, and that an unlock does not touch its neighbours |
 | `LiveScoreBoardSuite` | yes | `postScore` (also encrypted), plus every documented `getScores` filter **including `social`**. Also probes the server's own `limit` clamping and `skip` handling through `callComponent`, since the model throws before those can reach the gateway |
@@ -128,6 +136,33 @@ before:
 | Guest session | **true** | false | `LiveGuestSuite` | `[110] User is not logged in` |
 | Signed in | true | true | everything after `LiveSignInSuite` | — it succeeds |
 
+**A single run covers all three, on any machine, whatever you are logged into.**
+No prompt, no state-dependent skips, and no need to clear anything by hand.
+Neither suite waits for a run that happens to be in the right state — each
+creates it:
+
+| Suite | How it gets there | Cost |
+|---|---|---|
+| `LiveNoSessionSuite` | `setUp` **parks** the session `AppState` restored, `tearDown` puts it back | Nothing sent; no session ended |
+| `LiveGuestSuite` | Parks any login, then asks the gateway for a **real guest session**; ends it; restores the parked login | 3 extra gateway calls |
+
+Parking is purely local and entirely honest: the request envelope is built from
+`appState.session.id`, so clearing that id reproduces exactly the wire condition
+being tested — a request with no `session_id`. Your login is never ended and
+never leaves the machine. `stashSession()` / `restoreSession()` on `LiveSuite`
+do it, and they clear the whole session object rather than just the id so
+`hasUser()` goes false too — otherwise the `keepAlive` interval fires a ping
+into the window that was just opened.
+
+Guest state cannot be faked that way. *"This session has no user"* is a
+judgement the **server** makes, so a locally-faked guest session would still be
+signed in as far as the gateway is concerned and every refusal test would fail.
+Hence the real guest session.
+
+**This is also why `App.endSession` no longer needs a prompt.** It is tested on
+the throwaway guest session the suite just created, so nobody's login is at
+stake.
+
 **The two refusal codes differ, and that is the empirical case for two suites
 rather than one.** With no session there is no `session_id` in the envelope to
 check, so the gateway reports a missing parameter; with a guest session the id is
@@ -135,10 +170,12 @@ present and belongs to nobody. Same call, same component, two genuinely differen
 answers — both asserted, since both are documented `Errors` constants rather than
 transient server conditions.
 
-The no-session window is real but **often unavailable**. `init()` fires only
-`App.logView`, and the `keepAlive` interval returns early unless `hasUser()`, so
-nothing in the library opens a session on its own. But `AppState` picks one up
-during construction from either of two pre-authorised sources:
+**Why parking was necessary at all.** The suite used to rely on finding a
+naturally session-free window between `init()` and the first `checkSession()`.
+`init()` fires only `App.logView`, and the `keepAlive` interval returns early
+unless `hasUser()`, so nothing in the library opens a session on its own — but
+`AppState` picks one up during construction from either of two pre-authorised
+sources:
 
 1. **A remembered session in the SharedObject** (`ngio`), checked **first**. This
    is the usual case when testing locally. It does **not** set
@@ -147,17 +184,11 @@ during construction from either of two pre-authorised sources:
    This is how Newgrounds hands a logged-in session to an embedded game, and it
    **does** set `preauthenticatedId`.
 
-Either way there is no session-free window, and `LiveNoSessionSuite` **skips** —
-"not applicable here", not a failure. The first test names which source it found,
-using `preauthenticatedId` to separate them and `getSavedSessionId()` to confirm
-the remembered case. A session from *neither* source also skips, but says so:
-that would mean the init path had changed.
-
-**To actually run this suite locally, clear the `ngio` SharedObject** — otherwise
-the remembered session closes the window before the first test.
-
-**Registering anything that touches `checkSession` before `LiveNoSessionSuite`
-closes that window permanently.**
+Those are the two common cases — a developer with a remembered login, and a game
+embedded on Newgrounds — so on exactly the machines people test on there was no
+window, and the whole suite reported permanent skips. This file used to tell you
+to clear the `ngio` SharedObject by hand to get around that. **You no longer need
+to**; parking makes the window on demand.
 
 Sixteen of the twenty-five components never touch a session, and games use them
 that way — a medal list or high score table on a title screen, before anyone
@@ -186,48 +217,67 @@ run a developer actually does. Coverage on paper only.
 What they meant to test now lives in the two suites above, where it is
 reachable — and split across the two states, which behave differently.
 
-### Ending a session
+#### The one state that cannot be manufactured
 
-`App.endSession` is awkward to cover: it needs a real signed-in session to be
-worth calling, and calling it invalidates everything downstream. The one moment
-both conditions are safe is the moment a **saved session is first detected**, so
-that is where the test sits — after the session exists, before anything depends
-on who is signed in.
+**Signing out.** A remembered login requires a human to have signed in through
+Passport, so `LiveSignOutSuite` cannot create its own precondition the way the
+other two do. Instead it is **registered only when local storage actually holds a
+session id** — checked before `NGIO.init()`, since the storage helpers are plain
+statics — so a machine with no remembered login simply does not see the suite,
+rather than seeing it skip.
 
-When a saved session is found you get a two-way choice:
+When it is present it **asks**, using both on-stage buttons, and keeping your
+login is the default (an unanswered prompt lands there). Sign out and you get
+three things nothing else covers:
 
-- **Keep this login** — the test skips, so does the Passport sign-in, and so does
-  the whole of `Live / Guest session`.
-- **End session and sign in fresh** — `App.endSession` runs and is checked, then
-  a new guest session is started. `Live / Guest session` then runs, and the
-  Passport tests genuinely execute instead of skipping.
+- `App.endSession` against a **real, signed-in, remembered** session rather than
+  the throwaway guest one `LiveGuestSuite` creates;
+- proof the stored session id is actually removed, so the next launch does not
+  auto-login. `LiveGuestSuite` cannot assert this, because it restores your login
+  afterwards and the library may re-save the id when the server re-verifies it;
+- **proof `endSession` reached the server at all.** It hands its callback nothing
+  and clears local state regardless of the reply, so every other assertion about
+  it describes the client. The follow-up case puts the dead id back and confirms
+  the gateway refuses to honour it.
 
-Signed out already, the test skips: there is nothing to end.
+It runs first, so the rest of the run then exercises the fresh-machine path —
+including a genuine Passport sign-in, which you will have to complete.
 
-**Ending the session is the only way `LiveGuestSuite` runs.** That makes its
-coverage opt-in per run rather than guaranteed — the alternative was signing the
-tester out without asking.
+The other half of that contract is in `LiveSignInSuite`: *saves the session id
+locally when the server says remember* checks the id reaches the SharedObject
+when — and only when — `session.remember` is true. When `remember` is false it
+**skips** rather than asserting the inverse, because
+`finalizeSessionPersistenceState` only ever *writes* on true and never clears on
+false, so an id found in storage during a `remember=false` run may be a
+legitimate leftover from an earlier login. The skip states which answer the
+server gave.
 
 This needs **`inputButton2` / `inputButtonLabel2`** on the stage. They are
-optional — a .fla with only one button skips this one test with a reason and
-runs everything else. `promptChoice()` skips rather than fails for that reason:
-unlike a single prompt there is no sensible default, because the entire point is
-that the harness cannot guess which branch you want.
+optional — a .fla with only one button skips the sign-out prompt with a reason
+and runs everything else. `promptChoice()` skips rather than fails for that
+reason: unlike a single prompt there is no sensible default, because the entire
+point is that the harness cannot guess which branch you want.
 
-Two library behaviours the test pins, both shared with AS3 rather than AS2 quirks:
+### Ending a session
 
-- `endSession()` passes its callback **nothing** — no result, no error — so the
-  only way to tell whether it worked is to inspect the state afterwards.
+Two library behaviours the guest and sign-out suites pin, both shared with AS3
+rather than AS2 quirks:
+
+- `endSession()` passes its callback **nothing** — no result, no error — so
+  inspecting local state afterwards cannot tell you whether the *server* honoured
+  it. `LiveSignOutSuite` is the one place that settles it, by offering the ended
+  id back and confirming the gateway refuses it.
 - `NgioAuthHelper` calls `appState.clearSession()` **synchronously**, right after
   dispatching the component rather than inside its callback, so the local
-  session is already gone by the time the callback runs.
+  session is already gone by the time the callback runs. That is why the client
+  looks signed out whether or not the request ever landed.
 
 And one trap worth knowing outside the tests: `checkSession` is throttled to one
 server call every 3 seconds, and inside that window it answers locally **without
 starting a new session**. A game that calls `endSession()` and immediately
-`checkSession()` gets no session and a misleading `UNVERIFIED`. The test waits
-`TestConfig.SESSION_THROTTLE_WAIT_MS` for exactly this reason — it is not
-padding.
+`checkSession()` gets no session and a misleading `UNVERIFIED`. The tests wait
+`TestConfig.SESSION_THROTTLE_WAIT_MS` (via `LiveSuite.afterThrottle()`) for
+exactly this reason — it is not padding.
 
 ## Configuration
 
@@ -240,6 +290,7 @@ these are `static var` by necessity — nothing in the suite writes to them.
 | `RUN_LIVE_TESTS` | `true` | `false` drops all live suites, including the prompt |
 | `LIVE_TEST_PACING_MS` | `750` | Pause between **live** cases. Offline suites are never paced. Temporarily raised from `100` to stay inside the gateway allowance — see [Pacing](#pacing-temporary), and drop it back once the server-side limit is updated |
 | `LOADER_PACING_MS` | `-1` | Pause before each **Loader** case only. `-1` uses the normal pace; kept as the worked example of `TestSuite.getPacingMs()` |
+| `SESSION_THROTTLE_WAIT_MS` | `4000` | How long to wait before a `checkSession` that must genuinely reach the server. `NgioAuthHelper` throttles it to one server call every 3s, and answers locally *without starting a session* inside that window. `LiveSuite.afterThrottle()` is the shared wait |
 | `USE_DEBUG_MODE` | `true` | Gateway validates without committing. Turn off only to verify persistence — then expect to re-lock the medal on the server |
 | `REQUIRE_LOGIN` | `true` | `false` skips the Passport prompt and everything needing a user |
 | `CONFIRM_BEFORE_LIVE` | `true` | `false` goes straight online |
@@ -396,10 +447,34 @@ Duration:   58.2s running, plus 276.7s waiting for a human (334.9s total)
 
 The first number is what the **suite** costs, and it is the one to judge pacing
 and run cost by. Anything that put a prompt on screen — the live-testing gate,
-the session hand-off choice, Passport sign-in — is charged to the second. A run
+the sign-out choice, Passport sign-in — is charged to the second. A run
 left sitting on the confirmation button used to report the combined figure, which
 reads as a slow suite rather than a distracted tester. Offline-only runs print a
 single number.
+
+### What the on-stage text shows
+
+`infoText` names the **suite** in progress and nothing finer:
+
+```
+Live / Sign-in   (11 of 20)
+
+Running - results appear in the Output panel.
+```
+
+It changes exactly twice per suite: when the suite starts, and when a test needs
+an answer from you — after which the banner comes straight back.
+
+This is deliberate. It used to update per test, which sounds more informative and
+was not: a test finishes in milliseconds while a person reads at human speed, so
+the line on screen was almost always describing work that had already finished,
+and a prompt or status message would sit there for the rest of the run. The
+Output panel is the report; the stage is a sign saying which part of the run you
+are in.
+
+`TestContext.status()` still exists for the one case that earns it — telling you
+the suite is polling after you have clicked through to Passport — but it is not a
+progress display, and the runner overwrites it when the case ends.
 
 ## Debugging a failure
 
@@ -497,14 +572,15 @@ What is known, since this is worth tuning from evidence rather than feel:
 |---|---|
 | 100ms | ~60 requests in ~25s — **refused on request 60** (2026-08-15) |
 | 1200ms | 71 requests, no refusal (2026-08-16) |
-| 750ms | untested when set |
+| 750ms | 75 and 78 requests, no refusal on either (2026-08-16, two runs) |
 
 Lowering it is low-risk to try. Since [the run stops itself](#the-run-stops-itself)
 at the first dead request, guessing too low costs a short burst of honest skips
 rather than a cascade of failures and false passes.
 
 **Pacing dominates the runtime.** At 1200ms it accounted for roughly 102s of a
-~120s suite run — the actual work is closer to 20s. At 750ms that drops to ~64s.
+~120s suite run — the actual work is closer to 20s. At 750ms it is ~68s of a
+measured 99.5s run (90 live cases), so pacing is still two thirds of the clock.
 
 This corrects something this file previously claimed. The earlier note said
 pacing could not help because the limit counts requests rather than measuring a
@@ -871,31 +947,53 @@ on-stage field. The one test that needs a non-ASCII character builds it with
 
 ## Status
 
-**212 passed, 0 failed, 8 skipped, 1045 assertions, 147.5s, 71 gateway calls**
-(run of 2026-08-16).
+**Fully green.** Run twice on 2026-08-16 at 750ms pacing, from a machine with a
+remembered login — once down each branch of the sign-out prompt, so both paths
+through the suite are verified rather than one:
 
-**Fully green.** Every skip states its reason, and none is a masked failure:
+| Sign-out prompt | Passed | Failed | Skipped | Assertions | Requests | Duration |
+|---|---|---|---|---|---|---|
+| **Sign out and test it** | 223 | 0 | 2 | 1076 | 78 | 99.5s + 13.9s human |
+| **Keep my login** | 221 | 0 | 4 | 1075 | 75 | 100.6s + 8.2s human |
 
-| Skipped | Why |
-|---|---|
-| `Live / No session` (all 6) | a remembered session in the SharedObject closed the window — clear it to run them |
-| `ScoreBoard` clamping probes (2) | server-side clamping is not enabled on this gateway |
+The keep-login branch has been run more than once and reproduces its counts
+exactly — same passes, skips, assertions and request total each time. Only the
+human-wait figure moves, which is the point of splitting it out.
 
-That run took the **end session** branch, so `Live / Guest session` executed in
-full — six passes, each carrying the real `[110] User is not logged in.` from the
-gateway — and the Passport sign-in ran for real rather than skipping.
+Both reconcile to the same 225 cases (135 offline + 90 live; `LiveGateSuite`
+registers two mutually exclusive cases and runs one).
 
-Changed since and therefore unrun: live pacing dropped from 1200ms to 750ms, and
-`Duration:` now separates human wait-time from suite time.
+**Signing out is the more thorough run**, which is worth knowing before you
+answer the prompt. It costs a Passport sign-in and 3 extra gateway calls, and in
+exchange the two sign-out cases execute instead of skipping — so it has *fewer*
+skips than keeping your login, not more.
 
-That run also hit the rate limit — one dead request after 60 sent, on the fourth
-`Live / Loader URLs` test — and the new stop handled it: one skip carrying the
+| Skipped | On which branch | Why |
+|---|---|---|
+| `ScoreBoard` clamping probes (2) | both | server-side clamping is not enabled on this gateway — see [Server-side conditions](#server-side-conditions--do-not-chase-these) |
+| `Live / Sign-out` (2) | keep only | you chose to keep your login, so there is no ended session to re-offer |
+
+Every remaining skip is a stated choice or a server-side condition. **No skip is
+a masked failure, and none is state-dependent.** Getting there took four passes:
+10 skips, then 3, then 2, then this — each round replacing a "that state was not
+available today" skip with a suite that **makes** the state.
+
+Two things the sign-out run confirmed for the first time:
+
+- **`endSession` reaches the server.** Re-offering the ended id came back
+  `not-logged-in`, and the gateway did not hand the dead id back. Until this run,
+  every assertion about `endSession` described only the client.
+- **The gateway echoes `remember` on a *restored* session**, not just at the
+  moment of Passport sign-in. Both runs reported `session.remember = true` —
+  the keep-login run on a session restored from the SharedObject and re-verified,
+  the sign-out run on a session freshly issued through Passport. This was an open
+  question when the test was written; had the echo been missing, the library's
+  re-save on every result would quietly stop refreshing a remembered login.
+
+An earlier run also hit the rate limit — one dead request after 60 sent, on the
+fourth `Live / Loader URLs` test — and the stop handled it: one skip carrying the
 explanation, three more skipped without firing a request, and no failures or
 false passes from it. See [Rate limiting](#rate-limiting).
-
-Live pacing has since been raised to 1200ms to keep a full run inside the
-allowance, so expect a duration nearer 100s than 25s, and expect those last
-three loader tests to run rather than skip. See [Pacing](#pacing-temporary).
 
 There is no ActionScript 2 compiler on this machine — `mxmlc` builds AS3 only,
 and the Flash Player debugger here refuses to execute any SWF passed on the

@@ -65,7 +65,6 @@ class ngiotest.suites.LiveGateSuite extends ngiotest.TestSuite {
 					decided = true;
 					t.note("live testing confirmed");
 					t.assert(true, "user opted in");
-					t.status("Starting live tests...");
 					t.done();
 				}
 			);

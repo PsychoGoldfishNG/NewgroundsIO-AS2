@@ -322,7 +322,17 @@ class ngiotest.TestContext {
 	}
 
 	/**
-	 * Update the on-stage status text without asking for input.
+	 * Replace the on-stage text for the rest of THIS case.
+	 *
+	 * Reserved for telling a person what is being waited on after they have
+	 * already interacted - the Passport poll is the only caller. It is not a
+	 * progress display: the runner restores its own suite banner as soon as the
+	 * case ends, and the Output panel is the report.
+	 *
+	 * It used to be called from a dozen tests ("Unlocking X...", "Loading app
+	 * data...") and those were removed. Each message outlived the work it
+	 * described, so the stage usually showed a line that had nothing to do with
+	 * what the run was actually doing.
 	 */
 	public function status(message:String):Void {
 		if (ui != null) {

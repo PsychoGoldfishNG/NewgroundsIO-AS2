@@ -12,6 +12,8 @@
  * This is the only suite that waits on a human.
  */
 import io.newgrounds.SessionStatus;
+import io.newgrounds.helpers.AppStateBootstrapHelper;
+import io.newgrounds.models.objects.Session;
 import io.newgrounds.models.objects.User;
 
 import ngiotest.LiveSuite;
@@ -42,19 +44,12 @@ class ngiotest.suites.LiveSignInSuite extends ngiotest.LiveSuite {
 
 		var self:ngiotest.suites.LiveSignInSuite = this;
 
-		add("offers a passport url for a guest session", function(t:ngiotest.TestContext):Void {
-			if (self.isSignedIn()) {
-				t.skip("already signed in, so there is no passport url to offer");
-				return;
-			}
-
-			var passportUrl:String = self.getCore().appState.session.passport_url;
-			if (t.assertNotNull(passportUrl, "passport url supplied by the server")) {
-				t.assertTrue(passportUrl.indexOf("http") == 0, "passport url is absolute");
-				t.note(passportUrl);
-			}
-			t.done();
-		});
+		// "offers a passport url for a guest session" lives in LiveGuestSuite,
+		// not here. It could only ever run when the tester was NOT already
+		// signed in, and this suite is where a user gets attached - so on any
+		// machine with a remembered login it reported a permanent skip. The
+		// guest suite guarantees a guest session, which is precisely the state
+		// that carries a passport_url.
 
 		// Deliberately generous: this test is bounded by how fast a person can
 		// sign in, not by the network.
@@ -106,6 +101,51 @@ class ngiotest.suites.LiveSignInSuite extends ngiotest.LiveSuite {
 
 			t.assertTrue(NGIO.hasUser(), "hasUser() agrees");
 			t.assertTrue(NGIO.hasSession(), "hasSession() agrees");
+			t.done();
+		});
+
+		add("saves the session id locally when the server says remember", function(t:ngiotest.TestContext):Void {
+			if (self.skipUnlessSignedIn(t)) {
+				return;
+			}
+
+			// The auto-login half of the sign-out suite's contract, from the other
+			// end: LiveSignOutSuite proves the stored id is REMOVED on sign-out,
+			// and this proves it was PUT THERE in the first place - and only when
+			// the server asked for it.
+			var session:io.newgrounds.models.objects.Session = self.getCore().appState.session;
+			if (!t.assertNotNull(session, "a session object is held")) {
+				t.done();
+				return;
+			}
+
+			var storageKey:String = self.getCore().appState.sessionStorageKey;
+			var storedId:String = io.newgrounds.helpers.AppStateBootstrapHelper.getSavedSessionId(storageKey);
+			var hasStored:Boolean = (storedId != null && storedId != undefined && storedId.length > 0);
+
+			t.note("session.remember = " + session.remember +
+			       ", storage " + (hasStored ? "holds an id" : "is empty"));
+
+			// SKIPPED RATHER THAN INVERTED when remember is false, and the reason
+			// is not squeamishness - it is that the opposite assertion would be
+			// unsound. finalizeSessionPersistenceState only ever WRITES on
+			// remember=true; it never clears on false. So an id sitting in storage
+			// during a remember=false run may be a perfectly legitimate leftover
+			// from an earlier remembered login, and "storage is empty" is not
+			// something this run can require.
+			//
+			// Choosing not to be remembered is a real answer to the question, so it
+			// reads as a skip with the reason stated, not a failure.
+			if (session.remember !== true) {
+				t.skip("the server did not ask us to remember this session" +
+				       (hasStored ? " (an id from an earlier remembered login is still stored)" : ""));
+				return;
+			}
+
+			t.assertTrue(hasStored, "a session id was written to local storage");
+			t.assertEquals(session.id, storedId, "and it is THIS session's id");
+			t.note("this machine will auto-log-in on the next run; " +
+			       "the Live / Sign-out suite is what removes it again");
 			t.done();
 		});
 

@@ -51,8 +51,6 @@ class ngiotest.suites.LiveCloudSaveSuite extends ngiotest.LiveSuite {
 
 			// Unique per run, so a stale read cannot pass by accident.
 			self.writtenPayload = "ngio-as2-unit-test:" + new Date().getTime();
-			t.status("Writing to cloud save slot " + slot.id + "...");
-
 			slot.saveDataRaw(self.writtenPayload, function(error):Void {
 				self.assertNoError(t, error, "saveDataRaw accepted");
 				t.done();

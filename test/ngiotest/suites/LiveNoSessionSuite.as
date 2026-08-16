@@ -3,33 +3,37 @@
  *
  * Everything the gateway will do for a client that has NO session at all.
  *
- * Runs immediately after LiveGatewaySuite and before LiveSessionSuite, in the
- * window between NGIO.init() and the first checkSession(). That window is real
- * and stable: init() only fires App.logView, which needs no session, and the
- * keepAlive interval started alongside it returns early unless hasUser(), so
- * nothing can quietly open a session behind these tests.
- *
  * WHY IT IS WORTH HAVING. Sixteen of the twenty-five components never touch a
  * session, and games use them that way - a medal list or a high score table
  * shown on a title screen, before anyone has signed in. Nothing else in the
  * suite proves those calls work with no session_id in the envelope, because
  * every other live suite runs after the session exists.
  *
- * It also loads the medal and scoreboard lists early, which the guest suite
- * later reuses.
+ * THIS SUITE MAKES ITS OWN WINDOW, so it runs on every machine in every login
+ * state. setUp() parks whatever session AppState restored during construction
+ * and tearDown() puts it back.
+ *
+ * That is honest rather than a shortcut: the request envelope is built from
+ * appState.session.id (Core.sendRequest), so clearing it locally reproduces
+ * exactly the wire condition being tested - a request with no session_id. No
+ * session is ended, nothing is sent, and the tester's login is untouched.
+ *
+ * It used to rely on finding a naturally session-free window between init() and
+ * the first checkSession(). That window does not exist for either common case -
+ * a developer with a remembered login, or a game embedded on Newgrounds where
+ * the page URL supplies ngio_session_id - so on exactly the machines people test
+ * on the whole suite reported permanent skips, and the only way to run it was to
+ * clear the SharedObject and start again.
+ *
+ * MUST RUN BEFORE anything loads medals while signed in. Its unlock test asserts
+ * the medal is not flagged unlocked, which only holds while the cache reflects a
+ * sessionless read.
  */
 import ngiotest.LiveSuite;
 import ngiotest.TestConfig;
 import ngiotest.TestContext;
 
 class ngiotest.suites.LiveNoSessionSuite extends ngiotest.LiveSuite {
-
-	/**
-	 * False once anything has opened a session, which makes the whole suite
-	 * meaningless. Static for the same reason LiveSuite.didInit is - and read
-	 * through the full path, because AS2 does not inherit statics.
-	 */
-	private static var sessionFree:Boolean = true;
 
 	public function LiveNoSessionSuite() {
 		super();
@@ -39,68 +43,37 @@ class ngiotest.suites.LiveNoSessionSuite extends ngiotest.LiveSuite {
 		return "Live / No session";
 	}
 
+	public function setUp(done:Function):Void {
+		var self:ngiotest.suites.LiveNoSessionSuite = this;
+
+		// super.setUp performs the one-time NGIO.init(), so the session only
+		// exists to be parked after it has run.
+		super.setUp(function():Void {
+			self.stashSession();
+			done.call(null);
+		});
+	}
+
+	public function tearDown(done:Function):Void {
+		restoreSession();
+		done.call(null);
+	}
+
 	public function build():Void {
 
 		var self:ngiotest.suites.LiveNoSessionSuite = this;
 
-		add("starts with no session at all", function(t:ngiotest.TestContext):Void {
-			// The precondition for everything below.
-			//
-			// A SESSION ALREADY EXISTING IS NOT A FAILURE. AppState picks one up
-			// during construction from either of TWO pre-authorised sources, and
-			// both are normal:
-			//
-			//   1. A "remember me" session saved in the SharedObject, checked
-			//      FIRST. This is the usual one when testing locally, and it does
-			//      NOT set preauthenticatedId.
-			//   2. ngio_session_id on the page URL, checked only if there was no
-			//      saved one. This is how Newgrounds hands a logged-in session to
-			//      an embedded game, and it DOES set preauthenticatedId.
-			//
-			// Either way there is no session-free window to test in, and the
-			// honest answer is "not applicable here", not "broken". Everything
-			// below skips on the same condition, so such a run reports clean
-			// skips rather than a cascade of failures.
-			var hasSession:Boolean = NGIO.hasSession();
-			ngiotest.suites.LiveNoSessionSuite.sessionFree = !hasSession;
-
-			if (hasSession) {
-				var appState:io.newgrounds.AppState = self.getCore().appState;
-				var session = appState.session;
-
-				// preauthenticatedId is set only by the URL path, which is what
-				// separates source 2 from source 1.
-				var fromUrl:Boolean = (session != null &&
-				                       session.preauthenticatedId != null &&
-				                       session.preauthenticatedId.length > 0);
-
-				var savedId:String = io.newgrounds.helpers.AppStateBootstrapHelper.getSavedSessionId(
-					appState.sessionStorageKey);
-				var remembered:Boolean = (savedId != null && savedId.length > 0);
-
-				if (fromUrl) {
-					t.skip("the page URL supplied a session id (ngio_session_id), which is normal - " +
-					       "no session-free window exists in this environment");
-				} else if (remembered) {
-					t.skip("a remembered session was restored from the SharedObject, which is normal - " +
-					       "no session-free window exists in this environment. Clear the 'ngio' " +
-					       "SharedObject to run this suite");
-				} else {
-					// Neither source explains it, which WOULD mean the init path
-					// changed. Still a skip rather than a failure - the suite
-					// cannot run either way - but said plainly.
-					t.skip("a session exists from neither the URL nor the SharedObject - " +
-					       "worth checking whether something in the init path now opens one");
-				}
-
-				t.note("session id present before checkSession() was ever called: " +
-				       self.getCore().sessionId);
-				return;
-			}
-
+		add("holds no session at all", function(t:ngiotest.TestContext):Void {
+			// The precondition for everything below. After setUp this is true on
+			// every machine, whether or not one was restored.
+			t.assertFalse(NGIO.hasSession(), "no session is held");
 			t.assertFalse(NGIO.hasUser(), "and no user");
 			t.assertNull(self.getCore().sessionId, "no session id on Core");
-			t.note("init() fires only App.logView, so this window is genuinely session-free");
+
+			t.note(self.hasStashedSession()
+			     ? "a restored session was parked for the duration of this suite, and is put " +
+			       "back in tearDown - nothing was ended server-side"
+			     : "nothing had opened a session yet, so this window was already open");
 			t.done();
 		});
 
@@ -252,14 +225,17 @@ class ngiotest.suites.LiveNoSessionSuite extends ngiotest.LiveSuite {
 	//==================== HELPERS ====================
 
 	/**
-	 * Skip when a session exists, so this suite never reports a pass for a
-	 * condition it did not actually meet.
+	 * Safety net: nothing in this suite opens a session, and setUp guarantees
+	 * there is none, so this should never fire. It stays because a pass recorded
+	 * against the wrong state is worse than a skip - if some future change
+	 * starts a session mid-suite, this says so rather than quietly reporting
+	 * green.
 	 *
 	 * Public because the closures above reach it through `self`.
 	 */
 	public function skipUnlessSessionFree(t:ngiotest.TestContext):Boolean {
-		if (!ngiotest.suites.LiveNoSessionSuite.sessionFree || NGIO.hasSession()) {
-			t.skip("a session exists, so this is no longer a no-session test");
+		if (NGIO.hasSession()) {
+			t.skip("a session appeared during this suite, so this is no longer a no-session test");
 			return true;
 		}
 		return false;

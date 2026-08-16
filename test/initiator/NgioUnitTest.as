@@ -29,6 +29,7 @@ import ngiotest.suites.LiveNoSessionSuite;
 import ngiotest.suites.LiveScoreBoardSuite;
 import ngiotest.suites.LiveSessionSuite;
 import ngiotest.suites.LiveSignInSuite;
+import ngiotest.suites.LiveSignOutSuite;
 import ngiotest.suites.OfflineBaseObjectSuite;
 import ngiotest.suites.OfflineCryptoSuite;
 import ngiotest.suites.OfflineForeignGuardSuite;
@@ -130,19 +131,38 @@ class initiator.NgioUnitTest {
 
 		// --- live: real gateway ---
 		//
-		// The first four walk the session states in order, and the order is the
-		// whole point - each one tests something only reachable before the next
-		// has run:
+		// These walk the session states in order. Each one MAKES the state it
+		// tests rather than waiting for a run that happens to be in it, so one
+		// run covers all three on any machine whatever the tester is logged
+		// into:
 		//
-		//   No session   nothing has opened one yet (init only fires App.logView)
-		//   Session      a session appears, and an existing one may be ended
-		//   Guest        session id, no user - only if one was just ended
-		//   Sign-in      Passport attaches a user
+		//   No session     parks the restored session locally, runs, puts it
+		//                  back. Nothing is ended, nothing is sent.
+		//   Session        proves a session can be obtained at all.
+		//   Guest          parks any login, asks the gateway for a real guest
+		//                  session, ends it (which is where App.endSession is
+		//                  covered), then restores.
+		//   Sign-in        Passport, or confirms an existing login.
 		//
-		// Inserting anything that touches checkSession before LiveNoSessionSuite
-		// closes that window permanently.
+		// BOTH no-session and guest MUST run before anything loads medals while
+		// signed in - each asserts that no medal comes back unlocked, which only
+		// holds while the cache reflects a sessionless read.
 		runner.addSuite(new ngiotest.suites.LiveGateSuite());
 		runner.addSuite(new ngiotest.suites.LiveGatewaySuite());
+		// Signing out is the one session state that CANNOT be manufactured - a
+		// remembered login needs a human to have signed in through Passport. So
+		// this suite is registered only when the SharedObject actually holds
+		// one, rather than reporting a permanent skip on a machine that has
+		// none. It asks before doing anything, and keeping the login is the
+		// default.
+		//
+		// First, because the session has to still be there to end - and because
+		// signing out here means the rest of the run exercises the fresh-machine
+		// path, Passport sign-in included.
+		if (ngiotest.suites.LiveSignOutSuite.hasRememberedLogin()) {
+			runner.addSuite(new ngiotest.suites.LiveSignOutSuite());
+		}
+
 		runner.addSuite(new ngiotest.suites.LiveNoSessionSuite());
 		runner.addSuite(new ngiotest.suites.LiveSessionSuite());
 		runner.addSuite(new ngiotest.suites.LiveGuestSuite());
