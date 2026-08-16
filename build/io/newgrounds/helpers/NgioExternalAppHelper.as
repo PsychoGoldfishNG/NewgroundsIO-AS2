@@ -39,7 +39,7 @@ class io.newgrounds.helpers.NgioExternalAppHelper {
 		if (thisArg == undefined) thisArg = null;
 		validate(core, appId);
 
-		call(core, appId, "Medal.getList", { app_id: appId }, "medals", callback, thisArg);
+		dispatch(core, appId, "Medal.getList", { app_id: appId }, "medals", callback, thisArg);
 	}
 
 	/**
@@ -64,7 +64,7 @@ class io.newgrounds.helpers.NgioExternalAppHelper {
 		params.app_id = appId;
 		params.id = boardId;
 
-		call(core, appId, "ScoreBoard.getScores", params, "scores", callback, thisArg);
+		dispatch(core, appId, "ScoreBoard.getScores", params, "scores", callback, thisArg);
 	}
 
 	/**
@@ -79,7 +79,7 @@ class io.newgrounds.helpers.NgioExternalAppHelper {
 		if (thisArg == undefined) thisArg = null;
 		validate(core, appId);
 
-		call(core, appId, "CloudSave.loadSlots", { app_id: appId }, "slots", callback, thisArg);
+		dispatch(core, appId, "CloudSave.loadSlots", { app_id: appId }, "slots", callback, thisArg);
 	}
 
 	/**
@@ -95,7 +95,7 @@ class io.newgrounds.helpers.NgioExternalAppHelper {
 		if (thisArg == undefined) thisArg = null;
 		validate(core, appId);
 
-		call(core, appId, "CloudSave.loadSlot", { app_id: appId, id: slotId }, "slot", callback, thisArg);
+		dispatch(core, appId, "CloudSave.loadSlot", { app_id: appId, id: slotId }, "slot", callback, thisArg);
 	}
 
 	//==================== PRIVATE METHODS ====================
@@ -126,9 +126,15 @@ class io.newgrounds.helpers.NgioExternalAppHelper {
 	/**
 	 * Shared request/unwrap path for all four components.
 	 *
+	 * NAMED dispatch(), NOT call(). ActionScript 2 inherits a global call(frame)
+	 * action from ActionScript 1, and an unqualified call(...) inside a class
+	 * resolves to THAT rather than to a private static of the same name - so the
+	 * compiler rejects every call site with "Wrong number of parameters; call
+	 * requires exactly 1". Do not rename it back.
+	 *
 	 * @param resultProperty The property on the result model holding the payload
 	 */
-	private static function call(core:io.newgrounds.Core, appId:String, componentPath:String, params:Object, resultProperty:String, callback:Function, thisArg):Void {
+	private static function dispatch(core:io.newgrounds.Core, appId:String, componentPath:String, params:Object, resultProperty:String, callback:Function, thisArg):Void {
 		// Locals are captured by the closure below; `this` is not bound in AS2
 		// closures, so nothing here may rely on it.
 		core.callComponent(componentPath, params, function(response, callbackParams) {
@@ -186,7 +192,20 @@ class io.newgrounds.helpers.NgioExternalAppHelper {
 		var i:Number;
 
 		if (value instanceof Array) {
-			var list:Array = Array(value);
+			// Iterated directly, NOT through Array(value).
+			//
+			// `Array(x)` is not a cast in ActionScript 2 - it is the
+			// ECMAScript Array conversion function, and called with a single
+			// non-numeric argument it returns a NEW ONE-ELEMENT ARRAY wrapping
+			// what it was given. So Array(someArray) is [someArray], this loop
+			// found one entry (the original array), recursed on it, wrapped it
+			// again, and never terminated: "256 levels of recursion were
+			// exceeded in one action list".
+			//
+			// The AS3 original says `value as Array`, which really is a cast and
+			// really does return the same array. There is no AS2 equivalent, and
+			// none is needed - `value` is untyped and already an Array here.
+			var list:Array = value;
 			for (i = 0; i < list.length; i++) {
 				stampForeign(list[i], appId);
 			}
