@@ -5,6 +5,7 @@
  *
  * This class acts as a cache and store for all data loaded from the server.
  */
+import io.newgrounds.Errors;
 import io.newgrounds.helpers.AppStateBootstrapHelper;
 import io.newgrounds.helpers.AppStateComponentHelper;
 import io.newgrounds.helpers.AppStateResultUpdateHelper;
@@ -73,6 +74,14 @@ class io.newgrounds.AppState {
 	public function AppState(core:io.newgrounds.Core) {
 		this.core = core;
 
+		// Assigned here, not just at the declaration. In AS2 a property
+		// initialiser lives on the PROTOTYPE until the property is first
+		// written on an instance - so every AppState would have pushed
+		// markLoaded() names into one array shared by all of them, and a
+		// second Core would have started life believing the first one's data
+		// was already loaded.
+		this.dataLoaded = [];
+
 		this.session = new io.newgrounds.models.objects.Session();
 		this.session.id = null;
 
@@ -94,6 +103,147 @@ class io.newgrounds.AppState {
 		this.host = io.newgrounds.helpers.AppStateBootstrapHelper.resolveHost();
 	}
 
+	//==================== PRIVATE HELPERS ====================
+
+	/**
+	 * Index of a value in an array, or -1.
+	 *
+	 * ActionScript 2 has NO Array.indexOf - it was an AS3 addition, and AVM1
+	 * returns undefined for it with no error. That is worse than a crash here:
+	 * `undefined == -1` is false and `undefined != -1` is true, so every guard
+	 * written against it silently inverted. hasLoaded() answered true for data
+	 * that had never been loaded, markLoaded() returned early and recorded
+	 * nothing, and loadData() accepted property names that do not exist.
+	 *
+	 * Kept private and named differently from indexOf so nothing can shadow the
+	 * real thing on some future player.
+	 */
+	/**
+	 * Every component-level failure in a response, as {component, error} pairs.
+	 *
+	 * A gateway request has THREE independent layers at which it can fail, and
+	 * they mean different things:
+	 *
+	 *   1. TRANSPORT  no HTTP response arrived at all. Core.onHTTPResponse
+	 *                 builds the error; nothing below ever runs.
+	 *   2. ENVELOPE   response.success !== true. The request as a whole was
+	 *                 rejected - bad app id, malformed body, unparseable reply.
+	 *                 No component ran.
+	 *   3. COMPONENT  result.success !== true. THIS component failed. Others in
+	 *                 the same envelope may have succeeded perfectly well.
+	 *
+	 * Layer 3 exists because an envelope can carry several components at once,
+	 * so "did it work" is not one question - it is one question per component,
+	 * and the answer has to say WHERE. That is what this returns.
+	 *
+	 * Each entry names the component (from the result's objectName, e.g.
+	 * "CloudSave.loadSlots") alongside its error, so a partial failure can be
+	 * reported precisely rather than as an anonymous "something went wrong".
+	 *
+	 * PUBLIC because the executeQueue closure in loadData has to reach it - AS2
+	 * cannot resolve a private static from inside a nested function.
+	 */
+	public static function resultErrors(response):Array {
+		var found:Array = [];
+
+		if (response == null) {
+			return found;
+		}
+
+		// Both response shapes. A single component comes back as `result`, a
+		// queue of them as `resultList`, and loadData produces either depending
+		// on how many property names it was given.
+		var list:Array = response.getResultList();
+
+		if (list == null) {
+			io.newgrounds.AppState.collectResultError(response.getResult(), found);
+			return found;
+		}
+
+		for (var i:Number = 0; i < list.length; i++) {
+			io.newgrounds.AppState.collectResultError(list[i], found);
+		}
+
+		return found;
+	}
+
+	/**
+	 * Append one result's failure to `found`, if it failed.
+	 *
+	 * Public for the same reason as resultErrors.
+	 */
+	public static function collectResultError(result, found:Array):Void {
+		var error = io.newgrounds.AppState.resultError(result);
+
+		if (error == null) {
+			return;
+		}
+
+		// objectName is the component path the result belongs to. A result the
+		// factory could not type has none, and is still worth reporting - just
+		// without a name.
+		var componentName:String = "(unidentified component)";
+		if (result != null && result.objectName != undefined && result.objectName != null) {
+			componentName = String(result.objectName);
+		}
+
+		found.push({ component: componentName, error: error });
+	}
+
+	/**
+	 * The first component-level failure, or null if every component succeeded.
+	 *
+	 * What loadData hands its callback. Reporting the first rather than all of
+	 * them keeps the (appState, error) signature unchanged; callers wanting the
+	 * full picture have two better tools - resultErrors() for the detail, and
+	 * hasLoaded() to ask which properties actually arrived, since the ones that
+	 * succeeded are still cached.
+	 *
+	 * Public for the same reason as resultErrors.
+	 */
+	public static function firstResultError(response) {
+		var found:Array = io.newgrounds.AppState.resultErrors(response);
+		return (found.length > 0) ? found[0].error : null;
+	}
+
+	/**
+	 * The error on one result, or null when it succeeded.
+	 *
+	 * A result that reports success !== true but carries no error still has to
+	 * produce something, or the caller is back to a silent failure.
+	 *
+	 * Public for the same reason as firstResultError.
+	 */
+	public static function resultError(result) {
+		if (result == null || result == undefined) {
+			return null;
+		}
+
+		if (result.success === true) {
+			return null;
+		}
+
+		if (result.error != null && result.error != undefined) {
+			return result.error;
+		}
+
+		return io.newgrounds.Errors.getError(io.newgrounds.Errors.INVALID_RESPONSE, null, false);
+	}
+
+	private static function indexOfValue(list:Array, value):Number {
+		if (list == null) {
+			return -1;
+		}
+
+		for (var i:Number = 0; i < list.length; i++) {
+			if (list[i] === value) {
+				return i;
+			}
+		}
+
+		return -1;
+	}
+
 	//==================== PUBLIC METHODS ====================
 
 	/**
@@ -112,7 +262,7 @@ class io.newgrounds.AppState {
 
 		for (var i:Number = 0; i < propertyNames.length; i++) {
 			var propertyName:String = propertyNames[i];
-			if (io.newgrounds.AppState.dataProperties.indexOf(propertyName) == -1) {
+			if (indexOfValue(io.newgrounds.AppState.dataProperties, propertyName) == -1) {
 				throw new Error("Unknown property name: " + propertyName);
 			}
 		}
@@ -126,8 +276,32 @@ class io.newgrounds.AppState {
 
 		var self:io.newgrounds.AppState = this;
 		core.executeQueue(function(response):Void {
-			if (response != null && response.error != null) {
+			// A failed load surfaces at either of two levels, and BOTH have to be
+			// checked - the same pattern NgioLoaderHelper.loadUrl, Medal.unlock
+			// and ScoreBoard.getScores use.
+			//
+			// Only the response level was checked here. A request can succeed
+			// while an individual COMPONENT is refused, and that is the common
+			// case rather than an exotic one: ask for saveSlots or medalScore
+			// without being logged in and the gateway returns
+			//
+			//   {"success":true,"result":[{"data":{"success":false,
+			//     "error":{"code":110,"message":"User is not logged in."}}}]}
+			//
+			// - a successful response carrying a refused component. The caller
+			// got (appState, null): no data and no reason. A game would read that
+			// as "this user has no saves" rather than "this user is not signed
+			// in", and NGIO.loadSaveSlots / loadMedalScore / loadAppData all
+			// inherit it.
+			if (response == null) {
+				localError = io.newgrounds.Errors.getError(io.newgrounds.Errors.INVALID_RESPONSE, null, false);
+			} else if (response.error != null) {
 				localError = response.error;
+			} else {
+				// Fully qualified: AS2 cannot resolve a static from inside a
+				// nested function, and a bare name here would silently be
+				// undefined rather than a compile error.
+				localError = io.newgrounds.AppState.firstResultError(response);
 			}
 
 			if (callback != null) {
@@ -143,11 +317,11 @@ class io.newgrounds.AppState {
 	 * @return true if property has been loaded, false otherwise
 	 */
 	public function hasLoaded(propertyName:String):Boolean {
-		if (io.newgrounds.AppState.dataProperties.indexOf(propertyName) == -1) {
+		if (indexOfValue(io.newgrounds.AppState.dataProperties, propertyName) == -1) {
 			throw new Error("Unknown property name: " + propertyName);
 		}
 
-		return (dataLoaded.indexOf(propertyName) != -1);
+		return (indexOfValue(dataLoaded, propertyName) != -1);
 	}
 
 	/**
@@ -194,11 +368,11 @@ class io.newgrounds.AppState {
 	 * Records that a property has been loaded from the server
 	 */
 	public function markLoaded(propertyName:String):Void {
-		if (io.newgrounds.AppState.dataProperties.indexOf(propertyName) == -1) {
+		if (indexOfValue(io.newgrounds.AppState.dataProperties, propertyName) == -1) {
 			throw new Error("Unknown property name: " + propertyName);
 		}
 
-		if (dataLoaded.indexOf(propertyName) != -1) {
+		if (indexOfValue(dataLoaded, propertyName) != -1) {
 			return;
 		}
 
