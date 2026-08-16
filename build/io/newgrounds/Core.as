@@ -52,6 +52,19 @@ class io.newgrounds.Core {
 	public var debugNetworkCalls:Boolean = false;
 
 	/**
+	 * Optional observer for raw gateway traffic, as
+	 * function(direction:String, detail:String):Void
+	 *
+	 * Where debugNetworkCalls only traces, this hands the packets to your own
+	 * code, so they can be attached to a log entry, shown in-game, or held
+	 * against a failing test. Independent of debugNetworkCalls - either, both
+	 * or neither may be enabled.
+	 *
+	 * `direction` is one of "request", "response" or "error".
+	 */
+	public var networkObserver:Function = null;
+
+	/**
 	 * Stores the app ID provided at initialization
 	 */
 	public var appId:String;
@@ -319,6 +332,26 @@ class io.newgrounds.Core {
 	}
 
 	/**
+	 * Hands a raw gateway packet to networkObserver, if one is attached.
+	 *
+	 * Called by the transport helper at the same points that honour
+	 * debugNetworkCalls. Failures in an observer are swallowed: a broken
+	 * logger must not take a live request down with it.
+	 *
+	 * @param direction "request", "response" or "error"
+	 * @param detail The raw payload, or an error description
+	 */
+	public function reportNetworkActivity(direction:String, detail:String):Void {
+		if (this.networkObserver == null) {
+			return;
+		}
+		try {
+			this.networkObserver.call(null, direction, detail);
+		} catch (e) {
+		}
+	}
+
+	/**
 	 * Internal forwarding entry for transport helper event callbacks.
 	 */
 	public function forwardHTTPResponse(statusCode:Number, responseText:String, callback:Function, thisArg):Void {
@@ -333,7 +366,34 @@ class io.newgrounds.Core {
 		var responseModel = io.newgrounds.models.objects.ObjectFactory.CreateObject("Response", null, this);
 
 		if (statusCode < 200 || statusCode > 299) {
-			responseModel.error = io.newgrounds.Errors.getError(statusCode);
+			// Mapped rather than used directly, matching AS3's Core.onHTTPResponse.
+			//
+			// Errors.getError(statusCode) treated the HTTP status AS an Errors code.
+			// That silently produced a plausible-looking lie: LoadVars reports no
+			// HTTP status at all, so CoreTransportHelper synthesises 500 when no
+			// body arrives, and 500 happens to be a real Errors constant whose
+			// message is "An unexpected error has occurred on the server. If error
+			// persists, contact support." Every transport failure the library can
+			// have - rate limited, offline, DNS, blocked domain, gateway down - told
+			// the game the SERVER had failed and sent the player to support.
+			//
+			// codeForStatus() falls back by CLASS, so an unlisted code like 502
+			// still reads as a server problem instead of becoming an unrecognised
+			// code with no message.
+			//
+			// statusCode is UNKNOWN_STATUS (0) whenever the transport could not
+			// learn a real one, which in AS2 is most of the time - LoadVars only
+			// reports a status when the host supplies it. That maps to
+			// INVALID_RESPONSE and the message "The gateway request failed, and no
+			// HTTP status was reported", which is the honest answer. It is NOT
+			// dressed up as a 500: claiming the server failed when the request may
+			// never have left the machine is what this branch used to do, and it
+			// sent players to support for their own dropped connections.
+			responseModel.error = io.newgrounds.helpers.HttpStatusHelper.errorForStatus(
+				statusCode,
+				"The gateway request",
+				null
+			);
 		} else {
 			var jsonObject:Object = null;
 			try {
@@ -347,9 +407,26 @@ class io.newgrounds.Core {
 				// REPLY could not be parsed. 505 is the one code the client raises
 				// rather than the server, and the import-failure branch below already
 				// uses it correctly.
-				responseModel.error = io.newgrounds.Errors.getError(
-					io.newgrounds.Errors.INVALID_RESPONSE,
-					"Unable to parse JSON response"
+				//
+				// Routed through the same helper as the branch above, again matching
+				// AS3. codeForStatus() returns INVALID_RESPONSE for any 2xx - the
+				// status was fine and the BODY was the problem, which is what a proxy
+				// interstitial, an error page or a truncated reply looks like - so the
+				// code is unchanged here too. The message gains the status and quotes
+				// the parser, which names the offending character and position.
+				//
+				// The detail is read defensively because this decoder throws two
+				// different shapes: decode()'s _error() throws an object carrying
+				// .message, while the background_decode paths throw bare strings.
+				// AS3 can just read error.message; here that would be undefined for
+				// half the cases. (errorForStatus ignores a null detail, so an
+				// unrecognised shape degrades to no detail rather than "undefined".)
+				var parseDetail:String = (error.message != undefined) ? error.message : String(error);
+
+				responseModel.error = io.newgrounds.helpers.HttpStatusHelper.errorForStatus(
+					statusCode,
+					"The gateway request",
+					parseDetail
 				);
 
 				jsonObject = null;
