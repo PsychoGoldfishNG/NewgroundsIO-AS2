@@ -162,6 +162,23 @@ class io.newgrounds.models.objects.SaveSlot extends io.newgrounds.BaseObject {
 		}
 
 		var lv:LoadVars = new LoadVars();
+
+		// The real HTTP status, when the player can tell us one. onHTTPStatus
+		// exists on LoadVars in Flash Player 8+, but it only reports a code when
+		// the host supplies one - the standalone player and IDE test movie
+		// commonly never call it, or call it with 0. Stays UNKNOWN_STATUS unless
+		// we genuinely learn otherwise, matching io.newgrounds.helpers.CoreTransportHelper.
+		var httpStatus:Number = io.newgrounds.helpers.HttpStatusHelper.UNKNOWN_STATUS;
+
+		// Parameter named `status`, not `httpStatus` - AS2 closures capture
+		// enclosing locals, and a same-named parameter would quietly shadow it
+		// instead of writing to the captured variable above.
+		lv.onHTTPStatus = function(status:Number):Void {
+			if (status != undefined && status != null && status > 0) {
+				httpStatus = status;
+			}
+		};
+
 		lv.onData = function(src:String):Void {
 			if (src != undefined && src != null) {
 				self.error = null;
@@ -169,7 +186,7 @@ class io.newgrounds.models.objects.SaveSlot extends io.newgrounds.BaseObject {
 					callback.call(thisArg, src, null);
 				}
 			} else {
-				self.error = io.newgrounds.Errors.getError(io.newgrounds.Errors.INVALID_RESPONSE, "Failed to load SaveSlot data from URL", true);
+				self.error = io.newgrounds.helpers.HttpStatusHelper.errorForStatus(httpStatus, "Loading this save slot's data", null);
 				if (callback != null) {
 					callback.call(thisArg, null, self.error);
 				}
