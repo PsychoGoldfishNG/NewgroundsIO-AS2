@@ -43,6 +43,11 @@
 		componentParams.skip = filters.skip;
 
 		// Handle social filter (friends only)
+		//
+		// Applies to foreign boards too. The friends list is a site-wide relation,
+		// not a per-app one, so "me and my friends" is just as meaningful on another
+		// app's board as on ours. The session gate stays because 'social' needs to
+		// know who "you" are.
 		if (this.core && this.core.hasSession() && filters.social === true) {
 			componentParams.social = true;
 		}
@@ -77,6 +82,15 @@
 
 		// Add this scoreboard's ID
 		componentParams.id = this.id;
+
+		// A board loaded from another app keeps reading from that app. Without
+		// forwarding the app_id the board came with, the gateway would look this id
+		// up against THIS app and reject it - and reading is the one thing cross-app
+		// access does allow, so make it work rather than refusing it. Every filter
+		// above still applies, including 'social'.
+		if (this.isForeign()) {
+			componentParams.app_id = this.foreignAppId;
+		}
 
 		var callbackParams:Object = {
 			callback: callback,
@@ -122,12 +136,40 @@
 
 	/**
 	 * Posts a score to this scoreboard.
-	 * @param value The score value to post
+	 *
+	 * THE SERVER STORES A 32-BIT INTEGER, and reshapes anything else SILENTLY
+	 * rather than rejecting it:
+	 *
+	 *   - fractional values are truncated toward zero (1.9 posts as 1, and -1.9
+	 *     posts as -1 - it truncates, it does not round or floor)
+	 *   - values outside -2147483648..2147483647 are clamped to the nearest
+	 *     limit
+	 *
+	 * Either way the post SUCCEEDS and the result carries the adjusted value, so
+	 * nothing surfaces as an error. A game scoring in milliseconds or
+	 * accumulating a large total can pass that ceiling and find every subsequent
+	 * score identical.
+	 *
+	 * Worth knowing in AS2 particularly: every number here is a Number (a
+	 * double), so there is no compiler warning and nothing local to notice the
+	 * truncation. AS2 has no int type to catch it for you.
+	 *
+	 * This library deliberately does NOT round or range-check on the caller's
+	 * behalf. The server is the authority on what it stores, and a port
+	 * inventing its own limits would disagree with the other ports and with
+	 * scores those games have already posted. Read `value` back off the result
+	 * if the exact stored number matters.
+	 *
+	 * @param value The score value to post. Round and range-check calculated
+	 *              values before calling - see above
 	 * @param tag Optional tag to associate with the score
 	 * @param callback Function to call when posting is complete
 	 * @param thisArg Context to use when calling the callback
+	 * @throws Error if this scoreboard was loaded from another app
 	 */
 	public function postScore(value:Number, tag:String, callback:Function, thisArg):Void {
+		this.assertNotForeign("postScore()", "The gateway would reject this scoreboard id against this app.");
+
 		if (tag == undefined) tag = null;
 		if (callback == undefined) callback = null;
 		if (thisArg == undefined) thisArg = null;

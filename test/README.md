@@ -92,7 +92,7 @@ everything that depends on a session.
 
 | Suite | What it pins down |
 |---|---|
-| `OfflineBaseObjectSuite` | Import/export for every model: defaults on omitted fields, nested and `array-of-X` casting, error payloads, required-property validation. Also pins the two places AS2 behaves differently from AS3 — no type coercion on import, and dead `parent` / `parentPropertyName` |
+| `OfflineBaseObjectSuite` | Import/export for every model: defaults on omitted fields, nested and `array-of-X` casting, error payloads, required-property validation. Also pins child-position stamping (`parent` / `parentPropertyName` / `getObjectPath()`) and the one place AS2 behaves differently from AS3 — no type coercion on import |
 | `OfflineObjectFactorySuite` | Walks the full inventory — 11 objects, 25 components, 25 results — so a model added to the codebase but not to the factory's switch fails here rather than silently returning null |
 | `OfflineJsonSuite` | `io.newgrounds.encoders.JSON` round-trips: escapes, unicode, big timestamps. Pins the non-ASCII escaping the RC4 path depends on. Also covers the **chunked** `background_encode` / `background_decode` pair, which has no AS3 counterpart and nothing in the library calls |
 | `OfflineCryptoSuite` | **Decrypts what `Core` encrypted**, independently, through the same RC4 the server uses. Rewritten rather than ported — see [RC4, not AES](#rc4-not-aes) |
@@ -195,16 +195,23 @@ that way — a medal list or high score table on a title screen, before anyone
 signs in. Nothing proved that worked until now, because every other live suite
 runs after the session exists.
 
-**The guard is server-side, not client-side.** `BaseComponent.hasValidProperties()`
-checks `requiresSession` and would reject these calls before they left the
-machine — but **nothing in `build/` ever calls it**. Confirmed by grep: the only
-callers are in the offline tests. So the request goes out and comes back refused,
-and the offline test *a session-gated component is invalid without a session*
-pins a method the library never consults at runtime. Both are worth having;
-neither should be mistaken for the other.
+**The guard now runs on both sides, and the split is deliberate.** `Core` consults
+`BaseComponent.getPreflightError()` before sending, so a session-gated call with
+**no session id at all** is refused on the machine and costs no request. The
+refusal is shaped exactly like the server's and carries the same code (102), so
+these tests assert the same things they always did — they just no longer spend a
+round trip proving it.
 
-Note also that `hasValidProperties()` demands `session.user`, not just a session
-id — so by its own definition a guest session does not satisfy `requiresSession`.
+What stays server-side is the **guest** case: a session id that belongs to
+nobody. The schema's `require_session` flag means only *"a session id must be in
+the envelope"*, which a guest session satisfies. Whether that is *enough* varies
+by component — `App.checkSession` and `App.endSession` carry the same flag and
+must work on a guest session — and nothing in the schema says which is which. So
+the library does not guess, and `LiveGuestSuite` still pins the server's 110.
+
+Previously `hasValidProperties()` demanded `session.user` outright. That was never
+called, so the contradiction was invisible; wiring it in unchanged would have made
+`checkSession` refuse itself and the library could never have signed anyone in.
 
 #### Two tests that could never run
 
@@ -410,19 +417,24 @@ does not unlock another"* now runs. It still guards on
 ever reduced again — medal count is server-side configuration that can change
 without anyone touching this repo.
 
-### `BaseObject.parent` is dead
+### `BaseObject.parent` is live now — and the flat name is deliberate
 
-`parent` and `parentPropertyName` are declared on `BaseObject` in **both**
-libraries and documented in the wiki as "set when a model is nested during
-import". Nothing anywhere ever assigns them — verified by grepping the whole
-build tree.
+`parent` and `parentPropertyName` used to be declared on `BaseObject` in **both**
+libraries, documented in the wiki, and never assigned by anything. They are now
+stamped by `importFromObject` as it casts each nested value, with an indexed form
+for `array-of-X` — a medal arriving in `medals[1]` records exactly that.
 
-`getFullObjectName()` depends on them, so it silently never produces a
-hierarchical name. `OfflineBaseObjectSuite` asserts the behaviour that actually
-exists (a flat name) and notes why, rather than asserting the documented
-behaviour and failing for a reason that has nothing to do with AS2. The
-properties should be either wired up or removed; that decision has not been
-made.
+The hierarchical name they feed is `getObjectPath()`, **not**
+`getFullObjectName()`. Two tests in `OfflineBaseObjectSuite` pin that split, and
+it is worth knowing why before "fixing" it: `importFromObject` uses
+`getFullObjectName()` as a **type check** when importing a nested value into a
+standalone one — `AppStateResultUpdateHelper` lifts `result.session` into
+`appState.session` that way. Make the name positional and that check starts
+comparing `object.Session` against `object.checkSessionResult.session`, and
+session handling breaks.
+
+So: `getFullObjectName()` answers *what it is*, `getObjectPath()` answers *where
+it sits*.
 
 ## Reading the output
 

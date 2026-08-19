@@ -58,8 +58,12 @@ class io.newgrounds.helpers.NgioLoaderHelper {
 
 					if (result === null) {
 						error = io.newgrounds.Errors.getError(io.newgrounds.Errors.INVALID_RESPONSE, null, false);
-					} else if (result.error !== null) {
-						error = result.error;
+					} else if (result.success !== true) {
+						// success, not error: a refused component is not obliged
+						// to carry an error object, and testing only error let
+						// that case through as (null, null) again - the very
+						// failure the comment above describes.
+						error = (result.error !== null) ? result.error : io.newgrounds.Errors.getError(0, null, false);
 					} else {
 						url = result.url;
 					}

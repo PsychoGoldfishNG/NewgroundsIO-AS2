@@ -19,6 +19,7 @@ class io.newgrounds.models.components.App.endSession extends io.newgrounds.BaseC
 		// Set component-specific flags
 		this.isSecure = false;
 		this.requiresSession = true;
+		this.requiresLogin = false;
 		this.redirect = false;
 	}
 

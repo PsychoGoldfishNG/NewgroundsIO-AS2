@@ -2,7 +2,7 @@
  * getMedalScore
  *
  * Component: Medal.getMedalScore
- * Loads the user's current medal score.
+ * Loads the user's current medal score. Requires a session with a signed-in user attached; a session without one fails with a Login Required error.
  */
 import io.newgrounds.BaseComponent;
 
@@ -19,6 +19,7 @@ class io.newgrounds.models.components.Medal.getMedalScore extends io.newgrounds.
 		// Set component-specific flags
 		this.isSecure = false;
 		this.requiresSession = true;
+		this.requiresLogin = true;
 		this.redirect = false;
 	}
 

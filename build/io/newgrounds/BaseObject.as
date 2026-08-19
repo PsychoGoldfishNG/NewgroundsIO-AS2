@@ -200,11 +200,21 @@ class io.newgrounds.BaseObject {
 			var castValue = castToExpectedType(propertyName, propertyValue);
 
 			this[propertyName] = castValue;
+
+			// Record where the nested model landed, so getObjectPath() can name
+			// it. Done here rather than inside castToExpectedType so a subclass
+			// overriding the cast still gets the links, and so arrays are
+			// handled in one place.
+			stampChildPosition(castValue, propertyName);
 		}
 
 		// Check for error property
 		if (importObject["error"] != undefined && importObject.error != null) {
 			this.error = io.newgrounds.models.objects.ObjectFactory.CreateObject("Error", importObject.error, this.core);
+
+			// `error` is not in propertyNames, so the loop above never saw it -
+			// stamp it here or a failed nested model reports no path.
+			stampChildPosition(this.error, "error");
 		}
 	}
 
@@ -277,13 +287,95 @@ class io.newgrounds.BaseObject {
 	 * @return Qualified name like "object.User" or "component.Medal.unlock"
 	 */
 	public function getFullObjectName():String {
-		var fullName:String = objectType + "." + objectName;
+		// TYPE identity, not location: the same class reports the same name
+		// wherever it sits. That is what makes it usable as the type check in
+		// importFromObject() - a Session is a Session whether it arrived
+		// standalone or nested inside a checkSession result.
+		//
+		// For where an object sits in a tree, use getObjectPath().
+		//
+		// NOTE: this used to fold parent/parentPropertyName in, which would have
+		// made it positional. Nothing ever assigned those, so the branch never
+		// ran - and the moment they WERE assigned it broke importFromObject,
+		// because AppStateResultUpdateHelper imports a nested result.session into
+		// the standalone appState.session.
+		return objectType + "." + objectName;
+	}
 
-		if (parent != null && parentPropertyName != null) {
-			fullName = parent.getFullObjectName() + "." + parentPropertyName;
+	/**
+	 * Returns where this object sits in the model tree, for debugging.
+	 *
+	 * A standalone model reports its type name. A nested one reports its
+	 * parent's path plus the property it occupies, so a Medal reached through an
+	 * unlock result reads:
+	 *
+	 *     result.Medal.unlock.medal
+	 *
+	 * and a Score inside a getScores result reads:
+	 *
+	 *     result.ScoreBoard.getScores.scores[3]
+	 *
+	 * That is the difference between "a Score failed to import" and knowing
+	 * WHICH score, which is the whole reason the parent links exist.
+	 *
+	 * Never use this for type comparison - use getFullObjectName().
+	 *
+	 * @return The path from the root model down to this one
+	 */
+	public function getObjectPath():String {
+		// Walk upward rather than recursing, so a cycle cannot blow the stack.
+		// AVM1 disables the WHOLE MOVIE on "256 levels of recursion exceeded",
+		// so a debugging aid that recursed would take the app with it.
+		var segments:Array = [];
+		var node:io.newgrounds.BaseObject = this;
+		var guard:Number = 0;
+
+		while (node != null && guard < 64) {
+			if (node.parent != null && node.parentPropertyName != null) {
+				segments.unshift(node.parentPropertyName);
+				node = node.parent;
+			} else {
+				// Reached the root - its own type name starts the path.
+				segments.unshift(node.getFullObjectName());
+				node = null;
+			}
+			guard++;
 		}
 
-		return fullName;
+		return segments.join(".");
+	}
+
+	/**
+	 * Records this object's position in the tree, so getObjectPath() can report
+	 * it later.
+	 *
+	 * Called from importFromObject() for every nested model it builds. Arrays
+	 * get an index, because "a Score failed" is not an answer when a scoreboard
+	 * returned a hundred of them.
+	 *
+	 * @param value The freshly cast property value - model, array, or scalar
+	 * @param propertyName The property it was assigned to
+	 */
+	public function stampChildPosition(value, propertyName:String):Void {
+		if (value instanceof io.newgrounds.BaseObject) {
+			value.parent = this;
+			value.parentPropertyName = propertyName;
+			return;
+		}
+
+		if (value instanceof Array) {
+			// NOT Array(value) - that is the conversion function, and it would
+			// return [value], so the loop below would stamp the array itself.
+			var items:Array = value;
+			for (var i:Number = 0; i < items.length; i++) {
+				if (items[i] instanceof io.newgrounds.BaseObject) {
+					items[i].parent = this;
+					items[i].parentPropertyName = propertyName + "[" + i + "]";
+				}
+			}
+		}
+
+		// Scalars have no position to record.
 	}
 
 	/**
@@ -292,29 +384,64 @@ class io.newgrounds.BaseObject {
 	 * @return true if all required properties are present, false if any are missing
 	 */
 	public function hasValidProperties():Boolean {
+		return getPreflightError() == null;
+	}
+
+	/**
+	 * The reason this object would be rejected, or null if it is valid.
+	 *
+	 * hasValidProperties() answers "is it valid?"; this answers "why not?",
+	 * which is what a caller needs when the answer arrives instead of a server
+	 * response. The two share one implementation so they can never disagree.
+	 *
+	 * NOT the same as getValidationErrors() below, despite the names: that one
+	 * lists every missing required property as a plain string, for a developer
+	 * reading a report. This one returns the FIRST problem as a real NgioError,
+	 * carrying the code the gateway would have used, for a caller reading it as
+	 * a refusal.
+	 *
+	 * @return An NgioError describing the first problem found, or null
+	 */
+	public function getPreflightError() {
 		var reqProps:Array = requiredProperties;
 
 		for (var i:Number = 0; i < reqProps.length; i++) {
 			var requiredProperty:String = reqProps[i];
 
 			if (this[requiredProperty] == null || this[requiredProperty] == undefined) {
-				return false;
+				return missingPropertyError(requiredProperty, "is missing");
 			}
 
 			if (typeof this[requiredProperty] == 'string') {
 				if (this[requiredProperty].length == 0) {
-					return false;
+					return missingPropertyError(requiredProperty, "is an empty string");
 				}
 			}
 
 			if (this[requiredProperty] instanceof Array) {
 				if (this[requiredProperty].length == 0) {
-					return false;
+					return missingPropertyError(requiredProperty, "is an empty array");
 				}
 			}
 		}
 
-		return true;
+		return null;
+	}
+
+	/**
+	 * Builds the error for a required property that is absent or empty.
+	 *
+	 * MISSING_PARAMETER (102) is what the gateway returns for the same
+	 * condition. The message names the object and the property, because
+	 * "missing a required parameter" on its own sends a developer reading their
+	 * own code rather than the one line that is wrong.
+	 */
+	public function missingPropertyError(propertyName:String, problem:String) {
+		return io.newgrounds.Errors.getError(
+			io.newgrounds.Errors.MISSING_PARAMETER,
+			getFullObjectName() + " requires '" + propertyName + "', which " + problem + ".",
+			false
+		);
 	}
 
 	/**

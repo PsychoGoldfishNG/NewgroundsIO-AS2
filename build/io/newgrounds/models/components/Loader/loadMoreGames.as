@@ -29,6 +29,7 @@ class io.newgrounds.models.components.Loader.loadMoreGames extends io.newgrounds
 		// Set component-specific flags
 		this.isSecure = false;
 		this.requiresSession = false;
+		this.requiresLogin = false;
 		this.redirect = true;
 	}
 

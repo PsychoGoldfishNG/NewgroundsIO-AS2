@@ -203,6 +203,7 @@ class io.newgrounds.Core {
 		var partitionedQueue:Object = io.newgrounds.helpers.CoreQueueExecutionHelper.partitionExecuteQueue(componentQueue, this);
 		var redirectComponents:Array = partitionedQueue.redirectComponents;
 		var toExecute:Array = partitionedQueue.batchedExecuteWrappers;
+		var refusedComponents:Array = partitionedQueue.refusedComponents;
 
 		// Dispatch redirects WITHOUT the caller's callback.
 		//
@@ -225,9 +226,39 @@ class io.newgrounds.Core {
 		componentQueue = [];
 
 		if (toExecute.length == 0) {
+			// Unless everything in the queue was refused locally, in which case
+			// the caller is owed a report saying so. Answering null here would
+			// mean "nothing to do", which is the one thing that did not happen.
+			if (refusedComponents != null && refusedComponents.length > 0) {
+				if (callback != null) {
+					callback.call(thisArg, io.newgrounds.helpers.ComponentValidationHelper.buildRefusalResponseList(refusedComponents, this));
+				}
+				return;
+			}
+
 			if (callback != null) {
 				callback.call(thisArg, null);
 			}
+			return;
+		}
+
+		// Some components were refused but others are going out. Send the valid
+		// ones, then fold the refusals into the response so the caller gets ONE
+		// report covering everything it queued - which is how the gateway would
+		// have answered had it done the refusing.
+		if (refusedComponents != null && refusedComponents.length > 0) {
+			// AS2 closures do not capture `this` - everything the wrapper needs
+			// has to be captured in locals first.
+			var self:io.newgrounds.Core = this;
+			var outerCallback:Function = callback;
+			var outerThisArg = thisArg;
+			var pendingRefusals:Array = refusedComponents;
+
+			sendRequest(toExecute, false, function(response):Void {
+				if (outerCallback != null) {
+					outerCallback.call(outerThisArg, io.newgrounds.helpers.CoreQueueExecutionHelper.mergeRefusalsIntoResponse(response, pendingRefusals, self));
+				}
+			}, null);
 			return;
 		}
 
@@ -245,11 +276,36 @@ class io.newgrounds.Core {
 			componentModel.core = this;
 		}
 
+		var isRedirect:Boolean = componentModel.redirect;
+
+		// Refuse a component that cannot possibly succeed, without spending a
+		// request on it. The refusal is shaped exactly like the server's, so
+		// callers need no special case - see ComponentValidationHelper.
+		//
+		// Redirects are exempt: they navigate the browser rather than exchanging
+		// JSON, there is no response to shape, and the one that matters
+		// (App.startSession -> Passport) is how a session gets established in
+		// the first place.
+		if (!isRedirect) {
+			var validationError = componentModel.getPreflightError();
+
+			if (validationError != null) {
+				if (debugNetworkCalls) {
+					trace("NETWORK: refused locally - " + validationError.message);
+				}
+				reportNetworkActivity("error", "Refused before sending - " + validationError.message);
+
+				if (callback != null) {
+					callback.call(thisArg, io.newgrounds.helpers.ComponentValidationHelper.buildRefusalResponse(componentModel, validationError, this));
+				}
+				return;
+			}
+		}
+
 		var executeModel = io.newgrounds.models.objects.ObjectFactory.CreateObject("Execute", null, this);
 		executeModel.core = this;
 		executeModel.setComponent(componentModel);
 
-		var isRedirect:Boolean = componentModel.redirect;
 		sendRequest(executeModel, isRedirect, callback, thisArg);
 	}
 

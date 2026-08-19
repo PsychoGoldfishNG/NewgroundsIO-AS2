@@ -31,17 +31,29 @@ class io.newgrounds.helpers.NgioEventHelper {
 				return;
 			}
 
+			// All three failure layers, the same pattern Medal.unlock and
+			// AppState.loadData use.
+			//
+			// A null response - no HTTP reply at all - left `error` null and so
+			// reported the event as logged. A component reporting success:false
+			// with no error object did the same. Both are silent failures: the
+			// caller is told the event reached the gateway when nothing did.
 			var error = null;
-			if (response !== null) {
-				if (response.error !== null) {
-					error = response.error;
-				} else {
-					var result = response.getResult();
-					if (result !== null && result.error !== null) {
-						error = result.error;
-					}
+
+			if (response === null || response.success !== true) {
+				error = (response !== null && response.error !== null)
+					? response.error
+					: io.newgrounds.Errors.getError(0, null, false);
+			} else {
+				var result = response.getResult();
+
+				if (result === null) {
+					error = io.newgrounds.Errors.getError(io.newgrounds.Errors.INVALID_RESPONSE, null, false);
+				} else if (result.success !== true) {
+					error = (result.error !== null) ? result.error : io.newgrounds.Errors.getError(0, null, false);
 				}
 			}
+
 			callback.call(thisArg, error);
 		});
 	}

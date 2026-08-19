@@ -26,6 +26,7 @@ Note: Any previous session ids will no longer be valid if this is used.
 		// Set component-specific flags
 		this.isSecure = false;
 		this.requiresSession = false;
+		this.requiresLogin = false;
 		this.redirect = false;
 	}
 

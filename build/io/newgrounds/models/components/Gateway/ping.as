@@ -19,6 +19,7 @@ class io.newgrounds.models.components.Gateway.ping extends io.newgrounds.BaseCom
 		// Set component-specific flags
 		this.isSecure = false;
 		this.requiresSession = false;
+		this.requiresLogin = false;
 		this.redirect = false;
 	}
 

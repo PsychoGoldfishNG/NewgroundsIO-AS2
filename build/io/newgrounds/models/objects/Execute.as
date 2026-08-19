@@ -118,15 +118,32 @@ class io.newgrounds.models.objects.Execute extends io.newgrounds.BaseObject {
 	 * both properties required, but they are mutually exclusive - a plain "all present"
 	 * check can never pass. This enforces the actual rule instead.
 	 */
-	public function hasValidProperties():Boolean {
-		if (!super.hasValidProperties()) {
-			return false;
+	public function getPreflightError() {
+		var parentError = super.getPreflightError();
+		if (parentError != null) {
+			return parentError;
 		}
 
 		var hasComponent:Boolean = (this.component != null && this.component.length > 0);
 		var hasSecure:Boolean = (this.secure != null && this.secure.length > 0);
 
-		return (hasComponent || hasSecure) && !(hasComponent && hasSecure);
+		if (!hasComponent && !hasSecure) {
+			return io.newgrounds.Errors.getError(
+				io.newgrounds.Errors.MISSING_PARAMETER,
+				"Execute requires either 'component' or 'secure', and has neither.",
+				false
+			);
+		}
+
+		if (hasComponent && hasSecure) {
+			return io.newgrounds.Errors.getError(
+				io.newgrounds.Errors.INVALID_PARAMETER,
+				"Execute carries both 'component' and 'secure', which are mutually exclusive.",
+				false
+			);
+		}
+
+		return null;
 	}
 
 }

@@ -2,7 +2,7 @@
  * loadSlot
  *
  * Component: CloudSave.loadSlot
- * Returns a specific #saveslot object.
+ * Returns a specific #saveslot object. Requires a session with a signed-in user attached; a session without one fails with a Login Required error.
  */
 import io.newgrounds.BaseComponent;
 
@@ -29,6 +29,7 @@ class io.newgrounds.models.components.CloudSave.loadSlot extends io.newgrounds.B
 		// Set component-specific flags
 		this.isSecure = false;
 		this.requiresSession = true;
+		this.requiresLogin = true;
 		this.redirect = false;
 	}
 

@@ -29,6 +29,7 @@ class io.newgrounds.models.components.Loader.loadOfficialUrl extends io.newgroun
 		// Set component-specific flags
 		this.isSecure = false;
 		this.requiresSession = false;
+		this.requiresLogin = false;
 		this.redirect = true;
 	}
 

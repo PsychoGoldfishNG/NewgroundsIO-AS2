@@ -11,12 +11,27 @@
  *   2. GUEST session   hasSession() TRUE,  hasUser() false   this suite
  *   3. signed in       hasSession() true,  hasUser() true    everything else
  *
- * The distinction matters because it is where the library and the server
- * disagree about what "session-gated" means. BaseComponent.requiresSession is
- * satisfied by a session ID alone as far as the envelope is concerned, but
- * hasValidProperties() also demands session.user - and nothing in build/ ever
- * calls hasValidProperties(). So in guest state the request is built, sent, and
- * refused by the server. These tests pin that refusal.
+ * The distinction matters because it is the boundary of what the client can
+ * decide for itself. The schema's require_session flag means literally "a session
+ * id must be sent", and a guest session HAS one - so the preflight check in
+ * BaseComponent.getPreflightError() passes it, and the request goes out.
+ *
+ * Whether a guest session is ENOUGH is the separate require_login flag, which
+ * BaseComponent exposes as requiresLogin and getPreflightError() refuses with 110.
+ * It is set on the four CloudSave methods, Medal.unlock, Medal.getMedalScore and
+ * ScoreBoard.postScore - so MOST OF THE REFUSALS BELOW NO LONGER LEAVE THE
+ * MACHINE. The assertions are unchanged and still pass: the local refusal is
+ * shaped like the server's and carries the same 110.
+ *
+ * The gateway enforces this identically, and always did. What changed is the
+ * schema, which used to carry one require_session flag for both meanings; the
+ * client could not act on it until the two were separated.
+ *
+ * If any case here starts FAILING, the flag has landed on a component that
+ * actually tolerates a guest session - check the schema before the library.
+ *
+ * Contrast LiveNoSessionSuite, where there is no session id at all: that IS
+ * locally knowable, and is now refused before it is sent.
  *
  * THIS SUITE MAKES ITS OWN WINDOW, so it runs on every machine in every login
  * state, without a prompt and without signing the tester out.
@@ -215,7 +230,7 @@ class ngiotest.suites.LiveGuestSuite extends ngiotest.LiveSuite {
 			var medal:io.newgrounds.models.objects.Medal = medals[0];
 			medal.unlock(function(unlockedMedal:io.newgrounds.models.objects.Medal, error):Void {
 				if (t.assertNotNull(error, "the unlock was refused")) {
-					t.note("server said: " + self.describeError(error));
+					t.note("refused with: " + self.describeError(error));
 				}
 				t.assertFalse(unlockedMedal.unlocked, "and the medal is not flagged unlocked");
 				t.done();
@@ -236,7 +251,7 @@ class ngiotest.suites.LiveGuestSuite extends ngiotest.LiveSuite {
 			var board:io.newgrounds.models.objects.ScoreBoard = boards[0];
 			board.postScore(1, null, function(postedBoard, error):Void {
 				if (t.assertNotNull(error, "the post was refused")) {
-					t.note("server said: " + self.describeError(error));
+					t.note("refused with: " + self.describeError(error));
 				}
 				t.done();
 			}, null);
@@ -253,10 +268,17 @@ class ngiotest.suites.LiveGuestSuite extends ngiotest.LiveSuite {
 			// not logged in" ...]} and loadData, which only inspected the
 			// RESPONSE-level error, handed the caller (slots, null). A game would
 			// have read that as "this user has no saves".
+			//
+			// CloudSave.loadSlots now sets requiresLogin, so this refusal is
+			// synthesized locally rather than fetched. The regression cover
+			// survives because the synthesized response has the SAME shape -
+			// envelope success:true carrying a failed component - and runs the
+			// same loadData path. What it no longer proves is that the GATEWAY
+			// still produces that shape; only that loadData reads it.
 			NGIO.loadSaveSlots(function(slots:Array, error):Void {
 				if (t.assertNotNull(error, "loading save slots was refused")) {
 					t.assertEquals(110, error.code, "and refused specifically for not being logged in");
-					t.note("server said: " + self.describeError(error));
+					t.note("refused with: " + self.describeError(error));
 				}
 				t.done();
 			}, null);
@@ -273,7 +295,7 @@ class ngiotest.suites.LiveGuestSuite extends ngiotest.LiveSuite {
 			NGIO.loadMedalScore(function(medalScore:Number, error):Void {
 				if (t.assertNotNull(error, "the medal score request was refused")) {
 					t.assertEquals(110, error.code, "and refused specifically for not being logged in");
-					t.note("server said: " + self.describeError(error));
+					t.note("refused with: " + self.describeError(error));
 				}
 				t.done();
 			}, null);

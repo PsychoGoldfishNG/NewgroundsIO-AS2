@@ -304,21 +304,18 @@ class ngiotest.suites.OfflineBaseObjectSuite extends ngiotest.TestSuite {
 			t.done();
 		});
 
-		add("getFullObjectName() never actually nests, because parent is never set", function(t:ngiotest.TestContext):Void {
-			// BaseObject declares `parent` and `parentPropertyName`, and
-			// getFullObjectName() builds a hierarchical name from them. The wiki
-			// says they are "set when a model is nested during import".
+		add("import stamps a child's position, and getFullObjectName() stays flat", function(t:ngiotest.TestContext):Void {
+			// parent and parentPropertyName used to be dead - declared, documented,
+			// and never assigned by anything in either library. importFromObject now
+			// stamps them via stampChildPosition() as it casts each nested value.
 			//
-			// NOTHING IN EITHER LIBRARY EVER ASSIGNS THEM - verified by grepping
-			// the whole build tree. So the hierarchical branch is unreachable and
-			// a nested model reports the same flat name as a standalone one.
-			//
-			// This asserts the behaviour that actually exists rather than the
-			// behaviour that is documented, because a test for the documented
-			// version would fail for a reason that has nothing to do with AS2.
-			// The properties should be either wired up or removed; that decision
-			// has not been made, and this test is here so it does not get made by
-			// accident.
+			// The pair feeds getObjectPath(), NOT getFullObjectName(). That split is
+			// load-bearing and this test exists to keep it: importFromObject uses
+			// getFullObjectName() as a TYPE CHECK when it imports a nested value into
+			// a standalone one - AppStateResultUpdateHelper lifts result.session into
+			// appState.session that way. Make the name positional and that check
+			// compares "object.Session" against "object.checkSessionResult.session"
+			// and session handling breaks.
 			var session:io.newgrounds.models.objects.Session = new io.newgrounds.models.objects.Session();
 			session.importFromObject({
 				id: "abc",
@@ -330,13 +327,57 @@ class ngiotest.suites.OfflineBaseObjectSuite extends ngiotest.TestSuite {
 				return;
 			}
 
-			t.assertNull(session.user.parent, "parent is not set by import");
-			t.assertNull(session.user.parentPropertyName, "parentPropertyName is not set by import");
-			t.assertEquals("object.User", session.user.getFullObjectName(),
-				"so the nested user reports a flat name, not object.Session.user");
+			t.assertStrictEquals(session, session.user.parent, "import set parent to the containing model");
+			t.assertEquals("user", session.user.parentPropertyName, "import recorded the property it arrived on");
 
-			t.note("BaseObject.parent / parentPropertyName are dead in both AS libraries - " +
-			       "declared and documented, never assigned. getFullObjectName() can only ever return a flat name.");
+			// Type identity - unchanged by nesting, and deliberately so.
+			t.assertEquals("object.User", session.user.getFullObjectName(),
+				"getFullObjectName() still answers WHAT it is, not where it sits");
+
+			// Position - the hierarchical name lives here instead.
+			t.assertEquals("object.Session.user", session.user.getObjectPath(),
+				"getObjectPath() answers WHERE it sits");
+			t.assertEquals("object.Session", session.getObjectPath(),
+				"an unparented model's path is just its own type name");
+			t.done();
+		});
+
+		add("array elements are stamped with their index", function(t:ngiotest.TestContext):Void {
+			// The array branch of stampChildPosition is where AS2 bites: `Array(value)`
+			// is a CONVERSION function, not a cast, and would wrap the array in another
+			// array - stamping the list itself and none of its contents. If this test
+			// ever reports a path with no index in it, that is what happened.
+			// Untyped, and read back through [] - `medals` is declared on
+			// getListResult, not on BaseResult, so a typed reference will not compile.
+			// Same reason the tests above do it this way.
+			var result = io.newgrounds.models.objects.ObjectFactory.CreateResult("Medal", "getList", {
+				success: true,
+				medals: [
+					{ id: 1, name: "First" },
+					{ id: 2, name: "Second" }
+				]
+			}, null);
+
+			if (!t.assertNotNull(result, "getListResult created")) {
+				t.done();
+				return;
+			}
+
+			var medals:Array = result["medals"];
+
+			if (!t.assert(medals != null && medals.length == 2, "both medals imported")) {
+				t.done();
+				return;
+			}
+
+			t.assertStrictEquals(result, medals[0].parent, "element 0 points at the containing result");
+			t.assertEquals("medals[0]", medals[0].parentPropertyName, "element 0 records its index");
+			t.assertEquals("medals[1]", medals[1].parentPropertyName, "element 1 records its index");
+
+			t.assertEquals("object.Medal", medals[1].getFullObjectName(),
+				"type identity is unaffected by living in an array");
+			t.assertEquals("result.Medal.getList.medals[1]", medals[1].getObjectPath(),
+				"the path names the slot the medal arrived in");
 			t.done();
 		});
 

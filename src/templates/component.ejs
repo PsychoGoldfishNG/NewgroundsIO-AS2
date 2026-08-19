@@ -44,6 +44,7 @@ class io.newgrounds.models.components.<%- model.component %>.<%- model.method %>
 		// Set component-specific flags
 		this.isSecure = <%= model.secure ? "true" : "false" %>;
 		this.requiresSession = <%= model.require_session ? "true" : "false" %>;
+		this.requiresLogin = <%= model.require_login ? "true" : "false" %>;
 		this.redirect = <%= model.redirect ? "true" : "false" %>;
 <%- partial.getIfExists(`components/${model.component}/${model.method}/constructor`) -%>
 	}

@@ -56,13 +56,31 @@ class io.newgrounds.helpers.NgioGatewayHelper {
 				return;
 			}
 
-			if (response == null) {
-				callback.call(thisArg, null, null);
-				return;
+			// All three failure layers, the same pattern Medal.unlock and
+			// AppState.loadData use.
+			//
+			// A null response - no HTTP reply at all - handed the caller
+			// (null, null): no pong and no reason, which reads as "the gateway
+			// answered with nothing" rather than "nothing answered". The
+			// component level was never checked at all, and 'pong' was returned
+			// alongside any envelope error rather than instead of it.
+			var error = null;
+
+			if (response == null || response.success !== true) {
+				error = (response != null && response.error != null)
+					? response.error
+					: io.newgrounds.Errors.getError(0, null, false);
+			} else {
+				var result = response.getResult();
+
+				if (result == null) {
+					error = io.newgrounds.Errors.getError(io.newgrounds.Errors.INVALID_RESPONSE, null, false);
+				} else if (result.success !== true) {
+					error = (result.error != null) ? result.error : io.newgrounds.Errors.getError(0, null, false);
+				}
 			}
 
-			var error = (response.error !== null) ? response.error : null;
-			callback.call(thisArg, 'pong', error);
+			callback.call(thisArg, (error == null) ? 'pong' : null, error);
 		});
 	}
 
@@ -77,19 +95,30 @@ class io.newgrounds.helpers.NgioGatewayHelper {
 		}
 
 		core.executeComponent(component, function(response):Void {
-			if (response == null) {
-				if (callback !== null) {
-					callback.call(thisArg, null, null);
+			// All three failure layers, the same pattern Medal.unlock and
+			// AppState.loadData use.
+			//
+			// A null response - no HTTP reply at all - handed the caller
+			// (null, null): no datetime and no reason. A component reporting
+			// success:false with no error object did the same, since only
+			// result.error was consulted.
+			var error = null;
+			var result = null;
+
+			if (response == null || response.success !== true) {
+				error = (response != null && response.error != null)
+					? response.error
+					: io.newgrounds.Errors.getError(0, null, false);
+			} else {
+				result = response.getResult();
+
+				if (result == null) {
+					error = io.newgrounds.Errors.getError(io.newgrounds.Errors.INVALID_RESPONSE, null, false);
+				} else if (result.success !== true) {
+					error = (result.error != null) ? result.error : io.newgrounds.Errors.getError(0, null, false);
 				}
-				return;
 			}
 
-			var error = (response.error !== null) ? response.error : null;
-			var result = (response !== null && response.success === true) ? response.getResult() : null;
-
-			if (error === null && result !== null && result.error !== null) {
-				error = result.error;
-			}
 			if (callback !== null) {
 				if (error !== null || result === null) {
 					callback.call(thisArg, null, error);
