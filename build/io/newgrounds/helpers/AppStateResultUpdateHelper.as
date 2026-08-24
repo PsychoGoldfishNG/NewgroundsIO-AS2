@@ -81,6 +81,16 @@ class io.newgrounds.helpers.AppStateResultUpdateHelper {
 			return;
 		}
 
+		// A rejected checkSession/startSession still reaches here with no
+		// 'session' payload - same "check before touching" rule every
+		// sibling branch in this file follows. Without this guard, a
+		// null appState.session would throw on the appState.session.error
+		// assignment below, and an existing session could be marked
+		// 'verified' based on stale state left over from before this call.
+		if (resultObject.session == null) {
+			return;
+		}
+
 		if (appState.session == null) {
 			// Note: no markLoaded("session") here - 'session' is not one of
 			// AppState.dataProperties (it isn't loadable via loadData), and
