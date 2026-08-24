@@ -137,11 +137,12 @@ class io.newgrounds.models.objects.ObjectFactory {
 
 		}
 
-		// An unrecognised name falls through the switch leaving obj null, and
-		// BaseObject.importFromObject() calls this with a dotted objectName
-		// ("App.checkSession") that deliberately has no case here. AS2 ignores assignment
-		// to a null reference, so the guard is behaviour-neutral here - but the same line
-		// throws TypeError #1009 in AS3, so keep the two libraries consistent.
+		// An unrecognised name (including a dotted component/result path like
+		// "App.checkSession", which deliberately has no case here - use
+		// CreateComponent/CreateResult for those) falls through the switch leaving
+		// obj null. AS2 ignores assignment to a null reference, so the guard is
+		// behaviour-neutral here - but the same line throws TypeError #1009 in AS3,
+		// so keep the two libraries consistent.
 		if (obj != null && coreReference) obj.core = coreReference;
 
 		// If object was created and data provided, import the data

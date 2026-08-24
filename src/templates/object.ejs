@@ -5,7 +5,19 @@
  * ====================================================================================
  */
 
-const propertyNames = Object.keys(model.properties).filter(prop => prop !== 'error');
+// Filter out 'error' (inherited from BaseObject) and "mixed single-or-array" properties
+// (property.object and property.array.object both set to the same type) - Model-Generation.md's
+// Mixed Type Handling pattern. Those need a custom {prop}/{prop}List pair with setters that
+// clear each other, not the generic array-of-X cast. In the current schema this is
+// Request.execute and Response.result, both handled entirely by their own partials. The
+// `object !== 'Result'` filter is a backstop since Result is never registered in ObjectFactory.
+function isMixedSingleOrArray(property) {
+	return Boolean(property.object) && Boolean(property.array) && property.array.object === property.object;
+}
+const propertyNames = Object.keys(model.properties)
+	.filter(prop => prop !== 'error')
+	.filter(prop => !isMixedSingleOrArray(model.properties[prop]))
+	.filter(prop => model.properties[prop].object !== 'Result');
 const requiredParams = [];
 const hasProperties = propertyNames.length > 0;
 const className = helpers.getClassName(model.name);

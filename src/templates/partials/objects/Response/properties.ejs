@@ -1,5 +1,15 @@
 
 	/**
+	 * This will be a #Result object, or an array containing one-or-more #Result objects
+	 * (this will match the structure of the execute property in your #Request object).
+	 *
+	 * Excluded from the schema-driven propertyNames loop (see object.ejs) because
+	 * this is Model-Generation.md's Mixed Type Handling pattern - use
+	 * setResult()/setResultList()/resultIsList() rather than assigning directly.
+	 */
+	public var result = null;
+
+	/**
 	 * Array of Result objects (for mixed type handling with single result)
 	 */
 	public var resultList:Array = null;

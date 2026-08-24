@@ -16,11 +16,6 @@ class io.newgrounds.models.objects.Request extends io.newgrounds.BaseObject {
 	public var app_id:String = null;
 
 	/**
-	 * A #Execute object, or array of one-or-more #Execute objects.
-	 */
-	public var execute = null;
-
-	/**
 	 * An optional login session id. Components that save and unlock things to a user account will require this.
 	 */
 	public var session_id:String = null;
@@ -35,6 +30,15 @@ class io.newgrounds.models.objects.Request extends io.newgrounds.BaseObject {
 	 */
 	public var echo = null;
 
+
+	/**
+	 * A #Execute object, or array of one-or-more #Execute objects.
+	 *
+	 * Excluded from the schema-driven propertyNames loop (see object.ejs) because
+	 * this is Model-Generation.md's Mixed Type Handling pattern - use
+	 * setExecute()/setExecuteList()/executeIsArray() rather than assigning directly.
+	 */
+	public var execute = null;
 
 	/**
 	 * Array of Execute objects (for mixed type handling with single execute)
@@ -67,14 +71,14 @@ class io.newgrounds.models.objects.Request extends io.newgrounds.BaseObject {
 	 * All property names for this object
 	 */
 	public function get propertyNames():Array {
-		return ["app_id","execute","session_id","debug","echo"];
+		return ["app_id","session_id","debug","echo"];
 	}
 
 	/**
 	 * Required properties for validation
 	 */
 	public function get requiredProperties():Array {
-		return ["app_id","execute"];
+		return ["app_id"];
 	}
 
 	/**
@@ -82,7 +86,6 @@ class io.newgrounds.models.objects.Request extends io.newgrounds.BaseObject {
 	 */
 	public function get castTypes():Object {
 		return {
-			execute: "array-of-Execute"
 		};
 	}
 

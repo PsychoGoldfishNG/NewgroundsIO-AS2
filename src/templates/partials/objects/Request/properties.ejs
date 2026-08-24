@@ -1,5 +1,14 @@
 
 	/**
+	 * A #Execute object, or array of one-or-more #Execute objects.
+	 *
+	 * Excluded from the schema-driven propertyNames loop (see object.ejs) because
+	 * this is Model-Generation.md's Mixed Type Handling pattern - use
+	 * setExecute()/setExecuteList()/executeIsArray() rather than assigning directly.
+	 */
+	public var execute = null;
+
+	/**
 	 * Array of Execute objects (for mixed type handling with single execute)
 	 */
 	public var executeList:Array;

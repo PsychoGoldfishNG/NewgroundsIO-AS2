@@ -183,7 +183,7 @@ class io.newgrounds.BaseObject {
 
 		// create a new object of this type to get default values from
 		// if the property isn't povided in the import object
-		var defaultObject = io.newgrounds.models.objects.ObjectFactory.CreateObject(objectName, null, core);
+		var defaultObject = buildDefaultInstance();
 
 		for (var i:Number = 0; i < propNames.length; i++) {
 			var propertyName:String = propNames[i];
@@ -191,7 +191,21 @@ class io.newgrounds.BaseObject {
 			// Check if property exists in the import object
 			// Use === to distinguish explicit null from missing/undefined
 			if (importObject[propertyName] === undefined) {
-				importObject[propertyName] = defaultObject[propertyName];
+				if (objectType == "component") {
+					// A component is built from a developer-supplied PARTIAL parameter
+					// set (see ObjectFactory.CreateComponent), not a complete snapshot.
+					// Absent means "not sent" - null it explicitly, regardless of the
+					// field's own declared default (a Boolean's false, a Number's 0),
+					// so it drops out of toObject()'s excludeNulls pass instead of
+					// reappearing on the wire as its type's zero value.
+					this[propertyName] = null;
+				} else if (defaultObject != null) {
+					this[propertyName] = defaultObject[propertyName];
+				}
+				// else: keep whatever the class-level initializer set. Do NOT index
+				// into the failed lookup - null[propertyName] is undefined in AVM1,
+				// and casting that would overwrite the field default with null.
+				continue;
 			}
 
 			var propertyValue = importObject[propertyName];
@@ -216,6 +230,45 @@ class io.newgrounds.BaseObject {
 			// stamp it here or a failed nested model reports no path.
 			stampChildPosition(this.error, "error");
 		}
+	}
+
+	/**
+	 * A throwaway instance used to read this model's declared defaults.
+	 *
+	 * A result's objectName is a dotted component path ("Medal.unlock") that
+	 * ObjectFactory.CreateObject() cannot resolve by objectName alone - see
+	 * BaseObject.md, "The default instance and dotted names". Dispatching to
+	 * CreateResult for objectType == "result" lets it split the scope and method
+	 * apart, so declared defaults apply there too.
+	 *
+	 * Deliberately NOT extended to objectType == "component": a component is
+	 * built from a developer-supplied PARTIAL parameter set (see
+	 * ObjectFactory.CreateComponent), not a complete server snapshot, so the
+	 * "absent means reset to the declared default" reasoning does not apply - an
+	 * omitted optional parameter needs to stay absent so it drops off the wire in
+	 * toObject(), not reappear as its type's default value. Return null for
+	 * components and let the caller's "keep the constructor value" fallback
+	 * handle it, same as it always effectively has.
+	 *
+	 * @return A fresh instance of this same type, or null if it couldn't be built
+	 */
+	private function buildDefaultInstance() {
+		if (objectType == "object") {
+			return io.newgrounds.models.objects.ObjectFactory.CreateObject(objectName, null, core);
+		}
+
+		if (objectType != "result") {
+			return null;
+		}
+
+		var dotIndex:Number = objectName.indexOf(".");
+		if (dotIndex == -1) {
+			return null;
+		}
+		var scope:String = objectName.substring(0, dotIndex);
+		var method:String = objectName.substring(dotIndex + 1);
+
+		return io.newgrounds.models.objects.ObjectFactory.CreateResult(scope, method, null, core);
 	}
 
 	/**

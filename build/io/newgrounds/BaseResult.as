@@ -27,8 +27,9 @@ class io.newgrounds.BaseResult extends io.newgrounds.BaseObject {
 	 */
 	public function importFromObject(importObject):Void {
 		super.importFromObject(importObject);
-		if (importObject.success != undefined) {
-			this.success = Boolean(importObject.success);
-		}
+		// Import success property if it exists, otherwise reset to false.
+		// importFromObject is a full replace, not a patch (see BaseObject.md) -
+		// an absent property must not leave a stale value from a prior import.
+		this.success = (importObject.success != undefined) ? Boolean(importObject.success) : false;
 	}
 }
