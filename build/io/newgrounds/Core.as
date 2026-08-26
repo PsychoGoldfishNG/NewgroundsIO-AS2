@@ -283,9 +283,9 @@ class io.newgrounds.Core {
 		// callers need no special case - see ComponentValidationHelper.
 		//
 		// Redirects are exempt: they navigate the browser rather than exchanging
-		// JSON, there is no response to shape, and the one that matters
-		// (App.startSession -> Passport) is how a session gets established in
-		// the first place.
+		// JSON, so there is no response to shape. This is the Loader family
+		// (Loader.loadOfficialUrl, Loader.loadMoreGames, and similar) - the
+		// only components with redirect=true.
 		if (!isRedirect) {
 			var validationError = componentModel.getPreflightError();
 
