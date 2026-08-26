@@ -10,10 +10,12 @@ import io.newgrounds.models.objects.ObjectFactory;
  *
  * WHY THIS MATTERS MORE THAN "SAVING A REQUEST":
  *
- * The gateway limits requests per time window. A game that calls medal.unlock()
- * on every scoring event while the player has no session spends that budget on
- * calls whose outcome was knowable before they left the machine - and then a
- * call that COULD have succeeded gets a 429.
+ * A refusal decided locally resolves instantly, with no network round trip -
+ * the caller isn't waiting on latency for an outcome that was already
+ * knowable. It also matters at volume: the gateway limits requests per time
+ * window, so a game that calls medal.unlock() on every scoring event while
+ * the player has no session burns through that budget on calls that could
+ * never succeed, leaving less room for the ones that could.
  *
  * THE CONTRACT:
  *
