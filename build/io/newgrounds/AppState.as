@@ -157,9 +157,11 @@ class io.newgrounds.AppState {
 			return found;
 		}
 
-		// Both response shapes. A single component comes back as `result`, a
-		// queue of them as `resultList`, and loadData produces either depending
-		// on how many property names it was given.
+		// Both result shapes. executeQueue always sends the queue as an execute
+		// list, so a response from loadData always carries `resultList` - even
+		// for one property. This method is public, though: a caller can hand it
+		// a single-component response from executeComponent(), which carries the
+		// scalar `result` instead.
 		var list:Array = response.getResultList();
 
 		if (list == null) {

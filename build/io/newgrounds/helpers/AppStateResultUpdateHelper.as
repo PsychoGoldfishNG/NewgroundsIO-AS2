@@ -201,6 +201,14 @@ class io.newgrounds.helpers.AppStateResultUpdateHelper {
 		}
 	}
 
+	// The three list results (CloudSave.loadSlots, Medal.getList,
+	// ScoreBoard.getBoards) are complete snapshots: the same ids and the same
+	// count on every call, empty save slots included (a SaveSlot with a null
+	// url, not an omission). So every incoming entry matches an existing one by
+	// id and this loop covers the whole collection. importFromObject() overwrites
+	// every field, so a value changed elsewhere lands and nothing stale is kept.
+	// An id on only one side means the set itself changed mid-session - out of
+	// scope here; re-init for that.
 	private static function updateCollectionById(existingCollection:Array, incomingCollection:Array):Void {
 		if (existingCollection == null || incomingCollection == null) {
 			return;
