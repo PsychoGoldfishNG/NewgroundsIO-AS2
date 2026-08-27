@@ -70,7 +70,12 @@ class io.newgrounds.Core {
 	public var appId:String;
 
 	/**
-	 * Stores the app's version number provided at initialization
+	 * Stores the app's version number provided at initialization.
+	 *
+	 * Leave this null unless a version is set in your Newgrounds project's
+	 * "Version Control" settings. The server compares this value against that
+	 * setting, so sending a build version while the project has none can make
+	 * App.getCurrentVersion report the client as deprecated for no reason.
 	 */
 	public var buildVersion:String = null;
 
@@ -103,7 +108,9 @@ class io.newgrounds.Core {
 	 *
 	 * @param appId The unique identifier for the app (from Newgrounds)
 	 * @param encryptionKey The key used for encryption (from Newgrounds, Base64)
-	 * @param buildVersion The app's version number in XX.XX.XXXX format (optional)
+	 * @param buildVersion The app's version number in XX.XX.XXXX format (optional).
+	 *        Leave null unless a version is set in your Newgrounds project's "Version
+	 *        Control" settings, or App.getCurrentVersion can report a false deprecation.
 	 * @param useDebugMode Whether to run in test mode (optional, default: false)
 	 */
 	public function Core(appId:String, encryptionKey:String, buildVersion:String, useDebugMode:Boolean) {

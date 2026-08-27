@@ -57,6 +57,13 @@ class io.newgrounds.AppState {
 	public var session:io.newgrounds.models.objects.Session = null;
 	public var gatewayVersion:String = null;
 	public var currentVersion:String = null;
+	/**
+	 * Set to true when the local version sent to the server doesn't match the
+	 * version in your Newgrounds project. Only meaningful once that project has a
+	 * version set in "Version Control" AND core.buildVersion is set; with no
+	 * project version configured, leave core.buildVersion null or this can come
+	 * back true for a deprecation that isn't real.
+	 */
 	public var clientDeprecated:Boolean = false;
 	public var hostApproved:Boolean = true;
 	public var saveSlots:Array = null;
