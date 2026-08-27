@@ -28,12 +28,16 @@ class io.newgrounds.SessionStatus {
 	public var status:String = "uninitialized";
 
 	/**
-	 * The logged-in user (if status = LOGGED_IN), otherwise null
+	 * The logged-in user (if status = LOGGED_IN), otherwise null.
+	 * When set: an io.newgrounds.models.objects.User model instance (fields id, name,
+	 * supporter, url) - the session's own User, copied by reference. Not a plain object.
 	 */
 	public var user = null;
 
 	/**
-	 * Error details (if status = ERROR), otherwise null
+	 * Error details (if status = ERROR), otherwise null.
+	 * When set: an io.newgrounds.models.objects.Error model instance (fields code, message)
+	 * from the server response or io.newgrounds.Errors.getError(). Not a bare string.
 	 */
 	public var error = null;
 
