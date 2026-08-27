@@ -36,7 +36,7 @@ class io.newgrounds.helpers.HttpRequestHelper {
 	}
 
 	private static function serializeExecuteValue(requestModel:io.newgrounds.models.objects.Request) {
-		if (requestModel.executeIsArray()) {
+		if (requestModel.executeIsList()) {
 			var executeArray:Array = [];
 			var list:Array = requestModel.getExecuteList();
 			for (var i:Number = 0; i < list.length; i++) {
