@@ -15,7 +15,13 @@ import io.newgrounds.encoders.JSON;
 
 class io.newgrounds.helpers.HttpResponseHelper {
 
-	public static function importResponseObject(responseModel:io.newgrounds.models.objects.Response, jsonObject:Object):Void {
+	/**
+	 * sentSessionId is the session id the request carried (null for none). A session
+	 * result for a session that has since been cleared or replaced is still attached,
+	 * but never written into AppState - see AppState.isStaleSessionResult(). Left out
+	 * (undefined), every result is treated as belonging to the current session.
+	 */
+	public static function importResponseObject(responseModel:io.newgrounds.models.objects.Response, jsonObject:Object, sentSessionId):Void {
 		var hasResultProperty:Boolean = (jsonObject != null && jsonObject.result != undefined);
 		var typedResults = null;
 
@@ -34,7 +40,7 @@ class io.newgrounds.helpers.HttpResponseHelper {
 		}
 
 		propagateResponseError(responseModel);
-		updateAppState(responseModel);
+		updateAppState(responseModel, sentSessionId);
 	}
 
 	private static function cloneWithoutResult(source:Object):Object {
@@ -106,18 +112,27 @@ class io.newgrounds.helpers.HttpResponseHelper {
 		}
 	}
 
-	private static function updateAppState(responseModel:io.newgrounds.models.objects.Response):Void {
+	private static function updateAppState(responseModel:io.newgrounds.models.objects.Response, sentSessionId):Void {
 		if (responseModel.core == null || responseModel.core.appState == null) {
 			return;
+		}
+
+		var appState = responseModel.core.appState;
+		if (sentSessionId === undefined) {
+			sentSessionId = (appState.session != null) ? appState.session.id : null;
 		}
 
 		if (responseModel.resultIsList()) {
 			var list:Array = responseModel.getResultList();
 			for (var i:Number = 0; i < list.length; i++) {
-				responseModel.core.appState.setValueFromResult(list[i]);
+				if (!appState.isStaleSessionResult(list[i], sentSessionId)) {
+					appState.setValueFromResult(list[i]);
+				}
 			}
 		} else if (responseModel.getResult() != null) {
-			responseModel.core.appState.setValueFromResult(responseModel.getResult());
+			if (!appState.isStaleSessionResult(responseModel.getResult(), sentSessionId)) {
+				appState.setValueFromResult(responseModel.getResult());
+			}
 		}
 	}
 }

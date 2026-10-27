@@ -44,8 +44,12 @@ class io.newgrounds.helpers.CoreTransportHelper {
 
 	/**
 	 * Sends a request via LoadVars.sendAndLoad() and forwards response to Core.
+	 *
+	 * sentSessionId is the session id the request went out with, handed back to
+	 * Core with the response so a late session result can be recognized. The onData
+	 * closure below captures it like any other enclosing local.
 	 */
-	public static function sendHttpRequest(core:io.newgrounds.Core, requestString:String, callback:Function, thisArg):Void {
+	public static function sendHttpRequest(core:io.newgrounds.Core, requestString:String, callback:Function, thisArg, sentSessionId):Void {
 		if (callback == undefined) callback = null;
 		if (thisArg == undefined) thisArg = null;
 
@@ -111,7 +115,7 @@ class io.newgrounds.helpers.CoreTransportHelper {
 				// of being parsed as if it had succeeded.
 				coreRef.forwardHTTPResponse(
 					(httpStatus != io.newgrounds.helpers.HttpStatusHelper.UNKNOWN_STATUS) ? httpStatus : 200,
-					src, callback, thisArg
+					src, callback, thisArg, sentSessionId
 				);
 			} else {
 				if (coreRef.debugNetworkCalls) {
@@ -130,7 +134,7 @@ class io.newgrounds.helpers.CoreTransportHelper {
 				coreRef.reportNetworkActivity("error",
 					"Load failed - no data received from " + io.newgrounds.Core.GATEWAY_URL +
 					io.newgrounds.helpers.CoreTransportHelper.describeStatus(httpStatus));
-				coreRef.forwardHTTPResponse(httpStatus, null, callback, thisArg);
+				coreRef.forwardHTTPResponse(httpStatus, null, callback, thisArg, sentSessionId);
 			}
 		};
 

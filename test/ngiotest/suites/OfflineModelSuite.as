@@ -350,6 +350,24 @@ class ngiotest.suites.OfflineModelSuite extends ngiotest.TestSuite {
 			t.done();
 		});
 
+		add("AppState flags a session result sent for a different session", function(t:ngiotest.TestContext):Void {
+			var state:io.newgrounds.AppState = self.freshAppState();
+			var factory = io.newgrounds.models.objects.ObjectFactory;
+			var check = factory.CreateResult("App", "checkSession", {}, null);
+			var start = factory.CreateResult("App", "startSession", {}, null);
+			var medals = factory.CreateResult("Medal", "getList", {}, null);
+
+			state.session.id = "sess-B";
+			t.assertTrue(state.isStaleSessionResult(check, "sess-A"), "check sent for an older session");
+			t.assertTrue(state.isStaleSessionResult(start, null), "start sent before a session existed");
+			t.assertFalse(state.isStaleSessionResult(check, "sess-B"), "check sent for the current session");
+			t.assertFalse(state.isStaleSessionResult(medals, "sess-A"), "non-session results are never flagged");
+
+			state.session.id = "";
+			t.assertFalse(state.isStaleSessionResult(start, null), "an empty id counts as no id");
+			t.done();
+		});
+
 		add("AppState reports an expired session as EXPIRED", function(t:ngiotest.TestContext):Void {
 			var state:io.newgrounds.AppState = self.freshAppState();
 			state.session.id = "sess-1";

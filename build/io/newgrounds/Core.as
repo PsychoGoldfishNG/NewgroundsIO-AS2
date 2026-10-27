@@ -369,8 +369,19 @@ class io.newgrounds.Core {
 		requestModel.app_id = this.appId;
 		requestModel.debug = this.useDebugMode;
 
-		if (this.appState != null && this.appState.session != null && this.appState.session.id != null) {
-			requestModel.session_id = this.appState.session.id;
+		// Remember which session this request is about. Read it now, while the request
+		// is being built, not when the response arrives: the player can sign out while
+		// it is in flight. The response import uses it to keep a late session result
+		// from overwriting a newer session. Normalized to null (never undefined), since
+		// undefined is what tells the response import "not supplied".
+		var sentSessionId:String = null;
+		if (this.appState != null && this.appState.session != null &&
+			this.appState.session.id != undefined && this.appState.session.id != null) {
+			sentSessionId = this.appState.session.id;
+		}
+
+		if (sentSessionId != null) {
+			requestModel.session_id = sentSessionId;
 		}
 
 		if (toExecute != null) {
@@ -391,7 +402,7 @@ class io.newgrounds.Core {
 			return;
 		}
 
-		io.newgrounds.helpers.CoreTransportHelper.sendHttpRequest(this, requestString, callback, thisArg);
+		io.newgrounds.helpers.CoreTransportHelper.sendHttpRequest(this, requestString, callback, thisArg, sentSessionId);
 	}
 
 	/**
@@ -416,15 +427,18 @@ class io.newgrounds.Core {
 
 	/**
 	 * Internal forwarding entry for transport helper event callbacks.
+	 *
+	 * sentSessionId is the session id the request went out with (null for none).
+	 * Left out, every result is treated as belonging to the current session.
 	 */
-	public function forwardHTTPResponse(statusCode:Number, responseText:String, callback:Function, thisArg):Void {
-		onHTTPResponse(statusCode, responseText, callback, thisArg);
+	public function forwardHTTPResponse(statusCode:Number, responseText:String, callback:Function, thisArg, sentSessionId):Void {
+		onHTTPResponse(statusCode, responseText, callback, thisArg, sentSessionId);
 	}
 
 	/**
 	 * Handle HTTP response from the server
 	 */
-	private function onHTTPResponse(statusCode:Number, responseText:String, callback:Function, thisArg):Void {
+	private function onHTTPResponse(statusCode:Number, responseText:String, callback:Function, thisArg, sentSessionId):Void {
 		
 		var responseModel = io.newgrounds.models.objects.ObjectFactory.CreateObject("Response", null, this);
 
@@ -497,7 +511,7 @@ class io.newgrounds.Core {
 
 			if (jsonObject != null) {
 				try {
-					io.newgrounds.helpers.HttpResponseHelper.importResponseObject(responseModel, jsonObject);
+					io.newgrounds.helpers.HttpResponseHelper.importResponseObject(responseModel, jsonObject, sentSessionId);
 				} catch (importError) {
 					trace("IMPORT ERROR: Error importing into Response model: " + importError);
 

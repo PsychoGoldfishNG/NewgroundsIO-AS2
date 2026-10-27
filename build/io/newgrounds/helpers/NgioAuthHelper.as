@@ -15,6 +15,18 @@ class io.newgrounds.helpers.NgioAuthHelper {
 	private static var lastCheckSessionTime:Date = null;
 
 	/**
+	 * True while an App.startSession is out. A second start would replace the first
+	 * session, and Passport may already be open on it, so checkSession() answers
+	 * locally until this one comes back. The throttle alone can't prevent that: a
+	 * start slower than the throttle window lets the next poll through.
+	 *
+	 * PUBLIC, and always written fully qualified from inside startNewSession()'s
+	 * response handler: ActionScript 2 cannot resolve a private static from inside
+	 * a nested function. Not part of the API; don't set it from outside.
+	 */
+	public static var sessionStartPending:Boolean = false;
+
+	/**
 	 * Opens the Newgrounds login window so the user can authenticate.
 	 *
 	 * @param core The active NGIO core instance
@@ -74,10 +86,11 @@ class io.newgrounds.helpers.NgioAuthHelper {
 
 		var sessionStatus:io.newgrounds.SessionStatus = new io.newgrounds.SessionStatus();
 
-		// Capture the static as a local so the response handler below can call it.
+		// Capture the statics as locals so the response handler below can call them.
 		// AS2 resolves class members lexically, but a bare static reference inside a
 		// nested function literal is unreliable - a captured local always works.
 		var startNew:Function = startNewSession;
+		var reportLocal:Function = reportLocalSessionStatus;
 
 		if (hasUser(core)) {
 			sessionStatus.status = io.newgrounds.SessionStatus.LOGGED_IN;
@@ -86,21 +99,18 @@ class io.newgrounds.helpers.NgioAuthHelper {
 			return;
 		}
 
+		var throttled:Boolean = false;
 		if (lastCheckSessionTime !== null) {
 			var timeSinceLastCheck:Number = (new Date().getTime() - lastCheckSessionTime.getTime()) / 1000;
-			if (timeSinceLastCheck < CHECKSESSION_THROTTLE_TIME) {
-				if (core.appState.passportIsOpen === true) {
-					sessionStatus.status = io.newgrounds.SessionStatus.WAITING_FOR_PASSPORT;
-				} else if (core.appState.session.verified !== true) {
-					sessionStatus.status = io.newgrounds.SessionStatus.UNVERIFIED;
-				} else {
-					sessionStatus.status = io.newgrounds.SessionStatus.NOT_LOGGED_IN;
-				}
-				callCallback(sessionStatus);
-				return;
-			}
+			throttled = (timeSinceLastCheck < CHECKSESSION_THROTTLE_TIME);
 		}
 
+		if (sessionStartPending === true || throttled) {
+			reportLocalSessionStatus(core, sessionStatus, callCallback);
+			return;
+		}
+
+		// The throttle limits how often the server is polled.
 		lastCheckSessionTime = new Date();
 
 		if (!hasSession(core)) {
@@ -112,8 +122,24 @@ class io.newgrounds.helpers.NgioAuthHelper {
 		if (checkSessionComponent == null) {
 			throw new Error("Could not create App.checkSession component");
 		}
+
+		// Normalized to null, so an unset id and an empty one compare as "no session".
+		var sentSessionId:String = core.appState.session.id;
+		if (sentSessionId == undefined || sentSessionId == "") sentSessionId = null;
+
 		core.executeComponent(checkSessionComponent, function(response):Void {
 			var result = null;
+
+			// The session this check was about was cleared or replaced while it was in
+			// flight. Its answer describes a session the app no longer holds, so none
+			// of the lifecycle handling below may act on it: an EXPIRED_SESSION here
+			// would discard the NEW session. AppState has already declined to cache it.
+			var currentId:String = core.appState.session.id;
+			if (currentId == undefined || currentId == "") currentId = null;
+			if (currentId !== sentSessionId) {
+				reportLocal(core, sessionStatus, callCallback);
+				return;
+			}
 
 			if (response !== null && response.success === true) {
 				result = response.getResult();
@@ -198,6 +224,28 @@ class io.newgrounds.helpers.NgioAuthHelper {
 		});
 
 		core.appState.clearSession();
+
+		// Reset the throttle, so the next checkSession() starts a fresh session straight
+		// away instead of reporting on the one just cleared. Safe: a check still in
+		// flight for the old session can no longer overwrite the new one, and the next
+		// call re-arms the throttle as usual.
+		lastCheckSessionTime = null;
+	}
+
+	/**
+	 * Reports the session status from local state, without contacting the server.
+	 * Used while the throttle is warm, while a session start is still out, and for a
+	 * check whose session went away while it was in flight.
+	 */
+	private static function reportLocalSessionStatus(core:io.newgrounds.Core, sessionStatus:io.newgrounds.SessionStatus, callCallback:Function):Void {
+		if (core.appState.passportIsOpen === true) {
+			sessionStatus.status = io.newgrounds.SessionStatus.WAITING_FOR_PASSPORT;
+		} else if (core.appState.session.verified !== true) {
+			sessionStatus.status = io.newgrounds.SessionStatus.UNVERIFIED;
+		} else {
+			sessionStatus.status = io.newgrounds.SessionStatus.NOT_LOGGED_IN;
+		}
+		callCallback(sessionStatus);
 	}
 
 	/**
@@ -215,7 +263,15 @@ class io.newgrounds.helpers.NgioAuthHelper {
 		if (startSessionComponent == null) {
 			throw new Error("Could not create App.startSession component");
 		}
+
+		io.newgrounds.helpers.NgioAuthHelper.sessionStartPending = true;
+
 		core.executeComponent(startSessionComponent, function(response):Void {
+
+			// First, on every path: a flag left set would make every later
+			// checkSession() answer locally forever. Fully qualified - see the
+			// declaration.
+			io.newgrounds.helpers.NgioAuthHelper.sessionStartPending = false;
 
 			if (!response || response.success !== true) {
 				sessionStatus.status = io.newgrounds.SessionStatus.ERROR;
