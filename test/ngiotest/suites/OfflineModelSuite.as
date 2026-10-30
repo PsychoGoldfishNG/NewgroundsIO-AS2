@@ -368,6 +368,27 @@ class ngiotest.suites.OfflineModelSuite extends ngiotest.TestSuite {
 			t.done();
 		});
 
+		add("AppState.clearSession() leaves nothing of the previous player behind", function(t:ngiotest.TestContext):Void {
+			var state:io.newgrounds.AppState = self.freshAppState();
+			var errors = io.newgrounds.Errors;
+			var medal:io.newgrounds.models.objects.Medal = io.newgrounds.models.objects.Medal(
+				io.newgrounds.models.objects.ObjectFactory.CreateObject("Medal", { id: 1, unlocked: true }, null));
+			state.medals = [medal];
+			state.session.id = "sess-1";
+			state.session.error = errors.getError(errors.EXPIRED_SESSION, null, false);
+			state.medalScore = 5;
+			state.passportIsOpen = true;
+
+			state.clearSession();
+
+			t.assertNull(state.session.id, "session id");
+			t.assertNull(state.session.error, "session error");
+			t.assertEquals(0, state.medalScore, "medal score");
+			t.assertFalse(state.passportIsOpen, "passportIsOpen, so the next player can open Passport");
+			t.assertFalse(medal.unlocked, "the last player's medal unlocks");
+			t.done();
+		});
+
 		add("AppState reports an expired session as EXPIRED", function(t:ngiotest.TestContext):Void {
 			var state:io.newgrounds.AppState = self.freshAppState();
 			state.session.id = "sess-1";

@@ -424,35 +424,34 @@ class io.newgrounds.AppState {
 	/**
 	 * Discard a session the server has rejected (expired or cancelled)
 	 *
-	 * Stronger than clearSession(): as well as forgetting the saved session id, this
-	 * resets the session-scoped caches (medals, save slots, medal score) and lowers
-	 * passportIsOpen, because none of that data is valid once the session is gone.
-	 *
-	 * Without this, a rejected session id stays in memory and in storage, so every
+	 * Same reset as clearSession(); kept separate because the reason differs.
+	 * Without it, a rejected session id stays in memory and in storage, so every
 	 * later checkSession() re-sends the same dead id and fails the same way.
 	 */
 	public function invalidateSession():Void {
+		this.clearSession();
+	}
+
+	/**
+	 * Completely clear the current session (used when logging out)
+	 *
+	 * Resets everything that described the old player, not just the session: the
+	 * medals' and save slots' session data, medalScore and passportIsOpen. Otherwise
+	 * the next player sees the last one's unlocks, and a sign-out while Passport
+	 * was open leaves openPassport() refusing to open it again.
+	 */
+	public function clearSession():Void {
 		// Reset session-scoped state and the session object itself
 		io.newgrounds.helpers.AppStateSessionResetHelper.clearSessionScopedData(this);
 
-		// Drop any error left over from the rejected session, so a freshly started
+		// Drop any error left over from the old session, so a freshly started
 		// session isn't immediately judged by the old session's failure
 		if (this.session != null) {
 			this.session.error = null;
 		}
 
-		// Forget the saved id so a page reload doesn't restore the dead session
+		// Also remove the saved session from storage
+		// So next time they open the app, they won't be auto-logged-in
 		io.newgrounds.helpers.AppStateBootstrapHelper.clearSavedSessionId(this.sessionStorageKey);
-	}
-
-	/**
-	 * Completely clear the current session (used when logging out)
-	 */
-	public function clearSession():Void {
-		if (session != null && typeof(session.clearSessionData) == "function") {
-			session.clearSessionData();
-		}
-
-		io.newgrounds.helpers.AppStateBootstrapHelper.clearSavedSessionId(sessionStorageKey);
 	}
 }
