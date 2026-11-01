@@ -117,7 +117,10 @@ class io.newgrounds.models.objects.Medal extends io.newgrounds.BaseObject {
 		if (thisArg == undefined) thisArg = null;
 		var callbackParams:Object = {
 			callback: callback,
-			thisArg: thisArg
+			thisArg: thisArg,
+			// The session this unlock is for. If the player signs out before the
+			// answer arrives, the flag would describe them, not whoever is playing now.
+			sentSessionId: this.currentSessionId()
 		};
 
 		// Call Medal.unlock component via core
@@ -153,13 +156,24 @@ class io.newgrounds.models.objects.Medal extends io.newgrounds.BaseObject {
 
 		// Only mark this unlocked if the server actually accepted it. Setting it on any
 		// response would leave the medal permanently showing as earned after a failure.
-		if (error == null) {
+		// And only if the session it was sent for is still the current one.
+		if (error == null && this.currentSessionId() === callbackParams.sentSessionId) {
 			this.unlocked = true;
 		}
 
 		if (callbackParams.callback != null) {
 			callbackParams.callback.call(callbackParams.thisArg, this, error);
 		}
+	}
+
+	/**
+	 * The current session id, or null with no session or no core. Unset and empty
+	 * both come back as null, so two of them always compare equal.
+	 */
+	private function currentSessionId():String {
+		if (this.core == null || this.core.appState == null || this.core.appState.session == null) return null;
+		var id:String = this.core.appState.session.id;
+		return (id == undefined || id == "") ? null : id;
 	}
 
 	/**

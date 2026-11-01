@@ -361,7 +361,10 @@ class ngiotest.suites.OfflineModelSuite extends ngiotest.TestSuite {
 			t.assertTrue(state.isStaleSessionResult(check, "sess-A"), "check sent for an older session");
 			t.assertTrue(state.isStaleSessionResult(start, null), "start sent before a session existed");
 			t.assertFalse(state.isStaleSessionResult(check, "sess-B"), "check sent for the current session");
-			t.assertFalse(state.isStaleSessionResult(medals, "sess-A"), "non-session results are never flagged");
+			t.assertTrue(state.isStaleSessionResult(medals, "sess-A"), "player data sent for a session that has gone");
+			t.assertFalse(state.isStaleSessionResult(medals, null), "player data sent with no session describes nobody");
+			t.assertFalse(state.isStaleSessionResult(factory.CreateResult("ScoreBoard", "getBoards", {}, null), "sess-A"),
+				"results that don't describe a player are never flagged");
 
 			state.session.id = "";
 			t.assertFalse(state.isStaleSessionResult(start, null), "an empty id counts as no id");

@@ -341,11 +341,16 @@ class io.newgrounds.AppState {
 	}
 
 	/**
-	 * True for an App.checkSession or App.startSession result whose request went out
-	 * for a session that is no longer the current one: the player signed out, or
-	 * another session replaced it, while the request was in flight. Writing it in
-	 * would put the old session back, so the response import skips
-	 * setValueFromResult() for it. The caller still receives the result.
+	 * True for a result whose request went out for a session that is no longer the
+	 * current one: the player signed out, or another session replaced it, while the
+	 * request was in flight. The response import skips setValueFromResult() for it.
+	 * The caller still receives the result.
+	 *
+	 * - App.checkSession / App.startSession: writing it in would put the old session
+	 *   back, so any change of session counts, including from none.
+	 * - Results that describe the signed-in player (medal unlocks, medal score, save
+	 *   slots): stale only when sent FOR a session that has since gone. One sent with
+	 *   no session describes nobody, so it is still good.
 	 *
 	 * Compares against the id the request carried, not an id in the result, so it
 	 * never depends on what the server echoes back. Unset, null and "" ids are all
@@ -355,15 +360,21 @@ class io.newgrounds.AppState {
 		if (resultObject == null) {
 			return false;
 		}
-		var name:String = resultObject.objectName;
-		if (name != "App.checkSession" && name != "App.startSession") {
-			return false;
-		}
 
 		var currentId:String = (this.session != null) ? this.session.id : null;
 		if (currentId == undefined || currentId == "") currentId = null;
 		if (sentSessionId == undefined || sentSessionId == "") sentSessionId = null;
-		return currentId !== sentSessionId;
+
+		var name:String = resultObject.objectName;
+		if (name == "App.checkSession" || name == "App.startSession") {
+			return currentId !== sentSessionId;
+		}
+		if (name == "Medal.getList" || name == "Medal.getMedalScore" || name == "Medal.unlock" ||
+			name == "CloudSave.loadSlots" || name == "CloudSave.loadSlot" ||
+			name == "CloudSave.setData" || name == "CloudSave.clearSlot") {
+			return sentSessionId !== null && currentId !== sentSessionId;
+		}
+		return false;
 	}
 
 	/**
