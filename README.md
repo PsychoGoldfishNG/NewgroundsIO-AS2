@@ -833,6 +833,12 @@ if (medal != null) {
 NGIO.setKeepGuestMedalUnlocks(false); // before or after init()
 ```
 
+Or hold them until you've asked the player whether they're theirs, which is the safer choice on a shared computer. `NGIO.getGuestMedalUnlocks()` lists them, and `NGIO.claimGuestMedalUnlocks(ids, callback, thisArg)` or `NGIO.discardGuestMedalUnlocks(ids)` settles them once someone has signed in:
+
+```actionscript
+NGIO.setHoldGuestMedalUnlocks(true); // before or after init()
+```
+
 **Get user's total medal score (cached):**
 ```actionscript
 // Quick synchronous access - no callback needed

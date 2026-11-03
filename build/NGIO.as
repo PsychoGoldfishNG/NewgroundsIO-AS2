@@ -102,6 +102,7 @@ class NGIO {
 
 	private static var keepGuestMedalUnlocksValue:Boolean = true;
 	private static var offerGuestSavesValue:Boolean = true;
+	private static var holdGuestMedalUnlocksValue:Boolean = false;
 
 	//==================== OPTIONS ====================
 	//
@@ -120,6 +121,21 @@ class NGIO {
 
 	public static function getKeepGuestMedalUnlocks():Boolean {
 		return keepGuestMedalUnlocksValue;
+	}
+
+	/**
+	 * Whether medals unlocked while nobody is signed in wait for the game to
+	 * claim or discard them, instead of going to whoever signs in next. Defaults
+	 * to false. Turn it on to ask a player whether those medals are theirs; see
+	 * getGuestMedalUnlocks().
+	 */
+	public static function setHoldGuestMedalUnlocks(value:Boolean):Void {
+		holdGuestMedalUnlocksValue = value;
+		if (core != null) core.medalUnlockQueue.holdGuestUnlocks = value;
+	}
+
+	public static function getHoldGuestMedalUnlocks():Boolean {
+		return holdGuestMedalUnlocksValue;
 	}
 
 	/**
@@ -159,6 +175,7 @@ class NGIO {
 
 		core = io.newgrounds.helpers.NgioBootstrapHelper.doInitializationSequence(appId, encryptionKey, buildVersion, useDebugMode);
 		core.medalUnlockQueue.keepGuestUnlocks = keepGuestMedalUnlocksValue;
+		core.medalUnlockQueue.holdGuestUnlocks = holdGuestMedalUnlocksValue;
 		core.appState.offerGuestSaves = offerGuestSavesValue;
 		keepAliveInterval = io.newgrounds.helpers.NgioBootstrapHelper.startKeepAlive(KEEP_ALIVE_TIME, keepAlive);
 		medalUnlockRetryInterval = io.newgrounds.helpers.NgioBootstrapHelper.startKeepAlive(MEDAL_UNLOCK_RETRY_TIME, retryPendingMedalUnlocks);
@@ -176,6 +193,39 @@ class NGIO {
 			throw new Error("Core not initialized");
 		}
 		core.medalUnlockQueue.retryPending();
+	}
+
+	/** The ids of medals unlocked while nobody was signed in, still waiting to be sent or discarded. */
+	public static function getGuestMedalUnlocks():Array {
+		if (core == null) {
+			throw new Error("Core not initialized");
+		}
+		return core.medalUnlockQueue.getGuestIds();
+	}
+
+	/**
+	 * Sends guest medal unlocks for the signed-in player. One that can't be sent
+	 * yet is kept as theirs and retried. Does nothing when nobody is signed in.
+	 *
+	 * @param ids Medal ids to claim
+	 * @param callback Called as callback(outcomes), each outcome {id, medal, error} (optional)
+	 * @param thisArg Context for the callback (optional)
+	 */
+	public static function claimGuestMedalUnlocks(ids:Array, callback:Function, thisArg):Void {
+		if (callback == undefined) callback = null;
+		if (thisArg == undefined) thisArg = null;
+		if (core == null) {
+			throw new Error("Core not initialized");
+		}
+		core.medalUnlockQueue.claimGuestUnlocks(ids, callback, thisArg);
+	}
+
+	/** Drops guest medal unlocks without sending them. */
+	public static function discardGuestMedalUnlocks(ids:Array):Void {
+		if (core == null) {
+			throw new Error("Core not initialized");
+		}
+		core.medalUnlockQueue.discardGuestUnlocks(ids);
 	}
 
 	/**

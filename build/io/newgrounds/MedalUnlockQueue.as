@@ -46,6 +46,13 @@ class io.newgrounds.MedalUnlockQueue {
 	 */
 	public var keepGuestUnlocks:Boolean;
 
+	/**
+	 * Whether guest entries wait for the game to claim or discard them, instead
+	 * of going to whoever signs in next. No effect while keepGuestUnlocks is
+	 * false. Set through NGIO.setHoldGuestMedalUnlocks().
+	 */
+	public var holdGuestUnlocks:Boolean;
+
 	public function MedalUnlockQueue(core:io.newgrounds.Core) {
 		this.core = core;
 		// Scoped by App ID for the same reason the saved session id is: apps on
@@ -55,6 +62,7 @@ class io.newgrounds.MedalUnlockQueue {
 		// prototype, and inFlight is mutated.
 		this.inFlight = {};
 		this.keepGuestUnlocks = true;
+		this.holdGuestUnlocks = false;
 	}
 
 	/** Ids currently waiting on the gateway, for any player. */
@@ -65,6 +73,93 @@ class io.newgrounds.MedalUnlockQueue {
 			if (io.newgrounds.MedalUnlockQueue.indexOfValue(ids, entries[i].id) == -1) ids.push(entries[i].id);
 		}
 		return ids;
+	}
+
+	/** Ids recorded while nobody was signed in, and not yet sent or discarded. */
+	public function getGuestIds():Array {
+		var entries:Array = this.readEntries();
+		var ids:Array = [];
+		for (var i:Number = 0; i < entries.length; i++) {
+			if (entries[i].user === null && io.newgrounds.MedalUnlockQueue.indexOfValue(ids, entries[i].id) == -1) {
+				ids.push(entries[i].id);
+			}
+		}
+		return ids;
+	}
+
+	/**
+	 * Hands guest entries to the signed-in player and sends them. Each is
+	 * recorded as that player's before it goes out, so one that can't be sent
+	 * yet waits for them like any of their own. Ids with no guest entry are
+	 * ignored. With nobody signed in, the callback gets an empty list.
+	 *
+	 * @param ids Medal ids to claim
+	 * @param callback Called as callback(outcomes), the same shape unlock() reports
+	 * @param thisArg Context for the callback
+	 */
+	public function claimGuestUnlocks(ids:Array, callback:Function, thisArg):Void {
+		if (callback == undefined) callback = null;
+		if (thisArg == undefined) thisArg = null;
+
+		var user = this.currentUserId();
+		var entries:Array = this.readEntries();
+		var claimed:Array = [];
+		var i:Number;
+		var j:Number;
+		for (i = 0; i < ids.length; i++) {
+			if (typeof(ids[i]) != "number" || io.newgrounds.MedalUnlockQueue.indexOfValue(claimed, ids[i]) != -1) continue;
+			for (j = 0; j < entries.length; j++) {
+				if (entries[j].id == ids[i] && entries[j].user === null) {
+					claimed.push(ids[i]);
+					break;
+				}
+			}
+		}
+
+		if (user === null || claimed.length == 0) {
+			if (callback != null) callback.call(thisArg, []);
+			return;
+		}
+
+		var kept:Array = [];
+		for (i = 0; i < entries.length; i++) {
+			if (entries[i].user !== null || io.newgrounds.MedalUnlockQueue.indexOfValue(claimed, entries[i].id) == -1) {
+				kept.push(entries[i]);
+			}
+		}
+		for (i = 0; i < claimed.length; i++) {
+			var owned:Boolean = false;
+			for (j = 0; j < kept.length; j++) {
+				if (kept[j].id == claimed[i] && io.newgrounds.MedalUnlockQueue.sameUser(kept[j].user, user)) {
+					owned = true;
+					break;
+				}
+			}
+			if (!owned) kept.push({id: claimed[i], user: user});
+		}
+		this.write(kept);
+
+		var toSend:Array = [];
+		for (i = 0; i < claimed.length; i++) {
+			if (this.inFlight[claimed[i]] !== true) toSend.push(claimed[i]);
+		}
+		if (toSend.length == 0) {
+			if (callback != null) callback.call(thisArg, []);
+			return;
+		}
+		this.send(toSend, user, callback, thisArg);
+	}
+
+	/** Drops guest entries for these ids without sending them. Players' own entries are untouched. */
+	public function discardGuestUnlocks(ids:Array):Void {
+		var entries:Array = this.readEntries();
+		var kept:Array = [];
+		for (var i:Number = 0; i < entries.length; i++) {
+			if (entries[i].user !== null || io.newgrounds.MedalUnlockQueue.indexOfValue(ids, entries[i].id) == -1) {
+				kept.push(entries[i]);
+			}
+		}
+		if (kept.length != entries.length) this.write(kept);
 	}
 
 	/**
@@ -104,7 +199,8 @@ class io.newgrounds.MedalUnlockQueue {
 	/**
 	 * Re-sends what is still buffered for whoever is signed in now: their own
 	 * entries and any guest entries, minus anything already in flight. Another
-	 * player's entries wait until that player signs in again.
+	 * player's entries wait until that player signs in again. With
+	 * holdGuestUnlocks on, guest entries wait for claimGuestUnlocks() instead.
 	 *
 	 * Never throws. A failed pass is exactly the "still can't reach the gateway"
 	 * case this exists for, and one bad pass mustn't stop the next.
@@ -128,7 +224,10 @@ class io.newgrounds.MedalUnlockQueue {
 			var pending:Array = [];
 			for (i = 0; i < entries.length; i++) {
 				var entry:Object = entries[i];
-				if ((entry.user === null || io.newgrounds.MedalUnlockQueue.sameUser(entry.user, user))
+				var owner:Boolean = (entry.user === null)
+					? !this.holdGuestUnlocks
+					: io.newgrounds.MedalUnlockQueue.sameUser(entry.user, user);
+				if (owner
 					&& io.newgrounds.MedalUnlockQueue.indexOfValue(pending, entry.id) == -1
 					&& this.inFlight[entry.id] !== true) {
 					pending.push(entry.id);

@@ -186,6 +186,73 @@ class ngiotest.suites.OfflineLocalDataSuite extends ngiotest.TestSuite {
 			}, null);
 		});
 
+		add("holds guest unlocks on a retry pass when holdGuestUnlocks is on", function(t:ngiotest.TestContext):Void {
+			self.resetStore();
+			self.memory["ngio-pending-medal-unlocks-for-" + appId] = io.newgrounds.encoders.JSON.encode([{id: 5, user: null}, {id: 6, user: 1}]);
+			var core:io.newgrounds.Core = self.signedInCore(1);
+			core.medalUnlockQueue.holdGuestUnlocks = true;
+			var sent:Number = 0;
+			var reply:String = self.unlockReply(true, 0);
+			core.requestHandler = function(request:String, respond:Function):Void {
+				sent++;
+				respond(200, reply);
+			};
+			core.medalUnlockQueue.retryPending();
+			t.assertEquals(1, sent, "only the player's own entry was sent");
+			t.assertEquals("5", core.medalUnlockQueue.getGuestIds().join(","), "the guest entry still waits");
+			t.done();
+		});
+
+		add("claims guest unlocks for the signed-in player", function(t:ngiotest.TestContext):Void {
+			self.resetStore();
+			self.memory["ngio-pending-medal-unlocks-for-" + appId] = io.newgrounds.encoders.JSON.encode([{id: 5, user: null}, {id: 9, user: null}]);
+			var core:io.newgrounds.Core = self.signedInCore(1);
+			core.medalUnlockQueue.holdGuestUnlocks = true;
+			self.answerAll(core, self.unlockReply(true, 0));
+			core.medalUnlockQueue.claimGuestUnlocks([5, 77], function(outcomes:Array):Void {
+				t.assertEquals(1, outcomes.length, "77 had no guest entry");
+				t.assertEquals(5, outcomes[0].id, "5 was claimed");
+				t.assertEquals("9", core.medalUnlockQueue.getPendingIds().join(","), "only 9 is left");
+				t.done();
+			}, null);
+		});
+
+		add("keeps a claimed unlock as the player's own when it can't be sent yet", function(t:ngiotest.TestContext):Void {
+			self.resetStore();
+			self.memory["ngio-pending-medal-unlocks-for-" + appId] = io.newgrounds.encoders.JSON.encode([{id: 5, user: null}]);
+			var core:io.newgrounds.Core = self.signedInCore(1);
+			core.medalUnlockQueue.holdGuestUnlocks = true;
+			core.requestHandler = function(request:String, respond:Function):Void {
+				respond(0, null);
+			};
+			core.medalUnlockQueue.claimGuestUnlocks([5], function(outcomes:Array):Void {
+				t.assertEquals(0, core.medalUnlockQueue.getGuestIds().length, "no longer a guest entry");
+				t.assertEquals("5", core.medalUnlockQueue.getPendingIds().join(","), "still pending, as player 1's");
+				t.done();
+			}, null);
+		});
+
+		add("claims nothing with nobody signed in", function(t:ngiotest.TestContext):Void {
+			self.resetStore();
+			self.memory["ngio-pending-medal-unlocks-for-" + appId] = io.newgrounds.encoders.JSON.encode([{id: 5, user: null}]);
+			var core:io.newgrounds.Core = new io.newgrounds.Core(appId, ngiotest.TestConfig.ENCRYPTION_KEY, null, false);
+			core.medalUnlockQueue.claimGuestUnlocks([5], function(outcomes:Array):Void {
+				t.assertEquals(0, outcomes.length, "nothing claimed");
+				t.assertEquals("5", core.medalUnlockQueue.getGuestIds().join(","), "still a guest entry");
+				t.done();
+			}, null);
+		});
+
+		add("discards guest unlocks and leaves players' own", function(t:ngiotest.TestContext):Void {
+			self.resetStore();
+			self.memory["ngio-pending-medal-unlocks-for-" + appId] = io.newgrounds.encoders.JSON.encode([{id: 5, user: null}, {id: 5, user: 2}, {id: 6, user: null}]);
+			var core:io.newgrounds.Core = self.signedInCore(1);
+			core.medalUnlockQueue.discardGuestUnlocks([5]);
+			t.assertEquals("6", core.medalUnlockQueue.getGuestIds().join(","), "only 6 is left as a guest entry");
+			t.assertEquals("5,6", core.medalUnlockQueue.getPendingIds().join(","), "player 2's 5 is untouched");
+			t.done();
+		});
+
 		add("Medal.unlock() marks the medal unlocked only when the gateway accepts it", function(t:ngiotest.TestContext):Void {
 			self.resetStore();
 			var core:io.newgrounds.Core = self.signedInCore(1);
