@@ -104,8 +104,16 @@ class io.newgrounds.models.objects.Medal extends io.newgrounds.BaseObject {
 
 	/**
 	 * Unlocks this medal for the current user.
+	 *
+	 * The request goes through Core's medal unlock queue, which records the id
+	 * before sending and keeps it until the gateway rules on it. A connection
+	 * that drops mid-request, or a game closed before the answer arrives, is
+	 * retried in the background rather than losing a medal the player already
+	 * earned. See MedalUnlockQueue.
+	 *
 	 * @param callback Function to call when the unlock completes, as callback(medal, error)
-	 *                 where error is null on success. Read the updated point total from
+	 *                 where error is null on success. medal is always this medal, so error
+	 *                 is the only reliable success signal. Read the updated point total from
 	 *                 NGIO.getMedalScore() - AppState updates it from the same result.
 	 * @param thisArg Context to use when calling the callback
 	 * @throws Error if this medal was loaded from another app
@@ -115,55 +123,40 @@ class io.newgrounds.models.objects.Medal extends io.newgrounds.BaseObject {
 
 		if (callback == undefined) callback = null;
 		if (thisArg == undefined) thisArg = null;
-		var callbackParams:Object = {
-			callback: callback,
-			thisArg: thisArg,
-			// The session this unlock is for. If the player signs out before the
-			// answer arrives, the flag would describe them, not whoever is playing now.
-			sentSessionId: this.currentSessionId()
-		};
 
-		// Call Medal.unlock component via core
-		if (this.core) this.core.callComponent("Medal.unlock", {id: this.id}, this.onUnlock, this, callbackParams);
-	}
-
-	/**
-	 * Callback handler for when the medal unlock completes.
-	 * @param response The result from the Medal.unlock component call
-	 * @param callbackParams The callback parameters stored during unlock()
-	 */
-	public function onUnlock(response:io.newgrounds.models.objects.Response, callbackParams:Object):Void {
-
-		var result:io.newgrounds.models.results.Medal.unlockResult = null;
-		var error = null;
-
-		// A rejected unlock can surface at either level: the request itself may fail, or
-		// it may succeed while the component result reports failure (unknown medal ID,
-		// no session, etc). Check both, so the caller gets one clear answer.
-		if (response == null || response.success !== true) {
-			error = (response != null && response.error != null)
-				? response.error
-				: io.newgrounds.Errors.getError();
-		} else {
-			result = response.getResult();
-
-			if (result == null) {
-				error = io.newgrounds.Errors.getError(io.newgrounds.Errors.INVALID_RESPONSE);
-			} else if (result.success !== true) {
-				error = (result.error != null) ? result.error : io.newgrounds.Errors.getError();
+		if (this.core == null || this.core == undefined) {
+			if (callback != null) {
+				callback.call(thisArg, this, io.newgrounds.Errors.getError(io.newgrounds.Errors.UNKNOWN, "This medal has no core, so it cannot be unlocked.", false));
 			}
+			return;
 		}
 
-		// Only mark this unlocked if the server actually accepted it. Setting it on any
-		// response would leave the medal permanently showing as earned after a failure.
-		// And only if the session it was sent for is still the current one.
-		if (error == null && this.currentSessionId() === callbackParams.sentSessionId) {
-			this.unlocked = true;
-		}
+		// Untyped, so the closure below can reach currentSessionId(): AS2 can't
+		// resolve a private member from inside a nested function otherwise.
+		var self = this;
+		// The session this unlock is for. If the player signs out before the
+		// answer arrives, the flag would describe them, not whoever is playing now.
+		var sentSessionId:String = this.currentSessionId();
 
-		if (callbackParams.callback != null) {
-			callbackParams.callback.call(callbackParams.thisArg, this, error);
-		}
+		// Deliberately not skipped when `unlocked` is already true: always ask the
+		// server, so the callback behaves the same every time.
+		this.core.medalUnlockQueue.unlock([this.id], function(outcomes:Array):Void {
+			var outcome = (outcomes.length > 0) ? outcomes[0] : null;
+			var error = (outcome == null)
+				? io.newgrounds.Errors.getError(io.newgrounds.Errors.INVALID_RESPONSE, null, false)
+				: outcome.error;
+
+			// Only mark this unlocked if the server actually accepted it. Setting it on any
+			// response would leave the medal permanently showing as earned after a failure.
+			// And only if the session it was sent for is still the current one.
+			if (error == null && self.currentSessionId() === sentSessionId) {
+				self.unlocked = true;
+			}
+
+			if (callback != null) {
+				callback.call(thisArg, self, error);
+			}
+		}, null);
 	}
 
 	/**

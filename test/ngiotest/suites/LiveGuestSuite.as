@@ -62,12 +62,33 @@ import ngiotest.TestContext;
 
 class ngiotest.suites.LiveGuestSuite extends ngiotest.LiveSuite {
 
+	/** NGIO.getKeepGuestMedalUnlocks() before setUp turned it off */
+	public var savedKeepGuestUnlocks:Boolean;
+
 	public function LiveGuestSuite() {
 		super();
+		this.savedKeepGuestUnlocks = true;
 	}
 
 	public function getSuiteName():String {
 		return "Live / Guest session";
+	}
+
+	public function setUp(done:Function):Void {
+		var self:ngiotest.suites.LiveGuestSuite = this;
+		super.setUp(function():Void {
+			// The guest unlock test is about the refusal. With guest unlocks kept,
+			// the refused unlock would also be buffered and sent for the tester
+			// once they sign in, changing what the medal suites see.
+			self.savedKeepGuestUnlocks = NGIO.getKeepGuestMedalUnlocks();
+			NGIO.setKeepGuestMedalUnlocks(false);
+			done.call(null);
+		});
+	}
+
+	public function tearDown(done:Function):Void {
+		NGIO.setKeepGuestMedalUnlocks(this.savedKeepGuestUnlocks);
+		super.tearDown(done);
 	}
 
 	public function build():Void {

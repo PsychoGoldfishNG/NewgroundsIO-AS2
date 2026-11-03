@@ -40,8 +40,9 @@ class io.newgrounds.helpers.NgioBootstrapHelper {
 	}
 
 	/**
-	 * Sets up an automatic interval that pings the server periodically
-	 * This keeps active user sessions from expiring
+	 * Sets up an automatic interval that calls onKeepAliveTick every
+	 * keepAliveTimeSeconds. NGIO uses it for the keep-alive ping, which keeps
+	 * active user sessions from expiring, and for resending medal unlocks.
 	 *
 	 * @param keepAliveTimeSeconds How often to ping (in seconds)
 	 * @param onKeepAliveTick Function to call on each tick

@@ -34,6 +34,7 @@ import ngiotest.suites.OfflineBaseObjectSuite;
 import ngiotest.suites.OfflineCryptoSuite;
 import ngiotest.suites.OfflineForeignGuardSuite;
 import ngiotest.suites.OfflineJsonSuite;
+import ngiotest.suites.OfflineLocalDataSuite;
 import ngiotest.suites.OfflineModelSuite;
 import ngiotest.suites.OfflineObjectFactorySuite;
 import ngiotest.suites.OfflineWireFormatSuite;
@@ -128,6 +129,7 @@ class initiator.NgioUnitTest {
 		runner.addSuite(new ngiotest.suites.OfflineWireFormatSuite());
 		runner.addSuite(new ngiotest.suites.OfflineModelSuite());
 		runner.addSuite(new ngiotest.suites.OfflineForeignGuardSuite());
+		runner.addSuite(new ngiotest.suites.OfflineLocalDataSuite());
 
 		// --- live: real gateway ---
 		//

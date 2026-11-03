@@ -35,8 +35,12 @@ import ngiotest.TestContext;
 
 class ngiotest.suites.LiveNoSessionSuite extends ngiotest.LiveSuite {
 
+	/** NGIO.getKeepGuestMedalUnlocks() before setUp turned it off */
+	public var savedKeepGuestUnlocks:Boolean;
+
 	public function LiveNoSessionSuite() {
 		super();
+		this.savedKeepGuestUnlocks = true;
 	}
 
 	public function getSuiteName():String {
@@ -50,11 +54,18 @@ class ngiotest.suites.LiveNoSessionSuite extends ngiotest.LiveSuite {
 		// exists to be parked after it has run.
 		super.setUp(function():Void {
 			self.stashSession();
+
+			// The unlock test below is about the refusal. With guest unlocks kept,
+			// the refused unlock would also be buffered and sent for the tester
+			// once they sign in, changing what the medal suites see.
+			self.savedKeepGuestUnlocks = NGIO.getKeepGuestMedalUnlocks();
+			NGIO.setKeepGuestMedalUnlocks(false);
 			done.call(null);
 		});
 	}
 
 	public function tearDown(done:Function):Void {
+		NGIO.setKeepGuestMedalUnlocks(this.savedKeepGuestUnlocks);
 		restoreSession();
 		done.call(null);
 	}

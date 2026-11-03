@@ -641,9 +641,9 @@ for (var i = 0; i < medals.length; i++) {
 
 // Later, when a medal is unlocked:
 var medal = NGIO.getMedal(123);
-medal.unlock(function(updatedMedal, newMedalScore) {
-	if (updatedMedal.unlocked) {
-		trace("Medal unlocked! New total score: " + newMedalScore);
+medal.unlock(function(unlockedMedal, error) {
+	if (error == null) {
+		trace("Medal unlocked! New total score: " + NGIO.getMedalScore());
 	}
 });
 ```
@@ -815,13 +815,22 @@ var medal = NGIO.getMedal(123);
 if (medal != null) {
 	trace("Found medal: " + medal.name);
 
-	// Medal objects have extended methods
-	medal.unlock(function(updatedMedal, newMedalScore) {
-		if (updatedMedal.unlocked) {
-			trace("Medal unlocked! New total score: " + newMedalScore);
+	// Medal objects have extended methods. The callback gets the medal and an
+	// error; the error is the only reliable sign of success.
+	medal.unlock(function(unlockedMedal, error) {
+		if (error == null) {
+			trace("Medal unlocked! New total score: " + NGIO.getMedalScore());
+		} else {
+			trace("Failed to unlock medal: " + error);
 		}
 	});
 }
+```
+
+**Unlocks that don't get an answer:** `medal.unlock()` records the unlock on the player's computer before sending it, and keeps resending it every 30 seconds until the server answers. So a medal earned while the connection is down, or just before the player closes the game, isn't lost. Each pending unlock remembers which player earned it, so on a shared computer one player's unlock is never sent for another. An unlock attempted while nobody is signed in is kept and sent once someone signs in. If your game shouldn't award those later, turn it off:
+
+```actionscript
+NGIO.setKeepGuestMedalUnlocks(false); // before or after init()
 ```
 
 **Get user's total medal score (cached):**
@@ -943,6 +952,31 @@ if (slot != null) {
 			trace("Failed to save: " + error);
 		}
 	});
+}
+```
+
+**Local copies:** every save is also kept on the player's computer, so a save made while the connection is down isn't lost. It still counts as a successful save: the callback gets no error, the slot's `source` is `"local"`, and the save reaches the cloud the next time the player saves. Loading works the same way, falling back to the local copy if the cloud can't be reached, and `NGIO.loadSaveSlots()` still lists the player's local saves when it can't reach the server (its callback still gets the error).
+
+Each player's local copies are kept separately, so on a shared computer one player never sees another's saves. A save made while nobody is signed in goes to whoever signs in next. To keep those saves away from signed-in players instead, turn it off:
+
+```actionscript
+NGIO.setOfferGuestSaves(false); // before or after init()
+```
+
+Local copies are stored in a Flash SharedObject. If a save would go past the space the player allows, Flash asks them for more, and until they agree that save is treated as not stored locally.
+
+**Conflicts:** when a slot's local copy is newer than its cloud copy and both hold a save (usually a save made offline), the slot's `source` is `"conflict"`. Loading it returns the local copy. The library never picks one for the player, so ask them, and tell them that keeping the local save replaces the cloud one:
+
+```actionscript
+var slots = NGIO.getSaveSlots();
+for (var i = 0; i < slots.length; i++) {
+	var slot = slots[i];
+	if (slot.source != "conflict") continue;
+	var local = slot.getLocalCopy(); // {size, datetime} of the local save
+	// slot.datetime is the cloud save's date. Ask the player, then either:
+	slot.keepLocal(function(error) {}); // saves the local copy to the cloud
+	// or:
+	slot.keepCloud(); // drops the local copy
 }
 ```
 

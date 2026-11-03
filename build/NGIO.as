@@ -82,12 +82,59 @@ class NGIO {
 	 */
 	public static var KEEP_ALIVE_TIME:Number = 300;
 
+	/**
+	 * How often, in seconds, medal unlocks still waiting on the gateway are sent
+	 * again. A pass with nothing waiting sends nothing.
+	 */
+	public static var MEDAL_UNLOCK_RETRY_TIME:Number = 30;
+
 	//==================== PRIVATE STATIC PROPERTIES ====================
 
 	/**
 	 * Interval ID that periodically pings the server to keep sessions alive
 	 */
 	private static var keepAliveInterval:Number = -1;
+
+	/**
+	 * Interval ID that resends medal unlocks the gateway never answered
+	 */
+	private static var medalUnlockRetryInterval:Number = -1;
+
+	private static var keepGuestMedalUnlocksValue:Boolean = true;
+	private static var offerGuestSavesValue:Boolean = true;
+
+	//==================== OPTIONS ====================
+	//
+	// Setter methods rather than properties, so they can pass the value on to a
+	// Core that already exists. Both work before or after init().
+
+	/**
+	 * Whether a medal unlock attempted while nobody is signed in is kept and sent
+	 * once a player signs in. Defaults to true. Set it to false if a medal earned
+	 * signed out must never be awarded later.
+	 */
+	public static function setKeepGuestMedalUnlocks(value:Boolean):Void {
+		keepGuestMedalUnlocksValue = value;
+		if (core != null) core.medalUnlockQueue.keepGuestUnlocks = value;
+	}
+
+	public static function getKeepGuestMedalUnlocks():Boolean {
+		return keepGuestMedalUnlocksValue;
+	}
+
+	/**
+	 * Whether a save made while nobody is signed in becomes the local copy of
+	 * whoever signs in next. Defaults to true. Set it to false to keep guest saves
+	 * out of a signed-in player's slots.
+	 */
+	public static function setOfferGuestSaves(value:Boolean):Void {
+		offerGuestSavesValue = value;
+		if (core != null) core.appState.offerGuestSaves = value;
+	}
+
+	public static function getOfferGuestSaves():Boolean {
+		return offerGuestSavesValue;
+	}
 
 	//==================== PUBLIC STATIC METHODS ====================
 
@@ -111,7 +158,24 @@ class NGIO {
 		}
 
 		core = io.newgrounds.helpers.NgioBootstrapHelper.doInitializationSequence(appId, encryptionKey, buildVersion, useDebugMode);
+		core.medalUnlockQueue.keepGuestUnlocks = keepGuestMedalUnlocksValue;
+		core.appState.offerGuestSaves = offerGuestSavesValue;
 		keepAliveInterval = io.newgrounds.helpers.NgioBootstrapHelper.startKeepAlive(KEEP_ALIVE_TIME, keepAlive);
+		medalUnlockRetryInterval = io.newgrounds.helpers.NgioBootstrapHelper.startKeepAlive(MEDAL_UNLOCK_RETRY_TIME, retryPendingMedalUnlocks);
+	}
+
+	/**
+	 * Sends medal unlocks that never got an answer again.
+	 *
+	 * init() already runs this on an interval, the same way it runs keepAlive().
+	 * It's public for the same reason keepAlive() is: a game can also call it when
+	 * it knows the connection is back. See io.newgrounds.MedalUnlockQueue.
+	 */
+	public static function retryPendingMedalUnlocks():Void {
+		if (core == null) {
+			throw new Error("Core not initialized");
+		}
+		core.medalUnlockQueue.retryPending();
 	}
 
 	/**

@@ -38,6 +38,23 @@ class io.newgrounds.models.objects.SaveSlot extends io.newgrounds.BaseObject {
 	 */
 	public var url:String = null;
 
+	/**
+	 * Not part of any component result: names which copy of this slot you're
+	 * looking at, "cloud" or "local", or "conflict".
+	 *
+	 * A save slot is meant to be stored on the cloud, with a local copy
+	 * protecting it from network loss and server outages. Slots are cloud-first,
+	 * so this starts as "cloud". AppState sets it to "local" when the local copy
+	 * is newer and the cloud slot is empty, and a save sets it to "local" when it
+	 * reaches local storage but not the cloud.
+	 *
+	 * "conflict" means both copies hold a save and the local one is newer. The
+	 * slot's fields describe the cloud copy, getLocalCopy() describes the local
+	 * one, and loading returns the local copy until the game calls keepLocal() or
+	 * keepCloud().
+	 */
+	public var source:String = "cloud";
+
 
 	//==================== CONSTRUCTOR ====================
 
@@ -87,15 +104,55 @@ class io.newgrounds.models.objects.SaveSlot extends io.newgrounds.BaseObject {
 
 	/**
 	 * Checks if this save slot contains any data.
+	 *
+	 * url answers that for the cloud copy, but a local-only slot has no url
+	 * (there's nothing to fetch), so checking url alone would report a save made
+	 * while offline as an empty slot. When this slot describes the local copy,
+	 * its recorded size is what says whether data is there.
+	 *
 	 * @return True if data exists, false if slot is empty
 	 */
 	public function hasData():Boolean {
-		return this.url != null;
+		if (this.source == "local") {
+			return this.size > 0;
+		}
+		return this.url != null && this.url != undefined && this.url != "";
+	}
+
+	//==================== SAVE DATA ====================
+	// A save slot is meant to be stored on the cloud, with a local copy protecting
+	// it from network loss and server outages. Writes go to the local copy first
+	// and then the cloud, and a write that only reaches the local copy is still a
+	// successful write, flagged by `source`. Reads use the copy the last merge
+	// chose rather than working freshness out again, so the badge a slot shows and
+	// the copy a load returns can't disagree. See AppState's SAVE SLOT LOCAL
+	// FALLBACK.
+	//
+	// Closures below reach this slot through an untyped `self`: AS2 can't resolve
+	// a private member from inside a nested function otherwise.
+
+	/**
+	 * AppState holds this app's local save copies. Null with no core, and for a
+	 * slot loaded from another app: that slot isn't this app's, so its data must
+	 * never land in this app's local copy of the same slot number.
+	 */
+	public function localFallback() {
+		if (this.core == null || this.core == undefined || this.isForeign()) return null;
+		return this.core.appState;
+	}
+
+	public static function sameOwner(a, b):Boolean {
+		if (a === null || a === undefined || b === null || b === undefined) {
+			return (a === null || a === undefined) && (b === null || b === undefined);
+		}
+		return a == b;
 	}
 
 	/**
-	 * Clears all data from this save slot.
-	 * @param callback Function to call when clearing is complete
+	 * Clears all data from this save slot, local copy first and then the cloud. A
+	 * cleared local copy with an unreachable cloud still counts as cleared.
+	 *
+	 * @param callback Function to call when clearing is complete, as callback(error)
 	 * @param thisArg Context to use when calling the callback
 	 * @throws Error if this slot was loaded from another app
 	 */
@@ -104,56 +161,61 @@ class io.newgrounds.models.objects.SaveSlot extends io.newgrounds.BaseObject {
 
 		if (callback == undefined) callback = null;
 		if (thisArg == undefined) thisArg = null;
-		var self = this;
-		if (this.core) this.core.callComponent("CloudSave.clearSlot", {id: this.id}, function(response:io.newgrounds.models.objects.Response, callbackParams):Void {
 
-			var error:io.newgrounds.models.objects.NgioError = null;
-
-			// request was good, check the result
-			if (response && response.success) {
-
-				var result = response.getResult();
-
-				if (!result) {
-					error = io.newgrounds.Errors.getError(io.newgrounds.Errors.INVALID_RESPONSE, "Invalid response format received from CloudSave.clearSlot", true);
-				} else if (!result.success) {
-					error = result.error;
-				}
-
-			} else {
-				error = response.error;
-			}
-
-			if (callback != null) {
-				callback.call(thisArg, error);
-			}
-		}, this);
+		var appState = this.localFallback();
+		var localOk:Boolean = (appState != null) ? appState.clearLocalSlotData(this.id) : false;
+		this.writeThroughCloud("CloudSave.clearSlot", {id: this.id}, localOk, null, callback, thisArg);
 	}
 
 	/**
-	 * Loads the raw string data from the URL stored on this save slot.
+	 * Loads this slot's raw save data, from whichever copy the last merge chose.
+	 *
+	 * Reads the local copy directly when this slot is local-sourced or in
+	 * conflict. Otherwise fetches url, caches what comes back, and falls back to
+	 * any local copy if the fetch fails.
 	 *
 	 * Deliberately NOT guarded against foreign slots. This reads the absolute URL
 	 * the server handed back with the slot, so it needs no app context and works
 	 * unchanged on another app's data - which is the point of being able to load
-	 * another app's slots at all.
+	 * another app's slots at all. A foreign slot just never touches the local
+	 * copies.
 	 *
-	 * @param callback Function to call with the raw data string or null
+	 * @param callback Function to call with the raw data string or null, as callback(data, error)
 	 * @param thisArg Context to use when calling the callback
 	 */
 	public function loadDataRaw(callback:Function, thisArg):Void {
 		if (callback == undefined) callback = null;
 		if (thisArg == undefined) thisArg = null;
 
+		var self = this;
+		var appState = this.localFallback();
+
+		// Whose copy this load is for. A fetch that finishes after the player
+		// changed must not be cached as, or fall back to, the next player's copy.
+		var owner = (appState != null) ? appState.getLocalSlotOwner() : null;
+
+		// `source` IS the record of which copy won the last merge, and the same
+		// property a game reads for its cloud badge, so a slot's badge and the copy
+		// a load returns can't disagree. A conflict loads the newer, local copy
+		// until the game picks one.
+		if (appState != null && (this.source == "local" || this.source == "conflict")) {
+			var local:String = appState.readLocalSlotData(this.id);
+			if (local != null) {
+				this.error = null;
+				if (callback != null) {
+					callback.call(thisArg, local, null);
+				}
+				return;
+			}
+		}
+
 		// If this is an empty slot, skip the load and just return null data to the callback.
-		if (this.url == null || this.url.length == 0) {
+		if (this.url == null || this.url == undefined || this.url.length == 0) {
 			if (callback != null) {
 				callback.call(thisArg, null, null);
 			}
 			return;
 		}
-
-		var self = this;
 
 		// the original v3 API did not include the protocol in the URL, so we need to add it if it's missing
 		var loadUrl:String = this.url;
@@ -180,25 +242,54 @@ class io.newgrounds.models.objects.SaveSlot extends io.newgrounds.BaseObject {
 		};
 
 		lv.onData = function(src:String):Void {
+			var stillSameOwner:Boolean = appState != null
+				&& io.newgrounds.models.objects.SaveSlot.sameOwner(appState.getLocalSlotOwner(), owner);
+
 			if (src != undefined && src != null) {
+				// Cache it locally, stamped with the CLOUD's datetime rather than
+				// now: caching must never make the local copy look newer than the
+				// cloud copy it came from, or the next merge would flip to local for
+				// no reason.
+				if (stillSameOwner) {
+					appState.writeLocalSlotData(self.id, src, self.datetime);
+				}
 				self.error = null;
 				if (callback != null) {
 					callback.call(thisArg, src, null);
 				}
-			} else {
-				self.error = io.newgrounds.helpers.HttpStatusHelper.errorForStatus(httpStatus, "Loading this save slot's data", null);
+				return;
+			}
+
+			// The cloud was the fresher copy, but the fetch itself failed (the
+			// network dropped between the list and the load). Fall back to any local
+			// copy rather than failing the whole load.
+			var cached:String = stillSameOwner ? appState.readLocalSlotData(self.id) : null;
+			if (cached != null) {
+				self.error = null;
 				if (callback != null) {
-					callback.call(thisArg, null, self.error);
+					callback.call(thisArg, cached, null);
 				}
+				return;
+			}
+
+			self.error = io.newgrounds.helpers.HttpStatusHelper.errorForStatus(httpStatus, "Loading this save slot's data", null);
+			if (callback != null) {
+				callback.call(thisArg, null, self.error);
 			}
 		};
 		lv.load(loadUrl);
 	}
 
 	/**
-	 * Saves raw string data to this save slot.
+	 * Saves raw string data to this save slot, local copy first and then the cloud.
+	 *
+	 * A cloud failure with a successful local write is still a success: the
+	 * callback gets no error, `source` is set to "local", and the save reaches the
+	 * cloud on the player's next save. Only a save that lands in neither place
+	 * fails. Sync is passive, so a newer local copy is never pushed on its own.
+	 *
 	 * @param data The raw string data to save
-	 * @param callback Function to call when saving is complete
+	 * @param callback Function to call when saving is complete, as callback(error)
 	 * @param thisArg Context to use when calling the callback
 	 * @throws Error if this slot was loaded from another app
 	 */
@@ -207,32 +298,15 @@ class io.newgrounds.models.objects.SaveSlot extends io.newgrounds.BaseObject {
 
 		if (callback == undefined) callback = null;
 		if (thisArg == undefined) thisArg = null;
-		if (this.core) this.core.callComponent("CloudSave.setData", {id: this.id, data: data}, function(response:io.newgrounds.models.objects.Response, callbackParams):Void {
 
-			var error:io.newgrounds.models.objects.NgioError = null;
-
-			// request was good, check the result
-			if (response && response.success) {
-
-				var result = response.getResult();
-
-				if (!result.success) {
-					error = result.error;
-				}
-
-			} else {
-				error = response.error;
-			}
-
-			if (callback != null) {
-				callback.call(thisArg, error);
-			}
-		}, this);
+		var appState = this.localFallback();
+		var localOk:Boolean = (appState != null) ? appState.writeLocalSlotData(this.id, data) : false;
+		this.writeThroughCloud("CloudSave.setData", {id: this.id, data: data}, localOk, data, callback, thisArg);
 	}
 
 	/**
 	 * Loads data from this save slot and parses it as JSON.
-	 * @param callback Function to call with the decoded object
+	 * @param callback Function to call with the decoded object, as callback(data, error)
 	 * @param thisArg Context to use when calling the callback
 	 */
 	public function loadData(callback:Function, thisArg):Void {
@@ -263,7 +337,7 @@ class io.newgrounds.models.objects.SaveSlot extends io.newgrounds.BaseObject {
 	/**
 	 * Encodes data as JSON and saves it to this save slot.
 	 * @param data The object to encode and save
-	 * @param callback Function to call when saving is complete
+	 * @param callback Function to call when saving is complete, as callback(error)
 	 * @param thisArg Context to use when calling the callback
 	 * @throws Error if this slot was loaded from another app
 	 */
@@ -277,6 +351,159 @@ class io.newgrounds.models.objects.SaveSlot extends io.newgrounds.BaseObject {
 		this.saveDataRaw(io.newgrounds.encoders.JSON.encode(data), callback, thisArg);
 	}
 
+	//==================== CONFLICTS ====================
+	// A slot is in conflict when both copies hold a save and the local one is
+	// newer, usually a save made while offline. Either choice loses one of them,
+	// so the library never decides and never shows UI: the game asks the player,
+	// then calls keepLocal() or keepCloud().
+
+	/**
+	 * The current player's local copy of this slot (or the guest's, with nobody
+	 * signed in), for showing the player both copies of a slot in conflict. This
+	 * slot's own fields describe the cloud copy.
+	 *
+	 * @return {size, datetime} of the local copy, or null if there is none
+	 */
+	public function getLocalCopy():Object {
+		var appState = this.localFallback();
+		return (appState != null) ? appState.getLocalSlotEntry(this.id) : null;
+	}
+
+	/**
+	 * Resolves a conflict in favour of the local copy, by saving it to the cloud
+	 * and replacing the cloud copy. Reports the outcome the same way saveDataRaw()
+	 * does. Reports an error, and changes nothing, if this slot isn't in conflict
+	 * or its local copy is gone.
+	 *
+	 * @param callback Function to call when saving is complete, as callback(error)
+	 * @param thisArg Context to use when calling the callback
+	 */
+	public function keepLocal(callback:Function, thisArg):Void {
+		if (callback == undefined) callback = null;
+		if (thisArg == undefined) thisArg = null;
+
+		var appState = this.localFallback();
+		var local:String = (this.source == "conflict" && appState != null) ? appState.readLocalSlotData(this.id) : null;
+		if (local == null) {
+			if (callback != null) {
+				callback.call(thisArg, io.newgrounds.Errors.getError(io.newgrounds.Errors.UNKNOWN, "This save slot has no conflict to resolve.", false));
+			}
+			return;
+		}
+		this.saveDataRaw(local, callback, thisArg);
+	}
+
+	/**
+	 * Resolves a conflict in favour of the cloud copy, by dropping the local one.
+	 * Nothing is sent.
+	 *
+	 * @return True if the local copy was dropped. False, changing nothing, if this
+	 *         slot isn't in conflict or the drop failed.
+	 */
+	public function keepCloud():Boolean {
+		var appState = this.localFallback();
+		if (this.source != "conflict" || appState == null) return false;
+		if (!appState.clearLocalSlotData(this.id)) return false;
+		this.source = "cloud";
+		return true;
+	}
+
+	//==================== INTERNAL ====================
+
+	/**
+	 * The cloud leg shared by saveDataRaw() and clearData(). With no core there
+	 * is nothing to send, so the local leg decides the outcome.
+	 *
+	 * @param data The data a save wrote, or null for a clear
+	 */
+	public function writeThroughCloud(componentPath:String, componentParams:Object, localOk:Boolean, data:String, callback:Function, thisArg):Void {
+		if (this.core == null || this.core == undefined) {
+			if (localOk) this.source = "local";
+			if (callback != null) {
+				callback.call(thisArg, localOk ? null : io.newgrounds.Errors.getError(io.newgrounds.Errors.UNKNOWN, "This save slot has no core, and the local write failed.", false));
+			}
+			return;
+		}
+
+		var appState = this.localFallback();
+		// Carried through the round trip rather than held on the model, so two
+		// writes in flight can't read each other's result. `owner` keeps a reply
+		// that arrives after the player changed away from the next player's copy.
+		var callbackParams:Object = {
+			callback: callback,
+			thisArg: thisArg,
+			localOk: localOk,
+			data: data,
+			owner: (appState != null) ? appState.getLocalSlotOwner() : null
+		};
+		this.core.callComponent(componentPath, componentParams, this.onWriteComplete, this, callbackParams);
+	}
+
+	/**
+	 * Shared handler for CloudSave.setData and CloudSave.clearSlot. A write can
+	 * fail at the transport, the envelope or the component, and all three are
+	 * checked: trusting the outer flag alone reports every rejected write as a
+	 * success.
+	 */
+	public function onWriteComplete(response, callbackParams:Object):Void {
+		var error = null;
+		var result = null;
+
+		if (!(response instanceof io.newgrounds.models.objects.Response)) {
+			// callComponent's local failure object, or nothing at all
+			var message:String = (response != null && response != undefined && typeof(response.error) == "string") ? response.error : null;
+			error = io.newgrounds.Errors.getError(io.newgrounds.Errors.INVALID_RESPONSE, message, message != null);
+		} else if (response.success !== true) {
+			error = (response.error != null && response.error != undefined)
+				? response.error
+				: io.newgrounds.Errors.getError(io.newgrounds.Errors.INVALID_RESPONSE, null, false);
+		} else {
+			result = response.getResult();
+			if (result == null || result == undefined) {
+				error = io.newgrounds.Errors.getError(io.newgrounds.Errors.INVALID_RESPONSE, "The response carried no save slot result.", true);
+			} else if (result.success !== true) {
+				error = (result.error != null && result.error != undefined)
+					? result.error
+					: io.newgrounds.Errors.getError(io.newgrounds.Errors.INVALID_RESPONSE, null, false);
+			}
+		}
+
+		if (error == null) {
+			// The cloud accepted the write, so the cloud copy is canonical again.
+			// AppState has already merged the returned slot into this model.
+			this.source = "cloud";
+			this.restampLocalCopy(result, callbackParams);
+		} else if (callbackParams.localOk) {
+			// Partial success: the write exists locally and nowhere else. Report it
+			// as a success, so the player is never told a save they still have was
+			// lost, and flag it so the game can show it isn't cloud-backed yet.
+			this.source = "local";
+			error = null;
+		}
+
+		if (callbackParams.callback != null) {
+			callbackParams.callback.call(callbackParams.thisArg, error);
+		}
+	}
+
+	/**
+	 * After the cloud accepts a save, stamps the local copy with the cloud's own
+	 * datetime. The local copy was stamped with this computer's clock, which can
+	 * run ahead of the server's, and a copy that only looks newer would be
+	 * reported as a conflict on the next load. Skipped for a clear, when the
+	 * reply carries no datetime, or when the player changed while the save was
+	 * out.
+	 */
+	public function restampLocalCopy(result, callbackParams:Object):Void {
+		var appState = this.localFallback();
+		if (appState == null || callbackParams.data == null || result == null || result == undefined) return;
+		if (result.slot == null || result.slot == undefined) return;
+		var datetime:String = result.slot.datetime;
+		if (datetime == null || datetime == undefined) return;
+		if (!io.newgrounds.models.objects.SaveSlot.sameOwner(appState.getLocalSlotOwner(), callbackParams.owner)) return;
+		appState.writeLocalSlotData(this.id, callbackParams.data, datetime);
+	}
+
 	/**
 	 * Returns a string representation of this save slot.
 	 */
@@ -287,11 +514,17 @@ class io.newgrounds.models.objects.SaveSlot extends io.newgrounds.BaseObject {
 	/**
 	 * Clears session-specific data to return the save slot to its unauthenticated state.
 	 * Called by AppState when the user's session expires or is cleared.
+	 *
+	 * `source` goes back to "cloud" too. The local copy this slot may have been
+	 * describing belongs to the player who just signed out, and it stays in their
+	 * own local copies for when they come back. The next merge works out the new
+	 * owner's source.
 	 */
 	public function clearSessionData():Void {
 		this.datetime = null;
 		this.timestamp = 0;
 		this.size = 0;
 		this.url = null;
+		this.source = "cloud";
 	}
 }

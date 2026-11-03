@@ -53,6 +53,16 @@ class io.newgrounds.helpers.CoreTransportHelper {
 		if (callback == undefined) callback = null;
 		if (thisArg == undefined) thisArg = null;
 
+		// A stand-in for the network (the offline tests). Its answer goes through
+		// exactly the same handling as a real one.
+		if (core.requestHandler != null && core.requestHandler != undefined) {
+			var handlerCore = core;
+			core.requestHandler.call(null, requestString, function(statusCode:Number, responseText:String):Void {
+				handlerCore.forwardHTTPResponse(statusCode, responseText, callback, thisArg, sentSessionId);
+			});
+			return;
+		}
+
 		System.security.allowDomain("www.newgrounds.io", ".newgrounds.io", "*");
 
 		var sendLV:LoadVars = new LoadVars();

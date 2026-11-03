@@ -123,19 +123,13 @@ class io.newgrounds.helpers.AppStateResultUpdateHelper {
 
 	private static function applyCloudSaveResult(appState:io.newgrounds.AppState, objectName:String, resultObject):Void {
 		if (objectName == "CloudSave.loadSlots") {
-			// A failed component still reaches here, carrying no payload.
-			// Caching that null and marking the property loaded would make
-			// hasLoaded('saveSlots') answer true for data we never received,
-			// so getSaveSlot() would stop warning and just return null.
-			if (resultObject.slots == null) {
-				return;
-			}
-			if (appState.saveSlots == null) {
-				appState.saveSlots = resultObject.slots;
-				appState.markLoaded("saveSlots");
-			} else {
-				updateCollectionById(appState.saveSlots, resultObject.slots);
-			}
+			// Merged against the local copies. A failed component arrives with no
+			// slots, which is the offline or signed-out case the local copies exist
+			// for, so it's merged too: only the local copies get listed, and
+			// nothing is marked loaded unless there's at least one. See AppState's
+			// SAVE SLOT LOCAL FALLBACK.
+			var slots:Array = (resultObject.slots == undefined) ? null : resultObject.slots;
+			appState.applySlotListResult(slots);
 			return;
 		}
 

@@ -65,6 +65,24 @@ class io.newgrounds.Core {
 	public var networkObserver:Function = null;
 
 	/**
+	 * Optional stand-in for the network, as
+	 * function(requestString:String, respond:Function):Void, where
+	 * respond(statusCode:Number, responseText:String) delivers the answer.
+	 *
+	 * When set, every gateway request goes here instead of out over HTTP, and
+	 * whatever it passes to respond() is handled exactly like a real reply. It
+	 * exists so the offline tests can check how the library handles a given
+	 * answer. Leave it null in a game.
+	 */
+	public var requestHandler:Function = null;
+
+	/**
+	 * Medal unlocks waiting on the gateway, and the retry pass that resends them.
+	 * Medal.unlock() goes through it. See MedalUnlockQueue.
+	 */
+	public var medalUnlockQueue:io.newgrounds.MedalUnlockQueue;
+
+	/**
 	 * Stores the app ID provided at initialization
 	 */
 	public var appId:String;
@@ -131,6 +149,10 @@ class io.newgrounds.Core {
 		this.componentQueue = [];
 
 		this.appState = new io.newgrounds.AppState(this);
+
+		// Scoped to this Core's App ID, like AppState
+		this.medalUnlockQueue = new io.newgrounds.MedalUnlockQueue(this);
+		this.requestHandler = null;
 
 		// Load the crossdomain policy file to allow HTTPS connections
 		System.security.loadPolicyFile(io.newgrounds.Core.POLICY_FILE_URL);

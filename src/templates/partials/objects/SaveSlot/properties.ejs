@@ -1,0 +1,17 @@
+	/**
+	 * Not part of any component result: names which copy of this slot you're
+	 * looking at, "cloud" or "local", or "conflict".
+	 *
+	 * A save slot is meant to be stored on the cloud, with a local copy
+	 * protecting it from network loss and server outages. Slots are cloud-first,
+	 * so this starts as "cloud". AppState sets it to "local" when the local copy
+	 * is newer and the cloud slot is empty, and a save sets it to "local" when it
+	 * reaches local storage but not the cloud.
+	 *
+	 * "conflict" means both copies hold a save and the local one is newer. The
+	 * slot's fields describe the cloud copy, getLocalCopy() describes the local
+	 * one, and loading returns the local copy until the game calls keepLocal() or
+	 * keepCloud().
+	 */
+	public var source:String = "cloud";
+

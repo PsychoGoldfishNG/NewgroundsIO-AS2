@@ -45,12 +45,36 @@ class io.newgrounds.AppState {
 	 */
 	private var core:io.newgrounds.Core;
 
+	/**
+	 * The local mirror of this app's save slots. Nothing outside AppState reaches
+	 * it: the SaveSlot model goes through readLocalSlotData(), writeLocalSlotData()
+	 * and clearLocalSlotData(), which keeps the merge in one place. See SAVE SLOT
+	 * LOCAL FALLBACK below.
+	 */
+	private var localSaveSlots:io.newgrounds.LocalSaveSlotStore;
+
+	/**
+	 * How many CloudSave.loadSlots results have been merged. loadData() compares
+	 * it before and after, to tell whether a slot list came back. Public only
+	 * because loadData()'s closure reads it: AS2 can't see private members from a
+	 * nested function.
+	 */
+	public var slotListsMerged:Number = 0;
+
 	//==================== PUBLIC PROPERTIES ====================
 
 	/**
 	 * Flag indicating whether Passport login window is currently open
 	 */
 	public var passportIsOpen:Boolean = false;
+
+	/**
+	 * Whether a save made while nobody was signed in (a guest save) becomes the
+	 * local copy of whoever signs in next. When false, guest saves stay
+	 * guest-only: a signed-in player never sees them, and they're still there
+	 * the next time nobody is signed in. Set through NGIO.setOfferGuestSaves().
+	 */
+	public var offerGuestSaves:Boolean = true;
 
 	public var host:String = "N/A";
 	public var sessionStorageKey:String = null;
@@ -93,6 +117,12 @@ class io.newgrounds.AppState {
 		this.session.id = null;
 
 		this.sessionStorageKey = io.newgrounds.helpers.AppStateBootstrapHelper.getSessionStorageKey(core.appId);
+
+		// Scoped by App ID for the same reason as the session key. The two
+		// counters are set here for the same prototype reason as dataLoaded.
+		this.localSaveSlots = new io.newgrounds.LocalSaveSlotStore(core.appId);
+		this.slotListsMerged = 0;
+		this.offerGuestSaves = true;
 
 		var savedSessionId:String = io.newgrounds.helpers.AppStateBootstrapHelper.getSavedSessionId(this.sessionStorageKey);
 
@@ -283,8 +313,19 @@ class io.newgrounds.AppState {
 
 		var localError = null;
 
+		var wantsSlots:Boolean = indexOfValue(propertyNames, "saveSlots") != -1;
+		var slotListsBefore:Number = this.slotListsMerged;
+
 		var self:io.newgrounds.AppState = this;
 		core.executeQueue(function(response):Void {
+			// No slot list came back from the gateway: refused without being sent
+			// (nobody signed in), or the request never got there. Neither passes
+			// through setValueFromResult(), and that's the case the local copies
+			// exist for, so merge them here.
+			if (wantsSlots && self.slotListsMerged == slotListsBefore) {
+				self.mergeWithoutCloudList();
+			}
+
 			// A failed load surfaces at either of two levels, and BOTH have to be
 			// checked - the same pattern NgioLoaderHelper.loadUrl, Medal.unlock
 			// and ScoreBoard.getScores use.
@@ -464,5 +505,260 @@ class io.newgrounds.AppState {
 		// Also remove the saved session from storage
 		// So next time they open the app, they won't be auto-logged-in
 		io.newgrounds.helpers.AppStateBootstrapHelper.clearSavedSessionId(this.sessionStorageKey);
+	}
+
+	//==================== SAVE SLOT LOCAL FALLBACK ====================
+	//
+	// A save slot is meant to be stored on the cloud, with a local copy protecting
+	// it from network loss and server outages. AppState is already the save slot
+	// cache and setValueFromResult() is already the by-id merge point, so choosing
+	// between two copies is that same job with one more source.
+	//
+	// Sync is passive. A fresher local copy is used for display and loading but
+	// never pushed on its own; it reaches the cloud on the player's next save, or
+	// when the game resolves a conflict with SaveSlot.keepLocal().
+	//
+	// Local copies belong to whoever wrote them: the signed-in user, or a guest
+	// when nobody is signed in. Every read and write goes through the current
+	// owner, so one player's local copy never reaches another.
+
+	/**
+	 * Who local slot copies currently belong to.
+	 *
+	 * @return The signed-in user's id, or null for a guest
+	 */
+	public function getLocalSlotOwner() {
+		if (this.session == null || this.session.user == null || this.session.user == undefined) return null;
+		return this.session.user.id;
+	}
+
+	/**
+	 * Merges a CloudSave.loadSlots result's slots into the cache. Called by
+	 * AppStateResultUpdateHelper. A rejected call arrives with no slots, which is
+	 * the offline or signed-out case the local copies exist for, so it's merged
+	 * like any other.
+	 */
+	public function applySlotListResult(cloudSlots:Array):Void {
+		this.slotListsMerged++;
+		this.applySlotList(cloudSlots);
+	}
+
+	/** Merges a slot list into the cache, against the local copies. */
+	private function applySlotList(cloudSlots:Array):Void {
+		var reconciled:Array = this.reconcileSaveSlots(cloudSlots);
+		// Nothing from either copy. Caching nothing and marking it loaded would
+		// make hasLoaded('saveSlots') true for data that never arrived.
+		if (reconciled.length == 0) return;
+
+		if (this.saveSlots == null) {
+			this.saveSlots = reconciled;
+			this.markLoaded("saveSlots");
+			return;
+		}
+
+		// Update in place, never replace the array: the game may be holding these
+		// slots.
+		for (var i:Number = 0; i < reconciled.length; i++) {
+			var slot = reconciled[i];
+			var cached = this.findCachedSlot(slot.id);
+			if (cached == null) {
+				// An id the cache has never seen. A first list made while offline
+				// holds only the local ids, so the cloud's arrive later.
+				this.saveSlots.push(slot);
+			} else if (cached !== slot) {
+				cached.importFromObject(slot);
+				// source isn't a schema property, so importFromObject() doesn't
+				// carry it across.
+				cached.source = slot.source;
+			}
+		}
+		this.saveSlots.sortOn("id", Array.NUMERIC);
+	}
+
+	/**
+	 * The merge for a loadData() that got no slot list back. The cached slots
+	 * stand in for the cloud's: they're the last thing known about the cloud
+	 * copies, so an older local copy can't replace a newer cloud one just because
+	 * the network is down. A cached slot describing a local copy says nothing
+	 * about the cloud, so it's left out. After a sign-out every cached slot is
+	 * empty, and the new owner's local copies are listed as they are.
+	 *
+	 * Public only because loadData()'s closure calls it.
+	 */
+	public function mergeWithoutCloudList():Void {
+		if (this.saveSlots == null) {
+			this.applySlotList(null);
+			return;
+		}
+		var known:Array = [];
+		for (var i:Number = 0; i < this.saveSlots.length; i++) {
+			if (this.saveSlots[i].source != "local") known.push(this.saveSlots[i]);
+		}
+		this.applySlotList(known);
+	}
+
+	private function findCachedSlot(id:Number) {
+		if (this.saveSlots == null) return null;
+		for (var i:Number = 0; i < this.saveSlots.length; i++) {
+			if (this.saveSlots[i] != null && this.saveSlots[i].id == id) return this.saveSlots[i];
+		}
+		return null;
+	}
+
+	/**
+	 * Builds the slot list from both copies, newest wins, and records each
+	 * decision on the slot's source.
+	 */
+	private function reconcileSaveSlots(cloudSlots:Array):Array {
+		var owner = this.getLocalSlotOwner();
+		if (owner !== null && this.offerGuestSaves) this.adoptGuestSaves(owner);
+		var registry:Object = this.localSaveSlots.getRegistry(owner);
+
+		var cloudById:Object = {};
+		var ids:Array = [];
+		var i:Number;
+		if (cloudSlots != null && cloudSlots != undefined) {
+			for (i = 0; i < cloudSlots.length; i++) {
+				var cloudSlot = cloudSlots[i];
+				if (cloudSlot == null || cloudSlot == undefined) continue;
+				cloudById[String(cloudSlot.id)] = cloudSlot;
+				if (indexOfValue(ids, Number(cloudSlot.id)) == -1) ids.push(Number(cloudSlot.id));
+			}
+		}
+
+		// The full slot id range, not just the ids the cloud returned: a slot
+		// saved while offline exists locally and nowhere else.
+		for (var key:String in registry) {
+			var localId:Number = Number(key);
+			if (!isNaN(localId) && localId == Math.floor(localId) && indexOfValue(ids, localId) == -1) {
+				ids.push(localId);
+			}
+		}
+		ids.sort(Array.NUMERIC);
+
+		var merged:Array = [];
+		for (i = 0; i < ids.length; i++) {
+			var id:Number = ids[i];
+			var local = registry[String(id)];
+			if (local == undefined) local = null;
+			var cloud = cloudById[String(id)];
+			if (cloud == undefined) cloud = null;
+			var chosen = this.chooseSlotCopy(id, cloud, local);
+			if (chosen != null) merged.push(chosen);
+		}
+		return merged;
+	}
+
+	/**
+	 * Picks the newer of the two copies by ISO 8601 datetime. The cloud wins ties,
+	 * since a save that round-tripped is the more complete state, and it wins an
+	 * unreadable local datetime too (NaN fails the comparison).
+	 *
+	 * A newer local copy only wins outright when the cloud slot is empty or
+	 * missing. When the cloud holds a save too, either choice loses one of them,
+	 * so the slot is marked "conflict" for the game to ask the player. It keeps
+	 * the cloud's fields, and loading it returns the local copy until the game
+	 * calls keepLocal() or keepCloud().
+	 */
+	private function chooseSlotCopy(id:Number, cloud, local) {
+		if (local == null) {
+			if (cloud != null) cloud.source = "cloud";
+			return cloud;
+		}
+
+		var localTime:Number = io.newgrounds.helpers.DateTimeHelper.parseIso(local.datetime);
+		var cloudTime:Number = (cloud != null && cloud.datetime != null && cloud.datetime != undefined)
+			? io.newgrounds.helpers.DateTimeHelper.parseIso(cloud.datetime)
+			: Number.NEGATIVE_INFINITY;
+
+		if (cloud != null && !(localTime > cloudTime)) {
+			cloud.source = "cloud";
+			return cloud;
+		}
+
+		if (cloud != null && cloud.url != null && cloud.url != undefined && cloud.url != "") {
+			cloud.source = "conflict";
+			return cloud;
+		}
+
+		var built = this.buildLocalSlot(id, local);
+		return (built != null) ? built : cloud;
+	}
+
+	/**
+	 * A slot describing the local copy. It carries no url: there is nothing to
+	 * fetch, and inventing one would send loadDataRaw() after a file that doesn't
+	 * exist.
+	 */
+	private function buildLocalSlot(id:Number, entry:Object) {
+		var parsed:Number = io.newgrounds.helpers.DateTimeHelper.parseIso(entry.datetime);
+		var slot = io.newgrounds.models.objects.ObjectFactory.CreateObject("SaveSlot", {
+			id: id,
+			size: entry.size,
+			datetime: entry.datetime,
+			timestamp: isNaN(parsed) ? 0 : Math.floor(parsed / 1000),
+			url: null
+		}, this.core);
+		if (slot == null || slot == undefined) return null;
+		slot.source = "local";
+		return slot;
+	}
+
+	/**
+	 * Moves guest copies into the signed-in player's own copies. A guest copy goes
+	 * to whoever signs in next, and only to them: once offered it's removed from
+	 * the guest copies. It replaces the player's own local copy only if it's
+	 * newer. Otherwise it's simply dropped.
+	 */
+	private function adoptGuestSaves(owner):Void {
+		var guestRegistry:Object = this.localSaveSlots.getRegistry(null);
+		for (var key:String in guestRegistry) {
+			var id:Number = Number(key);
+			if (isNaN(id) || id != Math.floor(id)) continue;
+			var guest = guestRegistry[key];
+			var payload:String = this.localSaveSlots.getPayload(id, null);
+
+			if (payload != null) {
+				var own = this.localSaveSlots.getEntry(id, owner);
+				var guestIsNewer:Boolean = (own == null)
+					|| io.newgrounds.helpers.DateTimeHelper.parseIso(guest.datetime) > io.newgrounds.helpers.DateTimeHelper.parseIso(own.datetime);
+				// Keep the guest copy if it can't be moved, rather than losing it.
+				if (guestIsNewer && !this.localSaveSlots.writeEntry(id, payload, owner, guest.datetime)) continue;
+			}
+
+			this.localSaveSlots.deleteEntry(id, null);
+		}
+	}
+
+	/** The current owner's local save data for one slot, or null. Used by SaveSlot.loadDataRaw() and keepLocal(). */
+	public function readLocalSlotData(id:Number):String {
+		return this.localSaveSlots.getPayload(id, this.getLocalSlotOwner());
+	}
+
+	/**
+	 * The current owner's local copy of one slot, as {size, datetime}, or null if
+	 * there is none. Used by SaveSlot.getLocalCopy().
+	 */
+	public function getLocalSlotEntry(id:Number):Object {
+		var entry:Object = this.localSaveSlots.getEntry(id, this.getLocalSlotOwner());
+		return (entry == null) ? null : {size: entry.size, datetime: entry.datetime};
+	}
+
+	/**
+	 * Stores one slot's local copy for the current owner, returning whether it was
+	 * written. Used for the local leg of a save, the cache of a cloud load, and
+	 * re-stamping a save the cloud accepted.
+	 *
+	 * @param datetime ISO 8601 stamp for the copy. Optional, defaults to now. Pass
+	 *        the cloud's own datetime when caching a cloud load.
+	 */
+	public function writeLocalSlotData(id:Number, data:String, datetime:String):Boolean {
+		if (datetime == undefined) datetime = null;
+		return this.localSaveSlots.writeEntry(id, data, this.getLocalSlotOwner(), datetime);
+	}
+
+	/** Drops the current owner's local copy of one slot. Used by SaveSlot.clearData() and keepCloud(). */
+	public function clearLocalSlotData(id:Number):Boolean {
+		return this.localSaveSlots.deleteEntry(id, this.getLocalSlotOwner());
 	}
 }
