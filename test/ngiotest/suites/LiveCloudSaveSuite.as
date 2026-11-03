@@ -3,11 +3,13 @@
  *
  * Writes to a cloud save slot, reads it back over HTTP, and clears it.
  *
- * NOTE ON DEBUG MODE: unlike medals and scores, it is not certain that cloud
- * saves honour debug mode server-side. This suite therefore treats slot
- * TestConfig.TEST_SAVE_SLOT_ID as genuinely writable and restores it to empty at
- * the end. Point TEST_SAVE_SLOT_ID at a scratch slot, never one holding data you
- * care about.
+ * NOTE ON DEBUG MODE: the gateway never writes a cloud save in debug mode, so a
+ * round trip under TestConfig.USE_DEBUG_MODE would read back whatever the slot
+ * held before. This suite turns debug mode off for its own run, writes for real
+ * to TestConfig.TEST_SAVE_SLOT_ID and TEST_SAVE_SLOT_ID_ALT, and empties both in
+ * tearDown. Point those at scratch slots, never ones holding data you care
+ * about. One test switches debug mode back on to check that a debug write
+ * leaves the slot alone.
  *
  * The read-back is a plain HTTP GET against the returned url, so it is also the
  * only live test that exercises a non-gateway request. In AS2 that goes through
@@ -25,13 +27,27 @@ class ngiotest.suites.LiveCloudSaveSuite extends ngiotest.LiveSuite {
 	/** Payload written by the save test and checked by the load test */
 	private var writtenPayload:String;
 
+	/** The Core's debug mode before setUp turned it off, put back in tearDown */
+	private var savedDebugMode:Boolean;
+
 	public function LiveCloudSaveSuite() {
 		super();
 		this.writtenPayload = null;
+		this.savedDebugMode = false;
 	}
 
 	public function getSuiteName():String {
 		return "Live / Cloud saves";
+	}
+
+	public function setUp(done:Function):Void {
+		var self:ngiotest.suites.LiveCloudSaveSuite = this;
+
+		super.setUp(function():Void {
+			self.savedDebugMode = self.getCore().useDebugMode;
+			self.getCore().useDebugMode = false;
+			done.call(null);
+		});
 	}
 
 	public function build():Void {
@@ -111,6 +127,54 @@ class ngiotest.suites.LiveCloudSaveSuite extends ngiotest.LiveSuite {
 					t.assertEquals(self.writtenPayload, data, "round-tripped exactly what was written");
 				}
 				t.done();
+			}, null);
+		});
+
+		add("a debug-mode write leaves the slot alone", function(t:ngiotest.TestContext):Void {
+			if (self.skipUnlessSignedIn(t)) {
+				return;
+			}
+
+			var slot:io.newgrounds.models.objects.SaveSlot = self.testSlot();
+			if (slot == null || !slot.hasData() || self.writtenPayload == null) {
+				t.skip("the real write above did not land, so there is nothing to compare against");
+				return;
+			}
+
+			var sizeBefore:Number = slot.size;
+			var timestampBefore:Number = slot.timestamp;
+
+			self.getCore().useDebugMode = true;
+			slot.saveDataRaw("ngio-as2-debug-write:" + new Date().getTime(), function(error):Void {
+				self.getCore().useDebugMode = false;
+
+				if (!self.assertNoError(t, error, "debug-mode saveDataRaw accepted")) {
+					t.done();
+					return;
+				}
+
+				NGIO.loadSaveSlots(function(slots:Array, reloadError):Void {
+					if (!self.assertNoError(t, reloadError, "slot list reloaded")) {
+						t.done();
+						return;
+					}
+
+					var after:io.newgrounds.models.objects.SaveSlot = self.testSlot();
+					if (!t.assertNotNull(after, "test slot present in the list")) {
+						t.done();
+						return;
+					}
+
+					t.assertEquals(sizeBefore, after.size, "size unchanged");
+					t.assertEquals(timestampBefore, after.timestamp, "save timestamp unchanged");
+
+					after.loadDataRaw(function(data:String, loadError):Void {
+						if (self.assertNoError(t, loadError, "loadDataRaw completed")) {
+							t.assertEquals(self.writtenPayload, data, "slot still holds the real write's data");
+						}
+						t.done();
+					}, null);
+				}, null);
 			}, null);
 		});
 
@@ -250,17 +314,19 @@ class ngiotest.suites.LiveCloudSaveSuite extends ngiotest.LiveSuite {
 
 	public function tearDown(done:Function):Void {
 		// Leave both scratch slots empty regardless of how the suite ended, so a
-		// failed run does not leave test data on the account.
+		// failed run does not leave test data on the account. Debug mode stays
+		// off until then, or the clears would not happen either.
 		if (!isSignedIn()) {
-			done.call(null);
+			restoreDebugMode(done);
 			return;
 		}
 
 		var self:ngiotest.suites.LiveCloudSaveSuite = this;
 
+		getCore().useDebugMode = false;
 		clearIfUsed(testSlot(), function():Void {
 			self.clearIfUsed(self.altSlot(), function():Void {
-				done.call(null);
+				self.restoreDebugMode(done);
 			});
 		});
 	}
@@ -268,6 +334,13 @@ class ngiotest.suites.LiveCloudSaveSuite extends ngiotest.LiveSuite {
 	//==================== HELPERS ====================
 	//
 	// Public because the closures above reach them through `self`.
+
+	public function restoreDebugMode(done:Function):Void {
+		if (getCore() != null) {
+			getCore().useDebugMode = this.savedDebugMode;
+		}
+		super.tearDown(done);
+	}
 
 	public function clearIfUsed(slot:io.newgrounds.models.objects.SaveSlot, next:Function):Void {
 		if (slot == null || !slot.hasData()) {

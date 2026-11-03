@@ -131,8 +131,12 @@ class ngiotest.TestConfig {
 	/** Cloud save slots configured on the test app */
 	public static var EXPECTED_SAVE_SLOT_COUNT:Number = 10;
 
-	/** Save slot the CloudSave suite writes raw text to */
-	public static var TEST_SAVE_SLOT_ID:Number = 1;
+	/**
+	 * Save slot the CloudSave suite writes raw text to. The suite writes for
+	 * real, with debug mode off, and empties the slot afterwards, so keep this
+	 * on a slot that holds nothing you want.
+	 */
+	public static var TEST_SAVE_SLOT_ID:Number = 9;
 
 	/**
 	 * A second scratch slot, used by the structured round-trip test.
@@ -145,7 +149,7 @@ class ngiotest.TestConfig {
 	 * against the *previous* test's payload on the AS3 suite. Separate slots
 	 * mean separate filenames, so the tests cannot alias each other.
 	 */
-	public static var TEST_SAVE_SLOT_ID_ALT:Number = 2;
+	public static var TEST_SAVE_SLOT_ID_ALT:Number = 10;
 
 	//==================== FAILURE DIAGNOSTICS ====================
 
