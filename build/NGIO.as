@@ -103,6 +103,7 @@ class NGIO {
 	private static var keepGuestMedalUnlocksValue:Boolean = true;
 	private static var offerGuestSavesValue:Boolean = true;
 	private static var holdGuestMedalUnlocksValue:Boolean = false;
+	private static var saveSlotCountValue:Number = 3;
 
 	//==================== OPTIONS ====================
 	//
@@ -152,6 +153,21 @@ class NGIO {
 		return offerGuestSavesValue;
 	}
 
+	/**
+	 * How many save slots this game has. Defaults to 3, which every game gets;
+	 * set it to 10 if the game uses the supporter expansion. When the slot list
+	 * can't be loaded (nobody signed in, or offline), this many slots are still
+	 * listed, so the player has somewhere to save.
+	 */
+	public static function setSaveSlotCount(value:Number):Void {
+		saveSlotCountValue = value;
+		if (core != null) core.appState.saveSlotCount = value;
+	}
+
+	public static function getSaveSlotCount():Number {
+		return saveSlotCountValue;
+	}
+
 	//==================== PUBLIC STATIC METHODS ====================
 
 	/**
@@ -177,6 +193,7 @@ class NGIO {
 		core.medalUnlockQueue.keepGuestUnlocks = keepGuestMedalUnlocksValue;
 		core.medalUnlockQueue.holdGuestUnlocks = holdGuestMedalUnlocksValue;
 		core.appState.offerGuestSaves = offerGuestSavesValue;
+		core.appState.saveSlotCount = saveSlotCountValue;
 		keepAliveInterval = io.newgrounds.helpers.NgioBootstrapHelper.startKeepAlive(KEEP_ALIVE_TIME, keepAlive);
 		medalUnlockRetryInterval = io.newgrounds.helpers.NgioBootstrapHelper.startKeepAlive(MEDAL_UNLOCK_RETRY_TIME, retryPendingMedalUnlocks);
 	}

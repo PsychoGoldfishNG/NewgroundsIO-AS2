@@ -969,6 +969,12 @@ Each player's local copies are kept separately, so on a shared computer one play
 NGIO.setOfferGuestSaves(false); // before or after init()
 ```
 
+Every game has 3 save slots, or 10 with the supporter expansion. When the cloud list can't be loaded, the library still lists that many slots, so a player who isn't signed in, or is offline, has somewhere to save. If your game has the expansion turned on, say so:
+
+```actionscript
+NGIO.setSaveSlotCount(10); // before or after init()
+```
+
 Local copies are stored in a Flash SharedObject. If a save would go past the space the player allows, Flash asks them for more, and until they agree that save is treated as not stored locally.
 
 **Conflicts:** when a slot's local copy is newer than its cloud copy and both hold a save (usually a save made offline), the slot's `source` is `"conflict"`. Loading it returns the local copy. The library never picks one for the player, so ask them, and tell them that keeping the local save replaces the cloud one:

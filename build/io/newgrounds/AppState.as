@@ -76,6 +76,14 @@ class io.newgrounds.AppState {
 	 */
 	public var offerGuestSaves:Boolean = true;
 
+	/**
+	 * How many save slots this app has: 3 for every app, or 10 for one using the
+	 * supporter expansion. Used only when no slot list comes back from the
+	 * gateway (nobody signed in, or offline), so the player still has empty slots
+	 * to save into. Set through NGIO.setSaveSlotCount().
+	 */
+	public var saveSlotCount:Number = 3;
+
 	public var host:String = "N/A";
 	public var sessionStorageKey:String = null;
 	public var session:io.newgrounds.models.objects.Session = null;
@@ -123,6 +131,7 @@ class io.newgrounds.AppState {
 		this.localSaveSlots = new io.newgrounds.LocalSaveSlotStore(core.appId);
 		this.slotListsMerged = 0;
 		this.offerGuestSaves = true;
+		this.saveSlotCount = 3;
 
 		var savedSessionId:String = io.newgrounds.helpers.AppStateBootstrapHelper.getSavedSessionId(this.sessionStorageKey);
 
@@ -588,13 +597,46 @@ class io.newgrounds.AppState {
 	public function mergeWithoutCloudList():Void {
 		if (this.saveSlots == null) {
 			this.applySlotList(null);
-			return;
+		} else {
+			var known:Array = [];
+			for (var i:Number = 0; i < this.saveSlots.length; i++) {
+				if (this.saveSlots[i].source != "local") known.push(this.saveSlots[i]);
+			}
+			this.applySlotList(known);
 		}
-		var known:Array = [];
-		for (var i:Number = 0; i < this.saveSlots.length; i++) {
-			if (this.saveSlots[i].source != "local") known.push(this.saveSlots[i]);
+		this.addEmptySlots();
+	}
+
+	/**
+	 * Lists an empty slot for every id up to saveSlotCount that has none yet. A
+	 * guest, or a player who starts offline, otherwise has only the slots this
+	 * device already holds a copy of, and nowhere to make a first save. Each one
+	 * describes the (empty) local copy, since nothing is known about the cloud's.
+	 */
+	private function addEmptySlots():Void {
+		var added:Array = [];
+		for (var id:Number = 1; id <= this.saveSlotCount; id++) {
+			if (this.findCachedSlot(id) != null) continue;
+			var slot = io.newgrounds.models.objects.ObjectFactory.CreateObject("SaveSlot", {
+				id: id,
+				size: 0,
+				datetime: null,
+				timestamp: 0,
+				url: null
+			}, this.core);
+			if (slot == null || slot == undefined) continue;
+			slot.source = "local";
+			added.push(slot);
 		}
-		this.applySlotList(known);
+		if (added.length == 0) return;
+
+		if (this.saveSlots == null) {
+			this.saveSlots = added;
+			this.markLoaded("saveSlots");
+		} else {
+			for (var j:Number = 0; j < added.length; j++) this.saveSlots.push(added[j]);
+			this.saveSlots.sortOn("id", Array.NUMERIC);
+		}
 	}
 
 	private function findCachedSlot(id:Number) {

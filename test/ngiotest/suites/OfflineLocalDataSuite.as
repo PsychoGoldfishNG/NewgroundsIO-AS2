@@ -311,6 +311,53 @@ class ngiotest.suites.OfflineLocalDataSuite extends ngiotest.TestSuite {
 			}, null);
 		});
 
+		add("gives a fresh guest saveSlotCount empty slots to save into", function(t:ngiotest.TestContext):Void {
+			self.resetStore();
+			var core:io.newgrounds.Core = new io.newgrounds.Core(appId, ngiotest.TestConfig.ENCRYPTION_KEY, null, false);
+			core.requestHandler = function(request:String, respond:Function):Void {};
+			core.appState.loadData(["saveSlots"], function(appState, error):Void {
+				t.assertEquals(3, core.appState.saveSlots.length, "three slots by default");
+				for (var i:Number = 0; i < core.appState.saveSlots.length; i++) {
+					var slot = core.appState.saveSlots[i];
+					t.assertEquals("local", slot.source, "slot " + slot.id + " describes the local copy");
+					t.assertFalse(slot.hasData(), "slot " + slot.id + " is empty");
+				}
+				t.assertTrue(core.appState.hasLoaded("saveSlots"), "marked loaded");
+				t.done();
+			}, null);
+		});
+
+		add("lists as many empty slots as saveSlotCount says, around a guest copy", function(t:ngiotest.TestContext):Void {
+			self.resetStore();
+			self.seedLocal(4, "guest-save", newerTime, null);
+			var core:io.newgrounds.Core = new io.newgrounds.Core(appId, ngiotest.TestConfig.ENCRYPTION_KEY, null, false);
+			core.appState.saveSlotCount = 10;
+			core.requestHandler = function(request:String, respond:Function):Void {};
+			core.appState.loadData(["saveSlots"], function(appState, error):Void {
+				t.assertEquals(10, core.appState.saveSlots.length, "ten slots");
+				t.assertEquals(4, core.appState.saveSlots[3].id, "kept in id order");
+				t.assertTrue(self.slotById(core, 4).hasData(), "the guest copy is still there");
+				t.assertFalse(self.slotById(core, 5).hasData(), "the rest are empty");
+				t.done();
+			}, null);
+		});
+
+		add("fills the empty slots in place once the cloud list arrives", function(t:ngiotest.TestContext):Void {
+			self.resetStore();
+			var core:io.newgrounds.Core = self.signedInCore(1);
+			core.requestHandler = function(request:String, respond:Function):Void {
+				respond(0, null);
+			};
+			core.appState.loadData(["saveSlots"], function(appState, error):Void {
+				var placeholder = self.slotById(core, 2);
+				core.appState.applySlotListResult([self.cloudSlot(core, 1, null), self.cloudSlot(core, 2, cloudTime), self.cloudSlot(core, 3, null)]);
+				t.assertTrue(self.slotById(core, 2) === placeholder, "the same slot");
+				t.assertEquals("cloud", placeholder.source, "now the cloud copy");
+				t.assertTrue(placeholder.hasData(), "holds the cloud save");
+				t.done();
+			}, null);
+		});
+
 		add("never shows one player's local copy to another", function(t:ngiotest.TestContext):Void {
 			self.resetStore();
 			self.seedLocal(1, "player-two-save", newerTime, 2);
