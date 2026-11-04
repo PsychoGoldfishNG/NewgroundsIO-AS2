@@ -499,11 +499,54 @@ class ngiotest.suites.OfflineLocalDataSuite extends ngiotest.TestSuite {
 				respond(0, null);
 			};
 			self.slotById(core, 1).saveDataRaw("offline-payload", function(error):Void {
+				var slot = self.slotById(core, 1);
 				t.assertNull(error, "reported as saved");
-				t.assertEquals("local", self.slotById(core, 1).source, "flagged as local");
+				t.assertEquals("local", slot.source, "flagged as local");
 				t.assertEquals("offline-payload", self.memory[self.localKey(1) + ":slot:1"], "in the player's own copies");
+				t.assertTrue(slot.hasData(), "describes the save just made, not the empty slot");
+				t.assertEquals("offline-payload".length, slot.size, "the local copy's size");
+				t.assertEquals(slot.getLocalCopy().datetime, slot.datetime, "the local copy's datetime");
+				t.assertNull(slot.url, "no url");
 				t.done();
 			}, null);
+		});
+
+		add("a clear that only reaches the local copy reads as empty straight away", function(t:ngiotest.TestContext):Void {
+			self.resetStore();
+			self.seedLocal(1, "to-be-cleared", newerTime, 1);
+			var core:io.newgrounds.Core = self.signedInCore(1);
+			core.appState.applySlotListResult([self.cloudSlot(core, 1, null)]);
+			t.assertTrue(self.slotById(core, 1).hasData(), "starts with the local save");
+			core.requestHandler = function(request:String, respond:Function):Void {
+				respond(0, null);
+			};
+			self.slotById(core, 1).clearData(function(error):Void {
+				t.assertNull(error, "reported as cleared");
+				t.assertFalse(self.slotById(core, 1).hasData(), "empty");
+				t.assertNull(self.slotById(core, 1).datetime, "no datetime");
+				t.done();
+			}, null);
+		});
+
+		add("a local-only save leaves the slot alone if the player changed meanwhile", function(t:ngiotest.TestContext):Void {
+			self.resetStore();
+			var core:io.newgrounds.Core = self.signedInCore(1);
+			core.appState.applySlotListResult([self.cloudSlot(core, 1, null)]);
+			var reply:Function = null;
+			core.requestHandler = function(request:String, respond:Function):Void {
+				reply = respond;
+			};
+			var slot = self.slotById(core, 1);
+			slot.saveDataRaw("player-one", function(error):Void {
+				t.assertNull(error, "still reported as saved");
+				t.assertFalse(slot.hasData(), "not described as the new player's");
+				t.done();
+			}, null);
+			var other:io.newgrounds.models.objects.User = new io.newgrounds.models.objects.User();
+			other.id = 2;
+			other.name = "Player 2";
+			core.appState.session.user = other;
+			if (t.assertNotNull(reply, "the request went out")) reply(0, null);
 		});
 
 		add("a save the cloud accepted is stamped with the cloud's datetime", function(t:ngiotest.TestContext):Void {
