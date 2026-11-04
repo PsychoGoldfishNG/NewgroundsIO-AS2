@@ -78,6 +78,13 @@ class io.newgrounds.helpers.HttpRequestHelper {
 			}
 
 			var encryptedObject:String = executeModel.core.encryptObject(executeObject);
+			// Never send { secure: null }: the gateway can't read it, and its reply
+			// ("Missing required component") points nowhere near the cause.
+			// Core.sendRequest() catches this and fails the request.
+			if (encryptedObject == null || encryptedObject == undefined) {
+				var reason:String = executeModel.core.describeEncryptionProblem();
+				throw new Error("A secure component couldn't be encrypted, so the request wasn't sent." + (reason != null ? " " + reason : ""));
+			}
 			return { secure: encryptedObject };
 		}
 

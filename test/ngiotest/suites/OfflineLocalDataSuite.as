@@ -149,6 +149,28 @@ class ngiotest.suites.OfflineLocalDataSuite extends ngiotest.TestSuite {
 			}, null);
 		});
 
+		add("doesn't send an unlock it can't encrypt, and keeps it for a retry", function(t:ngiotest.TestContext):Void {
+			self.resetStore();
+			// No key at all: the one way RC4 encryption comes back null.
+			var core:io.newgrounds.Core = new io.newgrounds.Core(appId, "", null, false);
+			core.appState.session.id = "session-1";
+			var user:io.newgrounds.models.objects.User = new io.newgrounds.models.objects.User();
+			user.id = 1;
+			core.appState.session.user = user;
+			var sent:Number = 0;
+			core.requestHandler = function(request:String, respond:Function):Void {
+				sent++;
+			};
+			core.medalUnlockQueue.unlock([5], function(outcomes:Array):Void {
+				t.assertEquals(0, sent, "nothing sent");
+				if (t.assertNotNull(outcomes[0].error, "an error")) {
+					t.assertEquals(201, outcomes[0].error.code, "INVALID_ENCRYPTION");
+				}
+				t.assertEquals("5", core.medalUnlockQueue.getPendingIds().join(","), "kept for a retry");
+				t.done();
+			}, null);
+		});
+
 		add("never sends one player's unlock for another", function(t:ngiotest.TestContext):Void {
 			self.resetStore();
 			self.memory["ngio-pending-medal-unlocks-for-" + appId] = io.newgrounds.encoders.JSON.encode([{id: 5, user: 2}]);

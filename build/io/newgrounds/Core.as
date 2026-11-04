@@ -346,6 +346,18 @@ class io.newgrounds.Core {
 	 * @param obj The plain object to encrypt
 	 * @return The encrypted data encoded as Base64 string
 	 */
+	/**
+	 * Why encryption can't run with this Core's key, or null if it can. The
+	 * request serializer adds it to the error when encryptObject() fails. RC4
+	 * takes a key of any length, so the only problem here is a missing one.
+	 */
+	public function describeEncryptionProblem():String {
+		if (this._encryptionKey == null || this._encryptionKey == undefined || this._encryptionKey.length == 0) {
+			return "No encryption key is set.";
+		}
+		return null;
+	}
+
 	public function encryptObject(obj:Object):String {
 		var jsonString:String;
 		try {
@@ -416,7 +428,21 @@ class io.newgrounds.Core {
 			}
 		}
 
-		var plainObject:Object = io.newgrounds.helpers.HttpRequestHelper.buildGatewayRequestObject(requestModel);
+		var plainObject:Object;
+		try {
+			plainObject = io.newgrounds.helpers.HttpRequestHelper.buildGatewayRequestObject(requestModel);
+		} catch (serializeError) {
+			// A secure component couldn't be encrypted. Nothing is sent, and the
+			// caller gets the same shape a dropped connection produces, so nothing
+			// reads this as the gateway ruling on a component: the medal queue keeps
+			// the unlock, and a save keeps its local copy.
+			var message:String = (serializeError != null && serializeError.message != undefined) ? serializeError.message : String(serializeError);
+			var failed = io.newgrounds.models.objects.ObjectFactory.CreateObject("Response", null, this);
+			failed.error = io.newgrounds.Errors.getError(io.newgrounds.Errors.INVALID_ENCRYPTION, message, true);
+			this.reportNetworkActivity("error", message);
+			if (callback != null && callback != undefined) callback.call(thisArg, failed);
+			return;
+		}
 		var requestString:String = io.newgrounds.encoders.JSON.encode(plainObject);
 
 		if (openInBrowser) {
