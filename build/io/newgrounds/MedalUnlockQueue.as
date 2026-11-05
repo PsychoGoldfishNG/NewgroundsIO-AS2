@@ -23,6 +23,7 @@
  */
 import io.newgrounds.Core;
 import io.newgrounds.Errors;
+import io.newgrounds.MedalUnlockStatus;
 import io.newgrounds.encoders.JSON;
 import io.newgrounds.helpers.LocalStorageHelper;
 import io.newgrounds.models.objects.Response;
@@ -37,6 +38,12 @@ class io.newgrounds.MedalUnlockQueue {
 	 * anything already in flight instead of sending it twice.
 	 */
 	public var inFlight:Object;
+
+	/**
+	 * Told about every retry pass that sent anything, as {listener, thisArg}.
+	 * Public only so retryPending()'s closure can reach it.
+	 */
+	public var retryListeners:Array;
 
 	/**
 	 * Whether an unlock attempted while nobody is signed in is kept and sent
@@ -59,8 +66,9 @@ class io.newgrounds.MedalUnlockQueue {
 		// the same host share their local storage.
 		this.storageKey = "ngio-pending-medal-unlocks-for-" + core.appId;
 		// Set here, not at the declarations: a declared default lives on the
-		// prototype, and inFlight is mutated.
+		// prototype, and inFlight and retryListeners are mutated.
 		this.inFlight = {};
+		this.retryListeners = [];
 		this.keepGuestUnlocks = true;
 		this.holdGuestUnlocks = false;
 	}
@@ -167,8 +175,8 @@ class io.newgrounds.MedalUnlockQueue {
 	 *
 	 * @param ids Medal ids to unlock
 	 * @param callback Called once every id has an answer, as callback(outcomes),
-	 *        where each outcome is {id, medal, error}. error is null on success,
-	 *        and is the only reliable success signal.
+	 *        where each outcome is {id, medal, error, status}. status is a
+	 *        MedalUnlockStatus value, and error is null exactly when it's UNLOCKED.
 	 * @param thisArg Context for the callback
 	 */
 	public function unlock(ids:Array, callback:Function, thisArg):Void {
@@ -204,8 +212,18 @@ class io.newgrounds.MedalUnlockQueue {
 	 *
 	 * Never throws. A failed pass is exactly the "still can't reach the gateway"
 	 * case this exists for, and one bad pass mustn't stop the next.
+	 *
+	 * @param callback Optional. Called as callback(outcomes) once this pass is
+	 *        done, or with an empty list when nothing was waiting. Retry listeners
+	 *        hear about the pass too, but only when it sent something.
+	 * @param thisArg Context for the callback
 	 */
-	public function retryPending():Void {
+	public function retryPending(callback:Function, thisArg):Void {
+		if (callback == undefined) callback = null;
+		if (thisArg == undefined) thisArg = null;
+
+		var pending:Array = [];
+		var user = null;
 		try {
 			var entries:Array = this.readEntries();
 			var i:Number;
@@ -220,8 +238,7 @@ class io.newgrounds.MedalUnlockQueue {
 				}
 			}
 
-			var user = this.currentUserId();
-			var pending:Array = [];
+			user = this.currentUserId();
 			for (i = 0; i < entries.length; i++) {
 				var entry:Object = entries[i];
 				var owner:Boolean = (entry.user === null)
@@ -233,11 +250,50 @@ class io.newgrounds.MedalUnlockQueue {
 					pending.push(entry.id);
 				}
 			}
-			if (pending.length == 0) return;
-			this.send(pending, user, null, null);
 		} catch (e) {
 			// See above: a retry pass never passes a failure on.
+			pending = [];
 		}
+
+		if (pending.length == 0) {
+			if (callback != null) callback.call(thisArg, []);
+			return;
+		}
+		var self = this;
+		this.send(pending, user, function(outcomes:Array):Void {
+			if (callback != null) callback.call(thisArg, outcomes);
+			// A copy, so a listener that removes itself doesn't skip the next one.
+			var listeners:Array = self.retryListeners.concat();
+			for (var j:Number = 0; j < listeners.length; j++) {
+				listeners[j].listener.call(listeners[j].thisArg, outcomes);
+			}
+		}, null);
+	}
+
+	/**
+	 * Adds a listener for retry passes: every pass that sent anything, whether
+	 * the interval or the game started it, calls listener(outcomes) once all the
+	 * answers are in. This is how a game hears that a medal earned offline has
+	 * now unlocked. Adding the same listener and thisArg twice does nothing more.
+	 */
+	public function addRetryListener(listener:Function, thisArg):Void {
+		if (thisArg == undefined) thisArg = null;
+		if (this.retryListenerIndex(listener, thisArg) != -1) return;
+		this.retryListeners.push({listener: listener, thisArg: thisArg});
+	}
+
+	/** Removes a listener added with the same listener and thisArg. */
+	public function removeRetryListener(listener:Function, thisArg):Void {
+		if (thisArg == undefined) thisArg = null;
+		var index:Number = this.retryListenerIndex(listener, thisArg);
+		if (index != -1) this.retryListeners.splice(index, 1);
+	}
+
+	public function retryListenerIndex(listener:Function, thisArg):Number {
+		for (var i:Number = 0; i < this.retryListeners.length; i++) {
+			if (this.retryListeners[i].listener === listener && this.retryListeners[i].thisArg === thisArg) return i;
+		}
+		return -1;
 	}
 
 	//==================== INTERNAL ====================
@@ -277,8 +333,32 @@ class io.newgrounds.MedalUnlockQueue {
 				// change that, so drop it whether the answer was yes or no.
 				self.removePending(id, user);
 			}
-			finish({id: outcome.id, medal: outcome.medal, error: outcome.error});
+			finish({id: outcome.id, medal: outcome.medal, error: outcome.error, status: self.statusFor(outcome, user)});
 		});
+	}
+
+	/**
+	 * Where an answered attempt left the medal. Ruled on: unlocked or rejected.
+	 * Not ruled on: whatever the buffer still holds for it. An entry for the
+	 * player it was sent for, or a guest entry (a retry pass sends those for
+	 * whoever is signed in), means it will be tried again; a guest entry under
+	 * holdGuestUnlocks waits for a claim instead.
+	 */
+	public function statusFor(outcome:Object, user):String {
+		if (outcome.adjudicated) {
+			return (outcome.error == null) ? io.newgrounds.MedalUnlockStatus.UNLOCKED : io.newgrounds.MedalUnlockStatus.REJECTED;
+		}
+		var entries:Array = this.readEntries();
+		for (var i:Number = 0; i < entries.length; i++) {
+			var entry:Object = entries[i];
+			if (entry.id == outcome.id && (entry.user === null || io.newgrounds.MedalUnlockQueue.sameUser(entry.user, user))) {
+				if (entry.user === null && (user === null || user === undefined) && this.holdGuestUnlocks) {
+					return io.newgrounds.MedalUnlockStatus.HELD;
+				}
+				return io.newgrounds.MedalUnlockStatus.PENDING;
+			}
+		}
+		return io.newgrounds.MedalUnlockStatus.DROPPED;
 	}
 
 	/** The signed-in player's user id, or null when nobody is signed in. */

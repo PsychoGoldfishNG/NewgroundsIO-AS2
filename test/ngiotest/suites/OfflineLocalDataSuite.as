@@ -16,6 +16,7 @@
  */
 import io.newgrounds.Core;
 import io.newgrounds.Errors;
+import io.newgrounds.MedalUnlockStatus;
 import io.newgrounds.encoders.JSON;
 import io.newgrounds.helpers.DateTimeHelper;
 import io.newgrounds.helpers.LocalStorageHelper;
@@ -272,6 +273,97 @@ class ngiotest.suites.OfflineLocalDataSuite extends ngiotest.TestSuite {
 			core.medalUnlockQueue.discardGuestUnlocks([5]);
 			t.assertEquals("6", core.medalUnlockQueue.getGuestIds().join(","), "only 6 is left as a guest entry");
 			t.assertEquals("5,6", core.medalUnlockQueue.getPendingIds().join(","), "player 2's 5 is untouched");
+			t.done();
+		});
+
+		//==================== OUTCOME STATUS ====================
+
+		add("reports an accepted unlock as unlocked, and a refused medal as rejected", function(t:ngiotest.TestContext):Void {
+			self.resetStore();
+			var core:io.newgrounds.Core = self.signedInCore(1);
+			self.answerAll(core, self.unlockReply(true, 0));
+			core.medalUnlockQueue.unlock([5], function(outcomes:Array):Void {
+				t.assertEquals(io.newgrounds.MedalUnlockStatus.UNLOCKED, outcomes[0].status, "unlocked");
+				self.answerAll(core, self.unlockReply(false, io.newgrounds.Errors.INVALID_MEDAL_ID));
+				core.medalUnlockQueue.unlock([6], function(refused:Array):Void {
+					t.assertEquals(io.newgrounds.MedalUnlockStatus.REJECTED, refused[0].status, "rejected");
+					t.done();
+				}, null);
+			}, null);
+		});
+
+		add("reports an unanswered unlock as pending", function(t:ngiotest.TestContext):Void {
+			self.resetStore();
+			var core:io.newgrounds.Core = self.signedInCore(1);
+			core.requestHandler = function(request:String, respond:Function):Void {
+				respond(0, null);
+			};
+			core.medalUnlockQueue.unlock([5], function(outcomes:Array):Void {
+				t.assertEquals(io.newgrounds.MedalUnlockStatus.PENDING, outcomes[0].status, "pending");
+				t.done();
+			}, null);
+		});
+
+		add("reports a guest's unlock as pending, held or dropped, by setting", function(t:ngiotest.TestContext):Void {
+			self.resetStore();
+			var core:io.newgrounds.Core = new io.newgrounds.Core(appId, ngiotest.TestConfig.ENCRYPTION_KEY, null, false);
+			core.appState.session.id = "guest-session";
+			core.medalUnlockQueue.unlock([5], function(kept:Array):Void {
+				t.assertEquals(io.newgrounds.MedalUnlockStatus.PENDING, kept[0].status, "kept for the next sign-in");
+				core.medalUnlockQueue.holdGuestUnlocks = true;
+				core.medalUnlockQueue.unlock([6], function(held:Array):Void {
+					t.assertEquals(io.newgrounds.MedalUnlockStatus.HELD, held[0].status, "held for a claim");
+					core.medalUnlockQueue.keepGuestUnlocks = false;
+					core.medalUnlockQueue.unlock([7], function(dropped:Array):Void {
+						t.assertEquals(io.newgrounds.MedalUnlockStatus.DROPPED, dropped[0].status, "not kept");
+						t.done();
+					}, null);
+				}, null);
+			}, null);
+		});
+
+		//==================== HEARING ABOUT RETRIES ====================
+
+		add("hands a retry pass's outcomes to its callback, or an empty list", function(t:ngiotest.TestContext):Void {
+			self.resetStore();
+			var core:io.newgrounds.Core = self.signedInCore(1);
+			self.answerAll(core, self.unlockReply(true, 0));
+			core.medalUnlockQueue.retryPending(function(empty:Array):Void {
+				t.assertEquals(0, empty.length, "nothing was waiting");
+				self.memory["ngio-pending-medal-unlocks-for-" + appId] = io.newgrounds.encoders.JSON.encode([{id: 5, user: 1}]);
+				core.medalUnlockQueue.retryPending(function(outcomes:Array):Void {
+					t.assertEquals(1, outcomes.length, "one sent");
+					t.assertEquals(io.newgrounds.MedalUnlockStatus.UNLOCKED, outcomes[0].status, "and it unlocked");
+					t.done();
+				}, null);
+			}, null);
+		});
+
+		add("tells retry listeners about passes that sent something, until removed", function(t:ngiotest.TestContext):Void {
+			self.resetStore();
+			var core:io.newgrounds.Core = self.signedInCore(1);
+			self.answerAll(core, self.unlockReply(true, 0));
+			var heard:Array = [];
+			var context:Object = {};
+			var listener:Function = function(outcomes:Array):Void {
+				t.assert(this === context, "called with its thisArg");
+				heard.push(outcomes);
+			};
+			core.medalUnlockQueue.addRetryListener(listener, context);
+			core.medalUnlockQueue.addRetryListener(listener, context);
+
+			core.medalUnlockQueue.retryPending(null, null);
+			t.assertEquals(0, heard.length, "not for a pass with nothing to send");
+
+			self.memory["ngio-pending-medal-unlocks-for-" + appId] = io.newgrounds.encoders.JSON.encode([{id: 5, user: 1}]);
+			core.medalUnlockQueue.retryPending(null, null);
+			t.assertEquals(1, heard.length, "once, though added twice");
+			t.assertEquals(io.newgrounds.MedalUnlockStatus.UNLOCKED, heard[0][0].status, "with the outcomes");
+
+			core.medalUnlockQueue.removeRetryListener(listener, context);
+			self.memory["ngio-pending-medal-unlocks-for-" + appId] = io.newgrounds.encoders.JSON.encode([{id: 6, user: 1}]);
+			core.medalUnlockQueue.retryPending(null, null);
+			t.assertEquals(1, heard.length, "not after it's removed");
 			t.done();
 		});
 

@@ -204,12 +204,39 @@ class NGIO {
 	 * init() already runs this on an interval, the same way it runs keepAlive().
 	 * It's public for the same reason keepAlive() is: a game can also call it when
 	 * it knows the connection is back. See io.newgrounds.MedalUnlockQueue.
+	 *
+	 * @param callback Optional. Called as callback(outcomes) with this pass's
+	 *        outcomes, or an empty list when nothing was waiting. Each outcome's
+	 *        status (an io.newgrounds.MedalUnlockStatus value) says whether that
+	 *        medal unlocked.
+	 * @param thisArg Context for the callback
 	 */
-	public static function retryPendingMedalUnlocks():Void {
+	public static function retryPendingMedalUnlocks(callback:Function, thisArg):Void {
 		if (core == null) {
 			throw new Error("Core not initialized");
 		}
-		core.medalUnlockQueue.retryPending();
+		core.medalUnlockQueue.retryPending(callback, thisArg);
+	}
+
+	/**
+	 * Calls listener(outcomes) after every retry pass that sent anything,
+	 * including the ones init()'s interval runs. This is how a game hears that a
+	 * medal earned while the connection was down has now unlocked: look for
+	 * outcomes whose status is io.newgrounds.MedalUnlockStatus.UNLOCKED.
+	 */
+	public static function addMedalRetryListener(listener:Function, thisArg):Void {
+		if (core == null) {
+			throw new Error("Core not initialized");
+		}
+		core.medalUnlockQueue.addRetryListener(listener, thisArg);
+	}
+
+	/** Removes a listener added with addMedalRetryListener(), matched by listener and thisArg. */
+	public static function removeMedalRetryListener(listener:Function, thisArg):Void {
+		if (core == null) {
+			throw new Error("Core not initialized");
+		}
+		core.medalUnlockQueue.removeRetryListener(listener, thisArg);
 	}
 
 	/** The ids of medals unlocked while nobody was signed in, still waiting to be sent or discarded. */

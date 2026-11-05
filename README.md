@@ -839,6 +839,18 @@ Or hold them until you've asked the player whether they're theirs, which is the 
 NGIO.setHoldGuestMedalUnlocks(true); // before or after init()
 ```
 
+To hear when a medal that was waiting finally unlocks, add a retry listener after `init()`. Every outcome has a `status`, one of the `io.newgrounds.MedalUnlockStatus` values: `UNLOCKED`, `REJECTED` (the server refused that medal), `PENDING` (still waiting), `HELD` (a guest's, waiting for a claim) or `DROPPED` (not kept).
+
+```actionscript
+import io.newgrounds.MedalUnlockStatus;
+
+NGIO.addMedalRetryListener(function(outcomes:Array) {
+	for (var i:Number = 0; i < outcomes.length; i++) {
+		if (outcomes[i].status == MedalUnlockStatus.UNLOCKED) trace("Medal " + outcomes[i].id + " came through");
+	}
+}, this);
+```
+
 **Get user's total medal score (cached):**
 ```actionscript
 // Quick synchronous access - no callback needed
